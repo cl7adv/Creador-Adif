@@ -2,299 +2,265 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>QSL Caribeña - ZMR CUBA</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADIF NEON COMMAND | V8 FIXED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00eaff; /* Azul eléctrico para el neón principal */
-            --neon-pink: #ff00ff; /* Rosa neón para acentos */
-            --cuba-red: #d40000;
-            --cuba-blue: #002a8f;
-            --bg-color: #000a12; /* Fondo muy oscuro para el efecto noche */
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --bg-dark: #020205;
         }
 
-        body { 
-            margin: 0; font-family: 'Segoe UI', Arial, sans-serif;
-            /* Fondo de la cabaña con la bandera y neón nocturno */
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
-                        url('https://i.postimg.cc/k47vQh5X/qsl-caribena-neon-noche-final.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex; align-items: center; justify-content: center; min-height: 100vh;
-            color: white; /* Texto blanco para contraste con fondo oscuro */
-            overflow: hidden; /* Evitar barras de desplazamiento si el contenido es grande */
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            /* Fondo de rejilla estático para no cansar la vista */
+            background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        .container { 
-            width: 90%; max-width: 580px; padding: 40px;
-            background: rgba(0, 10, 20, 0.85); /* Fondo oscuro traslúcido para panel */
-            border-radius: 25px; 
-            border: 2px solid var(--neon-blue); /* Borde neón azul */
-            box-shadow: 0 0 40px var(--neon-blue), inset 0 0 20px rgba(0, 234, 255, 0.4); /* Sombra neón */
-            text-align: center;
-            backdrop-filter: blur(12px); /* Efecto cristal más pronunciado */
+        .terminal-container {
+            max-width: 1100px;
+            margin: 20px auto;
+            border: 2px solid var(--neon-blue);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
             position: relative;
-            animation: pulseNeon 2s infinite alternate; /* Animación de brillo neón */
+            overflow: hidden; /* Mantiene el escáner dentro del cuadro */
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
         }
 
-        @keyframes pulseNeon {
-            from { box-shadow: 0 0 30px var(--neon-blue), inset 0 0 15px rgba(0, 234, 255, 0.3); }
-            to { box-shadow: 0 0 50px var(--neon-blue), inset 0 0 25px rgba(0, 234, 255, 0.5); }
+        /* ESCÁNER CORREGIDO: Ahora está al fondo (z-index: -1) */
+        .scanner-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            box-shadow: 0 0 15px var(--neon-blue);
+            opacity: 0.3;
+            z-index: 1; 
+            animation: scanMove 6s linear infinite;
+            pointer-events: none; /* No interfiere con clics */
         }
 
-        h1 { 
-            color: var(--neon-blue); margin: 0; font-size: 2.5rem; 
-            text-shadow: 0 0 15px var(--neon-blue), 0 0 20px var(--neon-pink); /* Doble sombra neón */
-        }
-        .subtitle { 
-            color: var(--neon-pink); font-weight: bold; letter-spacing: 2px; 
-            margin-bottom: 35px; font-size: 1rem; text-shadow: 0 0 8px var(--neon-pink); 
+        @keyframes scanMove {
+            0% { top: 0%; }
+            100% { top: 100%; }
         }
 
-        input { 
-            padding: 18px; width: 75%; border: 3px solid var(--neon-pink); 
-            border-radius: 15px; font-size: 1.4rem; font-weight: bold; text-align: center;
-            text-transform: uppercase; color: var(--neon-blue); background: rgba(0,0,0,0.7);
-            outline: none; box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 5;
         }
 
-        input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        /* Contenedor de Inputs con Z-index alto */
+        .input-grid {
+            position: relative;
+            z-index: 10; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            background: rgba(10, 10, 20, 0.8);
+            padding: 25px;
+            border: 1px solid var(--neon-pink);
+            margin-bottom: 20px;
+        }
+
+        .input-box { display: flex; flex-direction: column; }
+        .label { color: var(--neon-blue); font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase; }
+        
+        input, select {
+            background: #000;
+            border: 1px solid rgba(255, 0, 255, 0.5);
+            color: var(--neon-green);
+            padding: 12px;
+            font-family: 'Roboto Mono';
+            outline: none;
+        }
+
+        input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+        .action-bar { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; position: relative; z-index: 10; }
 
         button {
-            margin-top: 30px; padding: 20px 50px; background: linear-gradient(145deg, var(--neon-blue), var(--neon-pink));
-            color: white; border: none; border-radius: 15px; font-weight: bold;
-            cursor: pointer; font-size: 1.2rem; box-shadow: 0 5px 0 rgba(0, 234, 255, 0.5); 
-            transition: all 0.2s ease-in-out;
+            padding: 15px 25px;
+            font-family: 'Orbitron';
+            background: #000;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        button:active { transform: translateY(5px); box-shadow: 0 2px 0 rgba(0, 234, 255, 0.5); }
-        
-        /* Barra de Progreso con Efecto Neón */
-        .progress-box { width: 100%; height: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 40px; display: none; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        .fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue)); border-radius: 10px; box-shadow: 0 0 15px var(--neon-blue); }
+        button:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
 
-        #status { margin-top:15px; font-size:1rem; color:var(--neon-pink); font-weight:bold; text-shadow: 0 0 5px var(--neon-pink); }
-        #errorArea { margin-top: 25px; font-weight: bold; color: var(--cuba-red); font-size: 1.1rem; text-shadow: 0 0 5px var(--cuba-red); }
-
-        /* Estilo del Modal - Galería de QSLs */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; padding: 20px; }
-        .modal-content { 
-            background: rgba(0, 10, 20, 0.9); 
-            max-width: 900px; margin: 40px auto; padding: 30px; border-radius: 20px; 
-            border: 2px solid var(--neon-blue); text-align: center;
-            box-shadow: 0 0 40px var(--neon-blue);
-            backdrop-filter: blur(10px);
+        /* Tabla Organizada */
+        .table-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--neon-green);
+            max-height: 350px;
+            overflow-y: auto;
         }
-        .qsl-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(0, 234, 255, 0.3); }
-        .qsl-card img { width: 100%; border-radius: 10px; border: 2px solid var(--neon-pink); }
-        .dl-link { 
-            display: inline-block; margin-top: 15px; padding: 12px 25px; 
-            background: linear-gradient(45deg, var(--cuba-red), var(--cuba-blue)); 
-            color: white; text-decoration: none; border-radius: 10px; font-weight: bold; 
-            font-size: 0.95rem; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-            box-shadow: 0 3px 0 rgba(0, 234, 255, 0.3); transition: 0.2s;
-        }
-        .dl-link:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(0, 234, 255, 0.5); }
 
-        footer { margin-top: 50px; font-size: 0.85rem; color: rgba(255,255,255,0.7); border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
-
-        /* Estilo para la bandera de Cuba en el pie */
-        .flag-icon { width: 25px; height: auto; vertical-align: middle; margin-left: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #111; color: var(--neon-green); padding: 12px; font-size: 0.75rem; border-bottom: 2px solid var(--neon-green); }
+        td { padding: 12px; border-bottom: 1px solid rgba(57, 255, 20, 0.1); text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🌴 QSL CARIBEÑA</h1>
-        <div class="subtitle">RADIO CLUB SANTA CRUZ DEL SUR <br> ZMR CUBA</div>
+    <div class="terminal-container">
+        <div class="scanner-line"></div>
 
-        <input type="text" id="callsign" placeholder="CALLSIGN" maxlength="10">
-        <br>
-        <button onclick="buscar()">BUSCAR MI QSL</button>
+        <h1>ADIF SYSTEM OS</h1>
 
-        <div class="progress-box" id="pBox"><div class="fill" id="pFill"></div></div>
-        <div id="status"></div>
-        
-        <div id="errorArea"></div>
+        <div class="input-grid">
+            <div class="input-box">
+                <span class="label">ESTACIÓN</span>
+                <input type="text" id="call" placeholder="CM6LK" onfocus="playBeep(440)">
+            </div>
+            <div class="input-box">
+                <span class="label">OPERADOR</span>
+                <input type="text" id="name" placeholder="NOMBRE">
+            </div>
+            <div class="input-box">
+                <span class="label">FECHA (DD-MM-AA)</span>
+                <input type="text" id="date" placeholder="03-01-26">
+            </div>
+            <div class="input-box">
+                <span class="label">HORA</span>
+                <input type="text" id="time" placeholder="12:00">
+            </div>
+            <div class="input-box">
+                <span class="label">BANDA</span>
+                <input type="text" id="band" placeholder="40M">
+            </div>
+            <div class="input-box">
+                <span class="label">MODO</span>
+                <select id="mode">
+                    <option value="SSB">SSB</option>
+                    <option value="FM">FM</option>
+                    <option value="DIGITAL VOICE">DIGITAL VOICE</option>
+                    <option value="FT8">FT8</option>
+                </select>
+            </div>
+            <div class="input-box">
+                <span class="label">RST</span>
+                <input type="text" id="rst" placeholder="59">
+            </div>
+        </div>
 
-        <footer>
-            CL7ADV &bull; Alfred &bull; 2026<br>
-            Fomentando la Radioafición en el Caribe 
-            <img src="https://i.postimg.cc/k47vQh5X/qsl-caribena-neon-noche-final.jpg" alt="Bandera de Cuba" class="flag-icon" style="opacity:0">
-        </footer>
-    </div>
+        <div class="action-bar">
+            <button onclick="handleEntry()">[+] AGREGAR REGISTRO</button>
+            <button style="border-color: var(--neon-pink); color: var(--neon-pink);" onclick="exportADIF()">[V] GENERAR ADIF</button>
+        </div>
 
-    <div id="qslModal" class="modal">
-        <div class="modal-content">
-            <h2 id="modalTitle" style="color:var(--neon-blue); text-shadow:0 0 10px var(--neon-blue);"></h2>
-            <div id="qslGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:25px; margin-top:30px;"></div>
-            <button onclick="cerrarModal()" style="margin-top:40px; background:linear-gradient(145deg, var(--cuba-red), var(--cuba-blue)); box-shadow:0 5px 0 #8b0000;">CERRAR VENTANA</button>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CALL</th><th>NAME</th><th>DATE</th><th>TIME</th><th>BAND</th><th>MODE</th><th>RST</th><th>ACC</th>
+                    </tr>
+                </thead>
+                <tbody id="log-body"></tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        let resetTimer; // Variable para controlar el temporizador de reinicio
-        let isSearching = false; // Bandera para evitar búsquedas múltiples
+        let qsoList = [];
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Función para el sonido de estática
-        function playStatic() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const buf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate);
-                const out = buf.getChannelData(0);
-                for (let i = 0; i < buf.length; i++) out[i] = Math.random() * 2 - 1;
-                const src = ctx.createBufferSource();
-                src.buffer = buf;
-                const gain = ctx.createGain();
-                gain.gain.setValueAtTime(0.04, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
-                src.connect(gain); gain.connect(ctx.destination);
-                src.start();
-            } catch(e) { console.warn("AudioContext no disponible o error al reproducir audio:", e); }
+        function playBeep(freq) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        // Reinicia la página o limpia el formulario
-        function resetPage() {
-            document.getElementById('callsign').value = '';
-            document.getElementById('pBox').style.display = 'none';
-            document.getElementById('pFill').style.width = '0%';
-            document.getElementById('status').innerText = '';
-            document.getElementById('errorArea').innerText = '';
-            isSearching = false; // Restablecer la bandera de búsqueda
+        function handleEntry() {
+            const entry = {
+                call: document.getElementById('call').value.toUpperCase(),
+                name: document.getElementById('name').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                band: document.getElementById('band').value.toUpperCase(),
+                mode: document.getElementById('mode').value,
+                rst: document.getElementById('rst').value
+            };
+
+            if(!entry.call) return;
+
+            playBeep(880);
+            qsoList.push(entry);
+            renderTable();
+            clearInputs();
         }
 
-        // Función principal de búsqueda
-        async function buscar() {
-            if (isSearching) return; // Si ya está buscando, no hacer nada
-            isSearching = true; // Indicar que la búsqueda ha comenzado
-
-            const call = document.getElementById('callsign').value.trim().toUpperCase();
-            if(!call) {
-                isSearching = false; // Liberar la bandera si no hay indicativo
-                return;
-            }
-
-            clearTimeout(resetTimer); // Limpiar cualquier temporizador de reinicio anterior
-            playStatic(); // Reproducir el sonido de radio
-
-            // Limpiar resultados anteriores
-            document.getElementById('errorArea').innerText = '';
-            document.getElementById('status').innerText = '';
-            
-            const pBox = document.getElementById('pBox');
-            const pFill = document.getElementById('pFill');
-            const status = document.getElementById('status');
-            
-            pBox.style.display = 'block';
-            pFill.style.width = '0%'; // Asegurarse de que la barra esté en 0 al inicio
-            status.innerText = 'SINTONIZANDO SEÑAL CARIBEÑA...';
-
-            let p = 0;
-            const anim = setInterval(() => {
-                p += 5;
-                pFill.style.width = p + '%';
-                if (p === 40) status.innerText = 'ESCANEANDO FRECUENCIAS...';
-                if (p === 80) status.innerText = 'LOCALIZANDO QSLs EN ARCHIVOS...';
-
-                if (p >= 100) {
-                    clearInterval(anim);
-                    buscarFotos(call); // Una vez que la barra llega al 100%, buscar fotos
-                }
-            }, 70); // Velocidad de la barra de progreso
+        function renderTable() {
+            const body = document.getElementById('log-body');
+            body.innerHTML = "";
+            qsoList.forEach((q, i) => {
+                body.innerHTML += `<tr>
+                    <td style="color:var(--neon-blue)">${q.call}</td>
+                    <td>${q.name}</td>
+                    <td>${q.date}</td>
+                    <td>${q.time}</td>
+                    <td>${q.band}</td>
+                    <td>${q.mode}</td>
+                    <td>${q.rst}</td>
+                    <td><button onclick="deleteRow(${i})" style="padding:2px 5px; border-color:#ff4444; color:#ff4444; font-size:10px">X</button></td>
+                </tr>`;
+            });
         }
 
-        async function buscarFotos(call) {
-            const exts = ['jpg', 'JPG', 'png', 'PNG']; // Extensiones a buscar
-            let encontradas = [];
-            let rutasAProbar = [];
+        function clearInputs() {
+            ["call","name","date","time","band","rst"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('call').focus();
+        }
 
-            // Generar todas las rutas posibles (ej: CL7ADV.jpg, CL7ADV-1.png, etc.)
-            exts.forEach(e => {
-                rutasAProbar.push(`img/${call}.${e}`);
-                for(let i=1; i<=10; i++) rutasAProbar.push(`img/${call}-${i}.${e}`);
+        function deleteRow(i) {
+            qsoList.splice(i, 1);
+            renderTable();
+            playBeep(200);
+        }
+
+        function exportADIF() {
+            let adif = `ADIF Export V8\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+            qsoList.forEach(q => {
+                adif += `<CALL:${q.call.length}>${q.call} <QSO_DATE:${q.date.length}>${q.date} ` +
+                        `<TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
+                        `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
+                        `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
             });
 
-            // Usar Promise.all para verificar todas las imágenes en paralelo
-            await Promise.all(rutasAProbar.map(ruta => {
-                return new Promise(resolve => {
-                    const img = new Image();
-                    img.onload = () => { encontradas.push(ruta); resolve(); }; // Si carga, la añadimos
-                    img.onerror = () => resolve(); // Si no carga, simplemente resolvemos
-                    img.src = ruta + '?cache=' + new Date().getTime(); // Anti-caché
-                });
-            }));
-
-            // Ocultar barra de progreso y estado
-            document.getElementById('pBox').style.display = 'none';
-            document.getElementById('status').innerText = '';
-
-            if (encontradas.length > 0) {
-                mostrarResultados(call, [...new Set(encontradas)]); // Mostrar QSLs únicas en el modal
-            } else {
-                // Mensaje de error si no se encuentra nada
-                const errorArea = document.getElementById('errorArea');
-                errorArea.innerHTML = `
-                    <div style="color: var(--cuba-red); border: 1px solid var(--cuba-red); padding: 15px; border-radius: 10px; margin-top: 20px;">
-                        ❌ NO SE ENCONTRÓ NINGUNA QSL PARA <strong>${call}</strong>
-                        <p style="font-size: 0.9em; margin-top: 10px; color: rgba(255,255,255,0.7);">
-                            Volviendo al inicio en <span id="countdown">10</span> segundos...
-                        </p>
-                    </div>`;
-                
-                // Temporizador de cuenta atrás para el reinicio
-                let count = 10;
-                document.getElementById('countdown').innerText = count;
-                const countdownInterval = setInterval(() => {
-                    count--;
-                    document.getElementById('countdown').innerText = count;
-                    if (count <= 0) {
-                        clearInterval(countdownInterval);
-                        resetPage(); // Reiniciar al finalizar la cuenta atrás
-                    }
-                }, 1000);
-
-                resetTimer = setTimeout(() => {
-                    resetPage(); // Reinicio forzado si el contador falla
-                }, 10000);
+            const fileName = prompt("NOMBRE ARCHIVO:", "().adi");
+            if(fileName) {
+                const blob = new Blob([adif], {type: 'text/plain'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName.endsWith('.adi') ? fileName : fileName + '.adi';
+                a.click();
             }
-            isSearching = false; // La búsqueda ha terminado, liberar la bandera
         }
-
-        // Mostrar el modal con las QSLs encontradas
-        function mostrarResultados(call, fotos) {
-            const modal = document.getElementById('qslModal');
-            const grid = document.getElementById('qslGrid');
-            document.getElementById('modalTitle').innerText = `QSLs ENCONTRADAS PARA ${call}`;
-            grid.innerHTML = ''; // Limpiar el grid antes de añadir nuevas fotos
-            fotos.forEach(f => {
-                grid.innerHTML += `
-                    <div class="qsl-card">
-                        <img src="${f}" alt="QSL ${call}">
-                        <a href="${f}" download class="dl-link">DESCARGAR QSL</a>
-                    </div>`;
-            });
-            modal.style.display = 'block'; // Mostrar el modal
-
-            // Iniciar temporizador de reinicio para el modal también
-            clearTimeout(resetTimer);
-            resetTimer = setTimeout(() => {
-                cerrarModal();
-                resetPage();
-            }, 30000); // 30 segundos para revisar las QSLs
-        }
-
-        // Cerrar el modal de QSLs
-        function cerrarModal() {
-            document.getElementById('qslModal').style.display = 'none';
-            clearTimeout(resetTimer); // Detener el temporizador de reinicio del modal
-            resetPage(); // Asegurarse de que el formulario se limpia
-        }
-
-        // Evento para Enter en el input
-        document.getElementById('callsign').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                buscar();
-            }
-        });
     </script>
 </body>
 </html>
