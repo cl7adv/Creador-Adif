@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADIF PRO STATION | V5</title>
+    <title>ADIF ULTIMATE STATION | V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,52 +20,56 @@
             font-family: 'Roboto Mono', monospace;
             margin: 0;
             padding: 20px;
-            background: radial-gradient(circle at top, #101025 0%, #050508 100%);
+            background: linear-gradient(180deg, #0a0a1a 0%, #050508 100%);
         }
 
         .terminal-container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
             background: rgba(0, 0, 0, 0.95);
-            padding: 25px;
-            border-radius: 12px;
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
             text-align: center;
             color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            font-size: 2rem;
+            text-shadow: 0 0 15px var(--neon-blue);
+            font-size: 2.2rem;
             margin-bottom: 30px;
         }
 
-        /* Formulario */
+        /* Formulario Expandido */
         .input-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
             margin-bottom: 25px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(0, 243, 255, 0.03);
         }
 
         .input-box { display: flex; flex-direction: column; }
-        .label { color: var(--neon-blue); font-size: 0.7rem; margin-bottom: 5px; font-weight: bold; }
+        .label { color: var(--neon-blue); font-size: 0.65rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
         
-        input {
+        input, select {
             background: #000;
             border: 1px solid var(--neon-blue);
             color: var(--neon-green);
             padding: 10px;
             outline: none;
             font-size: 0.9rem;
+            font-family: 'Roboto Mono', monospace;
         }
 
-        /* Botones Principales */
+        select option { background: #000; color: var(--neon-green); }
+
+        /* Botones Acción */
         .action-bar {
             display: flex;
             gap: 15px;
@@ -80,16 +84,15 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 0.8rem;
             transition: 0.3s;
-            text-transform: uppercase;
         }
 
         .btn-add { border: 2px solid var(--neon-green); color: var(--neon-green); }
-        .btn-add:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
+        .btn-add:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
 
         .btn-adif { border: 2px solid var(--neon-pink); color: var(--neon-pink); }
-        .btn-adif:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 15px var(--neon-pink); }
+        .btn-adif:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 20px var(--neon-pink); }
 
-        /* Tabla Estilo Profesional */
+        /* Tabla Estilo Matrix */
         .table-container {
             width: 100%;
             max-height: 400px;
@@ -97,71 +100,58 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #111; color: var(--neon-blue); padding: 12px; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; border-bottom: 2px solid var(--neon-blue); }
+        td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.8rem; }
+        tr:hover { background: rgba(0, 243, 255, 0.05); }
 
-        th {
-            background: #111;
-            color: var(--neon-blue);
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid var(--neon-blue);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.85rem;
-        }
-
-        tr:hover { background: rgba(255, 255, 255, 0.05); }
-
-        /* Botones de fila */
         .row-btns { display: flex; gap: 5px; }
-        .edit-btn { color: var(--neon-yellow); border: 1px solid var(--neon-yellow); background: none; padding: 4px 8px; font-size: 0.6rem; }
-        .del-btn { color: #ff4444; border: 1px solid #ff4444; background: none; padding: 4px 8px; font-size: 0.6rem; }
+        .edit-btn { border: 1px solid var(--neon-yellow); color: var(--neon-yellow); padding: 3px 7px; font-size: 0.6rem; }
+        .del-btn { border: 1px solid #ff4444; color: #ff4444; padding: 3px 7px; font-size: 0.6rem; }
         .edit-btn:hover { background: var(--neon-yellow); color: #000; }
         .del-btn:hover { background: #ff4444; color: #fff; }
 
-        .status-bar {
-            margin-top: 15px;
-            text-align: right;
-            font-size: 0.7rem;
-            color: var(--neon-blue);
-            opacity: 0.7;
-        }
+        .status-info { text-align: center; color: var(--neon-blue); font-size: 0.7rem; margin-top: 15px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
     <div class="terminal-container">
-        <h1>ADIF NEON LOGGER</h1>
+        <h1>ADIF CYBER-LOGGER V6</h1>
 
         <div class="input-grid">
             <input type="hidden" id="edit-index" value="-1">
+            
             <div class="input-box">
-                <span class="label">ESTACIÓN</span>
-                <input type="text" id="call" placeholder="CM6LK">
+                <span class="label">Estación</span>
+                <input type="text" id="call" placeholder="CALLSIGN">
             </div>
             <div class="input-box">
-                <span class="label">NOMBRE</span>
-                <input type="text" id="name" placeholder="Jose Ignacio">
+                <span class="label">Nombre</span>
+                <input type="text" id="name" placeholder="OPERADOR">
             </div>
             <div class="input-box">
-                <span class="label">FECHA (03-01-26)</span>
+                <span class="label">Fecha (DD-MM-AA)</span>
                 <input type="text" id="date" placeholder="03-01-26">
             </div>
             <div class="input-box">
-                <span class="label">HORA</span>
-                <input type="text" id="time" placeholder="13:40">
+                <span class="label">Hora</span>
+                <input type="text" id="time" placeholder="12:00">
             </div>
             <div class="input-box">
-                <span class="label">BANDA</span>
-                <input type="text" id="band" placeholder="40m">
+                <span class="label">Banda</span>
+                <input type="text" id="band" placeholder="40M">
+            </div>
+            <div class="input-box">
+                <span class="label">Modo</span>
+                <select id="mode">
+                    <option value="SSB">SSB</option>
+                    <option value="FM">FM</option>
+                    <option value="DIGITAL VOICE">DIGITAL VOICE</option>
+                    <option value="FT8">FT8</option>
+                    <option value="CW">CW</option>
+                    <option value="AM">AM</option>
+                </select>
             </div>
             <div class="input-box">
                 <span class="label">RST</span>
@@ -171,27 +161,28 @@
 
         <div class="action-bar">
             <button class="btn-add" id="main-btn" onclick="handleEntry()">AGREGAR QSO</button>
-            <button class="btn-adif" onclick="prepareADIF()">CREAR ADIF</button>
+            <button class="btn-adif" onclick="exportADIF()">CREAR ADIF</button>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Estación</th>
-                        <th>Nombre</th>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Banda</th>
+                        <th>ESTACIÓN</th>
+                        <th>NOMBRE</th>
+                        <th>FECHA</th>
+                        <th>HORA</th>
+                        <th>BANDA</th>
+                        <th>MODO</th>
                         <th>RST</th>
-                        <th>Acciones</th>
+                        <th>ACCIONES</th>
                     </tr>
                 </thead>
                 <tbody id="log-body"></tbody>
             </table>
         </div>
 
-        <div class="status-bar" id="status">SISTEMA ONLINE | ESPERANDO DATOS</div>
+        <div class="status-info" id="status">SISTEMA LISTO PARA REGISTRO</div>
     </div>
 
     <script>
@@ -199,26 +190,26 @@
 
         function handleEntry() {
             const editIndex = document.getElementById('edit-index').value;
-            
             const entry = {
                 call: document.getElementById('call').value.toUpperCase(),
                 name: document.getElementById('name').value,
                 date: document.getElementById('date').value,
                 time: document.getElementById('time').value,
                 band: document.getElementById('band').value.toUpperCase(),
+                mode: document.getElementById('mode').value,
                 rst: document.getElementById('rst').value
             };
 
-            if(!entry.call) return alert("Error: El indicativo es obligatorio.");
+            if(!entry.call) return alert("ERROR: Inserte indicativo.");
 
             if(editIndex === "-1") {
                 qsoList.push(entry);
-                updateStatus(`REGISTRADO: ${entry.call}`);
+                updateStatus(`CONTACTO ${entry.call} AÑADIDO`);
             } else {
                 qsoList[editIndex] = entry;
                 document.getElementById('edit-index').value = "-1";
                 document.getElementById('main-btn').innerText = "AGREGAR QSO";
-                updateStatus(`ACTUALIZADO: ${entry.call}`);
+                updateStatus(`CONTACTO ${entry.call} ACTUALIZADO`);
             }
 
             clearInputs();
@@ -238,78 +229,66 @@
         function renderTable() {
             const body = document.getElementById('log-body');
             body.innerHTML = "";
-            
-            qsoList.forEach((item, index) => {
-                const row = `<tr>
-                    <td style="color: var(--neon-green)">${item.call}</td>
-                    <td>${item.name}</td>
-                    <td>${item.date}</td>
-                    <td>${item.time}</td>
-                    <td>${item.band}</td>
-                    <td>${item.rst}</td>
+            qsoList.forEach((q, i) => {
+                body.innerHTML += `<tr>
+                    <td style="color:var(--neon-green)">${q.call}</td>
+                    <td>${q.name}</td>
+                    <td>${q.date}</td>
+                    <td>${q.time}</td>
+                    <td>${q.band}</td>
+                    <td style="color:var(--neon-pink)">${q.mode}</td>
+                    <td>${q.rst}</td>
                     <td>
                         <div class="row-btns">
-                            <button class="edit-btn" onclick="editRow(${index})">EDITAR</button>
-                            <button class="del-btn" onclick="deleteRow(${index})">BORRAR</button>
+                            <button class="edit-btn" onclick="editRow(${i})">EDIT</button>
+                            <button class="del-btn" onclick="deleteRow(${i})">DEL</button>
                         </div>
                     </td>
                 </tr>`;
-                body.innerHTML += row;
             });
         }
 
-        function deleteRow(index) {
-            if(confirm("¿Eliminar este registro?")) {
-                qsoList.splice(index, 1);
-                renderTable();
-                updateStatus("REGISTRO ELIMINADO");
-            }
+        function deleteRow(i) {
+            qsoList.splice(i, 1);
+            renderTable();
         }
 
-        function editRow(index) {
-            const q = qsoList[index];
+        function editRow(i) {
+            const q = qsoList[i];
             document.getElementById('call').value = q.call;
             document.getElementById('name').value = q.name;
             document.getElementById('date').value = q.date;
             document.getElementById('time').value = q.time;
             document.getElementById('band').value = q.band;
+            document.getElementById('mode').value = q.mode;
             document.getElementById('rst').value = q.rst;
-            
-            document.getElementById('edit-index').value = index;
+            document.getElementById('edit-index').value = i;
             document.getElementById('main-btn').innerText = "GUARDAR CAMBIOS";
-            updateStatus(`EDITANDO: ${q.call}`);
         }
 
-        function prepareADIF() {
-            if(qsoList.length === 0) return alert("Lista vacía.");
-
-            let adif = `ADIF Export from NeonPro\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+        function exportADIF() {
+            if(qsoList.length === 0) return alert("LISTA VACÍA");
+            
+            let adif = `ADIF Export Neon V6\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
             qsoList.forEach(q => {
-                // Formateo de fecha para el estándar ADIF (AAAAMMDD)
-                const dParts = q.date.split('-');
-                const adifDate = dParts.length === 3 ? `20${dParts[2]}${dParts[1]}${dParts[0]}` : q.date;
-                const adifTime = q.time.replace(/:/g, "");
-
+                // Formato de exportación solicitado: DD-MM-AA
                 adif += `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
-                        `<QSO_DATE:8>${adifDate} <TIME_ON:${adifTime.length}>${adifTime} ` +
-                        `<BAND:${q.band.length}>${q.band} <RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
+                        `<QSO_DATE:${q.date.length}>${q.date} <TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
+                        `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
+                        `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
             });
 
-            const fileName = prompt("Nombre del archivo:", "().adi");
-            if (fileName) {
+            const fileName = prompt("NOMBRE DEL ARCHIVO:", "().adi");
+            if(fileName) {
                 const blob = new Blob([adif], {type: 'text/plain'});
-                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
+                a.href = URL.createObjectURL(blob);
                 a.download = fileName.endsWith('.adi') ? fileName : fileName + '.adi';
                 a.click();
-                updateStatus(`ARCHIVO ${fileName} GENERADO`);
             }
         }
 
-        function updateStatus(msg) {
-            document.getElementById('status').innerText = `SISTEMA: ${msg}`;
-        }
+        function updateStatus(m) { document.getElementById('status').innerText = `STATUS: ${m}`; }
     </script>
 </body>
 </html>
