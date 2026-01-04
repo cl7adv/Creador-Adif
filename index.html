@@ -3,40 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADIF NEON GENERATOR | Radioafición Pro</title>
+    <title>ADIF NEON OS | Radioafición Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
             --neon-green: #39ff14;
-            --bg-dark: #050505;
+            --bg-dark: #020205;
         }
 
+        /* Cinemática de Inicio */
+        #intro-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .scanning-line {
+            width: 100%;
+            height: 2px;
+            background: var(--neon-blue);
+            position: absolute;
+            box-shadow: 0 0 15px var(--neon-blue);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .boot-text {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            font-size: 1.2rem;
+        }
+
+        /* Estilos Base */
         body {
             background-color: var(--bg-dark);
             color: #fff;
             font-family: 'Roboto Mono', monospace;
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #050505 0%, #101020 100%);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 550px 550px, 350px 350px;
+            animation: stars 100s linear infinite;
+        }
+
+        @keyframes stars {
+            from { background-position: 0 0; }
+            to { background-position: 10000px 5000px; }
         }
 
         .cyber-panel {
             max-width: 800px;
-            margin: 20px auto;
+            margin: 50px auto;
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
             padding: 30px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            position: relative;
+            z-index: 10;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
             text-align: center;
             color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
             font-size: 2.5rem;
         }
 
@@ -47,102 +93,114 @@
             margin-bottom: 20px;
         }
 
-        input {
-            background: #111;
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-pink);
-            padding: 12px;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: transparent;
-            border: 2px solid var(--neon-green);
-            color: var(--neon-green);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: var(--neon-green);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-green);
-        }
-
-        #output {
-            margin-top: 30px;
-            background: #000;
-            padding: 20px;
-            border: 1px dashed var(--neon-blue);
-            color: var(--neon-green);
-            min-height: 100px;
-            word-break: break-all;
-            white-space: pre-wrap;
+        .input-box {
+            display: flex;
+            flex-direction: column;
         }
 
         .label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: var(--neon-blue);
             margin-bottom: 5px;
-            display: block;
+            letter-spacing: 1px;
         }
 
-        /* Animación de pulso */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        input {
+            background: rgba(20, 20, 30, 0.8);
+            border: 1px solid var(--neon-pink);
+            color: #fff;
+            padding: 12px;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: inset 0 0 5px var(--neon-pink);
         }
-        .live-tag {
-            color: var(--neon-pink);
-            animation: pulse 1.5s infinite;
-            font-size: 0.7rem;
-            text-align: center;
+
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            padding: 15px;
+            background: transparent;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.4s;
+            text-transform: uppercase;
+        }
+
+        .btn-gen { border: 2px solid var(--neon-green); color: var(--neon-green); }
+        .btn-gen:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
+
+        .btn-download { border: 2px solid var(--neon-pink); color: var(--neon-pink); }
+        .btn-download:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 20px var(--neon-pink); }
+
+        #output {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border: 1px dashed var(--neon-blue);
+            color: var(--neon-green);
+            min-height: 80px;
+            word-break: break-all;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="cyber-panel">
-        <h1>ADIF GENERATOR <small style="font-size: 0.5rem; vertical-align: middle;">V2.0</small></h1>
-        <p class="live-tag">● SISTEMA OPERATIVO DE RADIO ACTIVO</p>
+    <div id="intro-overlay">
+        <div class="scanning-line"></div>
+        <div class="boot-text" id="boot-text">ESTABLECIENDO ENLACE SATELITAL...</div>
+    </div>
 
+    <div class="cyber-panel">
+        <h1>ADIF MASTER V3</h1>
+        
         <div class="input-group">
-            <div>
-                <span class="label">INDICATIVO (CALLSIGN)</span>
-                <input type="text" id="call" placeholder="Ej: EA1ABC">
+            <div class="input-box">
+                <span class="label">CALLSIGN</span>
+                <input type="text" id="call" placeholder="EA1ABC">
             </div>
-            <div>
-                <span class="label">BANDA</span>
-                <input type="text" id="band" placeholder="Ej: 40M">
+            <div class="input-box">
+                <span class="label">BAND</span>
+                <input type="text" id="band" placeholder="40M">
             </div>
-            <div>
-                <span class="label">MODO</span>
-                <input type="text" id="mode" placeholder="Ej: FT8 / SSB">
+            <div class="input-box">
+                <span class="label">MODE</span>
+                <input type="text" id="mode" placeholder="FT8">
             </div>
-            <div>
-                <span class="label">FECHA (AAAAMMDD)</span>
+            <div class="input-box">
+                <span class="label">DATE (AAAAMMDD)</span>
                 <input type="text" id="date" placeholder="20260103">
             </div>
         </div>
 
-        <button onclick="generateADIF()">Generar Cadena ADIF</button>
+        <div class="button-container">
+            <button class="btn-gen" onclick="generateADIF()">Generar Matriz</button>
+            <button class="btn-download" onclick="downloadADIF()">Descargar .ADI</button>
+        </div>
 
-        <div id="output">Esperando datos de entrada...</div>
+        <div id="output">ESPERANDO INSTRUCCIONES...</div>
     </div>
 
     <script>
+        // Animación de Intro
+        window.addEventListener('load', () => {
+            const bootText = document.getElementById('boot-text');
+            setTimeout(() => { bootText.innerText = "SISTEMA OPERATIVO ADIF CARGADO."; }, 1000);
+            setTimeout(() => { 
+                document.getElementById('intro-overlay').style.opacity = '0';
+                setTimeout(() => { 
+                    document.getElementById('intro-overlay').style.display = 'none';
+                }, 1000);
+            }, 2500);
+        });
+
+        let currentADIF = "";
+
         function generateADIF() {
             const call = document.getElementById('call').value.toUpperCase();
             const band = document.getElementById('band').value.toUpperCase();
@@ -150,25 +208,28 @@
             const date = document.getElementById('date').value;
 
             if(!call || !band) {
-                alert("ERROR: Datos insuficientes en la matriz.");
+                alert("ERROR: MATRIZ INCOMPLETA");
                 return;
             }
 
-            // Lógica ADIF: <NOMBRE_CAMPO:LONGITUD>VALOR
-            const adif = `<CALL:${call.length}>${call} ` +
-                         `<BAND:${band.length}>${band} ` +
-                         `<MODE:${mode.length}>${mode} ` +
-                         `<QSO_DATE:${date.length}>${date} ` +
-                         `<EOR>`;
+            currentADIF = `ADIF Export\n<ADIF_VER:5>3.1.4\n<EOH>\n` +
+                          `<CALL:${call.length}>${call} <BAND:${band.length}>${band} ` +
+                          `<MODE:${mode.length}>${mode} <QSO_DATE:${date.length}>${date} <EOR>`;
 
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerText = adif;
-            
-            // Efecto de parpadeo al generar
-            outputDiv.style.boxShadow = "0 0 30px var(--neon-green)";
-            setTimeout(() => {
-                outputDiv.style.boxShadow = "none";
-            }, 500);
+            document.getElementById('output').innerText = currentADIF;
+        }
+
+        function downloadADIF() {
+            if(!currentADIF) {
+                alert("GENERA PRIMERO EL REGISTRO");
+                return;
+            }
+            const element = document.createElement('a');
+            const file = new Blob([currentADIF], {type: 'text/plain'});
+            element.href = URL.createObjectURL(file);
+            element.download = "qso_radioaficion.adi";
+            document.body.appendChild(element);
+            element.click();
         }
     </script>
 </body>
