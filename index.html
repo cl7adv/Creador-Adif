@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADIF SYSTEM | CL7ADV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ADIF COMMANDER | CL7ADV</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,16 +13,19 @@
             --bg-dark: #020205;
         }
 
+        /* --- RESET Y BASE --- */
+        * { box-sizing: border-box; }
         body {
             background-color: var(--bg-dark);
             color: #fff;
             font-family: 'Roboto Mono', monospace;
             margin: 0;
-            overflow: hidden;
+            overflow-x: hidden;
             background-image: radial-gradient(circle at center, #0a0a20 0%, #020205 100%);
+            min-height: 100vh;
         }
 
-        /* CINEMÁTICA DE ENTRADA */
+        /* --- CINEMÁTICA DE ENTRADA --- */
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -32,47 +35,47 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 1.5s ease-in-out;
+            transition: opacity 1s ease-in-out;
         }
 
         .intro-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
+            font-size: clamp(1.2rem, 5vw, 2.5rem);
             color: var(--neon-blue);
             text-shadow: 0 0 20px var(--neon-blue);
             text-align: center;
             opacity: 0;
-            transform: scale(0.8);
-            animation: introFade 4s forwards;
+            animation: introAnimation 4s forwards;
         }
 
-        @keyframes introFade {
+        @keyframes introAnimation {
+            0% { opacity: 0; transform: scale(0.8); }
             20% { opacity: 1; transform: scale(1); }
             80% { opacity: 1; transform: scale(1.05); }
             100% { opacity: 0; transform: scale(1.1); }
         }
 
-        /* MARCA DE AGUA */
+        /* --- MARCA DE AGUA --- */
         .watermark {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 10px;
+            right: 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            color: rgba(0, 243, 255, 0.2);
-            letter-spacing: 2px;
+            font-size: 0.7rem;
+            color: rgba(0, 243, 255, 0.15);
             pointer-events: none;
             z-index: 1000;
-            text-shadow: 0 0 5px var(--neon-blue);
+            text-transform: uppercase;
         }
 
-        /* CONTENEDOR PRINCIPAL */
+        /* --- CONTENEDOR PRINCIPAL --- */
         .terminal-container {
+            width: 95%;
             max-width: 1100px;
             margin: 20px auto;
             border: 1px solid var(--neon-blue);
             background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
+            padding: clamp(15px, 3vw, 30px);
             position: relative;
             box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
             opacity: 0;
@@ -86,9 +89,10 @@
             top: 0; left: 0; width: 100%; height: 2px;
             background: var(--neon-blue);
             box-shadow: 0 0 15px var(--neon-blue);
-            opacity: 0.2;
+            opacity: 0.1;
             z-index: 1;
-            animation: scanMove 8s linear infinite;
+            animation: scanMove 10s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
@@ -98,23 +102,28 @@
             text-align: center;
             color: var(--neon-blue);
             text-shadow: 0 0 10px var(--neon-blue);
+            font-size: clamp(1.2rem, 4vw, 2rem);
             margin-bottom: 25px;
         }
 
+        /* --- GRID RESPONSIVO --- */
         .input-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: 1fr; /* Móvil */
             gap: 15px;
             background: rgba(255, 255, 255, 0.03);
             padding: 20px;
             border: 1px solid rgba(0, 243, 255, 0.2);
             margin-bottom: 20px;
-            position: relative;
             z-index: 10;
+            position: relative;
         }
 
+        @media (min-width: 600px) { .input-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1000px) { .input-grid { grid-template-columns: repeat(4, 1fr); } }
+
         .input-box { display: flex; flex-direction: column; }
-        .label { color: var(--neon-blue); font-size: 0.6rem; margin-bottom: 5px; text-transform: uppercase; }
+        .label { color: var(--neon-blue); font-size: 0.65rem; margin-bottom: 5px; text-transform: uppercase; }
         
         input, select {
             background: #000;
@@ -122,9 +131,21 @@
             color: var(--neon-green);
             padding: 10px;
             outline: none;
+            font-family: 'Roboto Mono';
+            font-size: 16px; /* Evita zoom en iOS */
         }
 
-        .action-bar { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
+        input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+
+        /* --- BOTONES --- */
+        .action-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 600px) { .action-bar { flex-direction: row; justify-content: center; } }
 
         button {
             padding: 12px 25px;
@@ -134,20 +155,23 @@
             color: var(--neon-blue);
             cursor: pointer;
             transition: 0.3s;
+            text-transform: uppercase;
         }
 
         button:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
 
+        /* --- TABLA --- */
         .table-container {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid var(--neon-green);
-            max-height: 300px;
-            overflow-y: auto;
+            max-height: 350px;
+            overflow-x: auto; /* Scroll lateral en móviles */
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #111; color: var(--neon-green); padding: 10px; font-size: 0.7rem; border-bottom: 1px solid var(--neon-green); }
-        td { padding: 10px; border-bottom: 1px solid rgba(57, 255, 20, 0.1); text-align: center; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #111; color: var(--neon-green); padding: 12px; font-size: 0.7rem; border-bottom: 1px solid var(--neon-green); text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid rgba(57, 255, 20, 0.1); font-size: 0.8rem; }
+
     </style>
 </head>
 <body>
@@ -155,7 +179,7 @@
     <div id="intro-screen">
         <div class="intro-text">
             RADIOCLUB SANTA CRUZ DEL SUR<br>
-            <span style="color: var(--neon-pink); font-size: 3rem;">CL7ADV</span>
+            <span style="color: var(--neon-pink); font-size: 1.5em;">CL7ADV</span>
         </div>
     </div>
 
@@ -163,35 +187,37 @@
 
     <div class="terminal-container">
         <div class="scanner-line"></div>
-        <h1>ADIF COMMANDER V9</h1>
+        <h1>ADIF SYSTEM CL7ADV</h1>
 
         <div class="input-grid">
-            <div class="input-box"><span class="label">ESTACIÓN</span><input type="text" id="call" placeholder="CALLSIGN"></div>
-            <div class="input-box"><span class="label">NOMBRE</span><input type="text" id="name" placeholder="NOMBRE"></div>
-            <div class="input-box"><span class="label">FECHA</span><input type="text" id="date" placeholder="03-01-26"></div>
-            <div class="input-box"><span class="label">HORA</span><input type="text" id="time" placeholder="12:00"></div>
-            <div class="input-box"><span class="label">BANDA</span><input type="text" id="band" placeholder="40M"></div>
+            <input type="hidden" id="edit-index" value="-1">
+            <div class="input-box"><span class="label">Estación</span><input type="text" id="call" placeholder="CALLSIGN"></div>
+            <div class="input-box"><span class="label">Nombre</span><input type="text" id="name" placeholder="OPERADOR"></div>
+            <div class="input-box"><span class="label">Fecha (DD-MM-AA)</span><input type="text" id="date" placeholder="03-01-26"></div>
+            <div class="input-box"><span class="label">Hora</span><input type="text" id="time" placeholder="12:00"></div>
+            <div class="input-box"><span class="label">Banda</span><input type="text" id="band" placeholder="40M"></div>
             <div class="input-box">
-                <span class="label">MODO</span>
+                <span class="label">Modo</span>
                 <select id="mode">
                     <option value="SSB">SSB</option>
                     <option value="FM">FM</option>
                     <option value="DV">DIGITAL VOICE</option>
                     <option value="FT8">FT8</option>
+                    <option value="CW">CW</option>
                 </select>
             </div>
             <div class="input-box"><span class="label">RST</span><input type="text" id="rst" placeholder="59"></div>
         </div>
 
         <div class="action-bar">
-            <button onclick="handleEntry()">[+] AÑADIR QSO</button>
+            <button onclick="handleEntry()" id="btn-main">[+] AÑADIR QSO</button>
             <button style="border-color: var(--neon-pink); color: var(--neon-pink);" onclick="exportADIF()">[V] EXPORTAR ADIF</button>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>CALL</th><th>NAME</th><th>DATE</th><th>TIME</th><th>BAND</th><th>MODE</th><th>RST</th><th>CMD</th></tr>
+                    <tr><th>CALL</th><th>NOMBRE</th><th>FECHA</th><th>HORA</th><th>BANDA</th><th>MODO</th><th>RST</th><th>ACC</th></tr>
                 </thead>
                 <tbody id="log-body"></tbody>
             </table>
@@ -200,10 +226,13 @@
 
     <script>
         let qsoList = [];
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx;
 
-        // Sonido de sistema
+        // Iniciar audio al primer clic (politica navegadores)
+        document.body.addEventListener('click', () => { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }, {once: true});
+
         function playBeep(f, d=0.1) {
+            if(!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -213,13 +242,15 @@
             osc.start(); osc.stop(audioCtx.currentTime + d);
         }
 
-        // Remover intro
+        // Quitar intro
         setTimeout(() => {
-            document.getElementById('intro-screen').style.opacity = '0';
-            setTimeout(() => { document.getElementById('intro-screen').style.display = 'none'; }, 1500);
+            const intro = document.getElementById('intro-screen');
+            intro.style.opacity = '0';
+            setTimeout(() => intro.style.display = 'none', 1000);
         }, 4000);
 
         function handleEntry() {
+            const editIdx = document.getElementById('edit-index').value;
             const entry = {
                 call: document.getElementById('call').value.toUpperCase(),
                 name: document.getElementById('name').value,
@@ -229,9 +260,19 @@
                 mode: document.getElementById('mode').value,
                 rst: document.getElementById('rst').value
             };
-            if(!entry.call) return;
-            playBeep(880);
-            qsoList.push(entry);
+
+            if(!entry.call) return alert("Inserte Indicativo");
+
+            if(editIdx === "-1") {
+                qsoList.push(entry);
+                playBeep(880);
+            } else {
+                qsoList[editIdx] = entry;
+                document.getElementById('edit-index').value = "-1";
+                document.getElementById('btn-main').innerText = "[+] AÑADIR QSO";
+                playBeep(660);
+            }
+
             renderTable();
             clearInputs();
         }
@@ -244,7 +285,10 @@
                     <td style="color:var(--neon-blue)">${q.call}</td>
                     <td>${q.name}</td><td>${q.date}</td><td>${q.time}</td>
                     <td>${q.band}</td><td>${q.mode}</td><td>${q.rst}</td>
-                    <td><button onclick="deleteRow(${i})" style="padding:2px 5px; border-color:red; color:red; font-size:10px">X</button></td>
+                    <td>
+                        <button onclick="editRow(${i})" style="padding:2px 5px; border-color:var(--neon-green); color:var(--neon-green); font-size:10px">E</button>
+                        <button onclick="deleteRow(${i})" style="padding:2px 5px; border-color:red; color:red; font-size:10px">X</button>
+                    </td>
                 </tr>`;
             });
         }
@@ -256,15 +300,31 @@
 
         function deleteRow(i) { qsoList.splice(i, 1); renderTable(); playBeep(200); }
 
+        function editRow(i) {
+            const q = qsoList[i];
+            document.getElementById('call').value = q.call;
+            document.getElementById('name').value = q.name;
+            document.getElementById('date').value = q.date;
+            document.getElementById('time').value = q.time;
+            document.getElementById('band').value = q.band;
+            document.getElementById('mode').value = q.mode;
+            document.getElementById('rst').value = q.rst;
+            document.getElementById('edit-index').value = i;
+            document.getElementById('btn-main').innerText = "[V] GUARDAR";
+            window.scrollTo(0,0);
+        }
+
         function exportADIF() {
+            if(qsoList.length === 0) return alert("No hay datos");
             let adif = `ADIF Export from CL7ADV\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
             qsoList.forEach(q => {
-                adif += `<CALL:${q.call.length}>${q.call} <QSO_DATE:${q.date.length}>${q.date} ` +
-                        `<TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
+                adif += `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
+                        `<QSO_DATE:${q.date.length}>${q.date} <TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
                         `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
                         `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
             });
-            const fileName = prompt("NOMBRE ARCHIVO:", "CL7ADV_LOG.adi");
+
+            const fileName = prompt("Nombre del Log:", "CL7ADV_LOG.adi");
             if(fileName) {
                 const blob = new Blob([adif], {type: 'text/plain'});
                 const a = document.createElement('a');
