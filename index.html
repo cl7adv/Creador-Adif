@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADIF MASTER | Radioafición Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --bg-dark: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0c 100%);
+        }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            animation: fadeIn 2s ease-in;
+        }
+
+        .glitch {
+            font-size: 4rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .step-card {
+            background: var(--glass);
+            border-left: 4px solid var(--neon-pink);
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .step-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+        }
+
+        .step-number {
+            color: var(--neon-pink);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        code {
+            background: #000;
+            color: #00ff00;
+            padding: 10px;
+            display: block;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid var(--neon-blue);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.8rem;
+            color: var(--neon-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <h1 class="glitch">ADIF PROTOCOL</h1>
+        <p>Dominando el intercambio de datos en la Radioafición</p>
+    </section>
+
+    <div class="container">
+        
+        <div class="step-card">
+            <span class="step-number">01.</span>
+            <h2>La Estructura de Datos</h2>
+            <p>El formato ADIF no es un simple texto. Es el lenguaje universal entre loggers. Cada campo se define por su longitud y nombre.</p>
+            <code>&lt;CALL:5&gt;EA1ABC &lt;QSO_DATE:8&gt;20260103 &lt;EOR&gt;</code>
+        </div>
+
+        <div class="step-card">
+            <span class="step-number">02.</span>
+            <h2>Cabecera Obligatoria</h2>
+            <p>Todo archivo profesional debe comenzar con una cabecera que defina la versión del estándar.</p>
+            <code>ADIF Export from MyEpicStation v1.0<br>
+            &lt;ADIF_VER:5&gt;3.1.4<br>
+            &lt;EOH&gt;</code>
+        </div>
+
+        <div class="step-card">
+            <span class="step-number">03.</span>
+            <h2>El Registro (QSO)</h2>
+            <p>Cada contacto termina con la etiqueta <strong>&lt;EOR&gt;</strong> (End Of Record). Asegúrate de incluir frecuencia, modo y reporte RST.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        &copy; 2026 - TRANSMISIÓN NEÓN FINALIZADA
+    </div>
+
+</body>
+</html>
