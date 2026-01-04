@@ -3,233 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADIF NEON OS | Radioafición Pro</title>
+    <title>ADIF COMMAND CENTER | V4</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
             --neon-green: #39ff14;
-            --bg-dark: #020205;
+            --bg-dark: #08080a;
+            --row-bg: rgba(20, 20, 30, 0.6);
         }
 
-        /* Cinemática de Inicio */
-        #intro-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: black;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .scanning-line {
-            width: 100%;
-            height: 2px;
-            background: var(--neon-blue);
-            position: absolute;
-            box-shadow: 0 0 15px var(--neon-blue);
-            animation: scan 2s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0%; }
-            100% { top: 100%; }
-        }
-
-        .boot-text {
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            font-size: 1.2rem;
-        }
-
-        /* Estilos Base */
         body {
             background-color: var(--bg-dark);
             color: #fff;
             font-family: 'Roboto Mono', monospace;
             margin: 0;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
-            background-size: 550px 550px, 350px 350px;
-            animation: stars 100s linear infinite;
+            padding: 20px;
+            background-image: linear-gradient(var(--bg-dark) 2px, transparent 2px), linear-gradient(90deg, var(--bg-dark) 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-color: #0d0d15;
         }
 
-        @keyframes stars {
-            from { background-position: 0 0; }
-            to { background-position: 10000px 5000px; }
-        }
-
-        .cyber-panel {
-            max-width: 800px;
-            margin: 50px auto;
+        .terminal-container {
+            max-width: 1000px;
+            margin: 0 auto;
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px var(--neon-blue);
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            position: relative;
-            z-index: 10;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 25px;
+            border-radius: 8px;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
             text-align: center;
             color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
-            font-size: 2.5rem;
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 30px;
         }
 
-        .input-group {
+        /* Panel de entrada */
+        .input-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .input-box {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .label {
-            font-size: 0.7rem;
-            color: var(--neon-blue);
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
-
-        input {
-            background: rgba(20, 20, 30, 0.8);
-            border: 1px solid var(--neon-pink);
-            color: #fff;
-            padding: 12px;
-            font-size: 1rem;
-            outline: none;
-            box-shadow: inset 0 0 5px var(--neon-pink);
-        }
-
-        .button-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .input-box { display: flex; flex-direction: column; }
+        .label { color: var(--neon-blue); font-size: 0.75rem; margin-bottom: 5px; }
+        
+        input {
+            background: #000;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-green);
+            padding: 10px;
+            outline: none;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Botones laterales estilo Peanut */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
         }
 
         button {
-            padding: 15px;
+            padding: 12px 20px;
             background: transparent;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
             cursor: pointer;
-            transition: 0.4s;
-            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
-        .btn-gen { border: 2px solid var(--neon-green); color: var(--neon-green); }
-        .btn-gen:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
+        .btn-add { border: 2px solid var(--neon-green); color: var(--neon-green); }
+        .btn-add:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
 
-        .btn-download { border: 2px solid var(--neon-pink); color: var(--neon-pink); }
-        .btn-download:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 20px var(--neon-pink); }
+        .btn-adif { border: 2px solid var(--neon-pink); color: var(--neon-pink); }
+        .btn-adif:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 15px var(--neon-pink); }
 
-        #output {
-            margin-top: 30px;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 20px;
-            border: 1px dashed var(--neon-blue);
-            color: var(--neon-green);
-            min-height: 80px;
-            word-break: break-all;
+        /* Tabla de Registros */
+        .table-container {
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: var(--neon-blue);
+            color: #000;
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 0.9rem;
+        }
+
+        tr:nth-child(even) { background: var(--row-bg); }
+        tr:hover { background: rgba(0, 243, 255, 0.1); }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--neon-pink);
+            margin-top: 15px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <div id="intro-overlay">
-        <div class="scanning-line"></div>
-        <div class="boot-text" id="boot-text">ESTABLECIENDO ENLACE SATELITAL...</div>
-    </div>
+    <div class="terminal-container">
+        <h1>QSO DATA LOGGER</h1>
 
-    <div class="cyber-panel">
-        <h1>ADIF MASTER V3</h1>
-        
-        <div class="input-group">
+        <div class="input-grid">
             <div class="input-box">
-                <span class="label">CALLSIGN</span>
-                <input type="text" id="call" placeholder="EA1ABC">
+                <span class="label">ESTACIÓN</span>
+                <input type="text" id="call" placeholder="CM6LK">
             </div>
             <div class="input-box">
-                <span class="label">BAND</span>
-                <input type="text" id="band" placeholder="40M">
+                <span class="label">NOMBRE</span>
+                <input type="text" id="name" placeholder="Jose Ignacio">
             </div>
             <div class="input-box">
-                <span class="label">MODE</span>
-                <input type="text" id="mode" placeholder="FT8">
+                <span class="label">FECHA</span>
+                <input type="text" id="date" placeholder="03/01/2026">
             </div>
             <div class="input-box">
-                <span class="label">DATE (AAAAMMDD)</span>
-                <input type="text" id="date" placeholder="20260103">
+                <span class="label">HORA</span>
+                <input type="text" id="time" placeholder="13:40">
+            </div>
+            <div class="input-box">
+                <span class="label">BANDA</span>
+                <input type="text" id="band" placeholder="40m">
             </div>
         </div>
 
-        <div class="button-container">
-            <button class="btn-gen" onclick="generateADIF()">Generar Matriz</button>
-            <button class="btn-download" onclick="downloadADIF()">Descargar .ADI</button>
+        <div class="action-bar">
+            <button class="btn-add" onclick="addEntry()">AGREGAR QSO</button>
+            <button class="btn-adif" onclick="exportADIF()">GENERAR & DESCARGAR .ADI</button>
         </div>
 
-        <div id="output">ESPERANDO INSTRUCCIONES...</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estación</th>
+                        <th>Nombre</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Banda</th>
+                    </tr>
+                </thead>
+                <tbody id="log-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="status-msg" id="status">Sistema Listo - Esperando Entrada</div>
     </div>
 
     <script>
-        // Animación de Intro
-        window.addEventListener('load', () => {
-            const bootText = document.getElementById('boot-text');
-            setTimeout(() => { bootText.innerText = "SISTEMA OPERATIVO ADIF CARGADO."; }, 1000);
-            setTimeout(() => { 
-                document.getElementById('intro-overlay').style.opacity = '0';
-                setTimeout(() => { 
-                    document.getElementById('intro-overlay').style.display = 'none';
-                }, 1000);
-            }, 2500);
-        });
+        let qsoList = [];
 
-        let currentADIF = "";
+        function addEntry() {
+            const entry = {
+                call: document.getElementById('call').value.toUpperCase(),
+                name: document.getElementById('name').value,
+                date: document.getElementById('date').value.replace(/\//g, ""), // Limpiamos barras para ADIF
+                time: document.getElementById('time').value.replace(/:/g, ""), // Limpiamos puntos para ADIF
+                band: document.getElementById('band').value.toUpperCase()
+            };
 
-        function generateADIF() {
-            const call = document.getElementById('call').value.toUpperCase();
-            const band = document.getElementById('band').value.toUpperCase();
-            const mode = document.getElementById('mode').value.toUpperCase();
-            const date = document.getElementById('date').value;
+            if(!entry.call) return alert("Indique el indicativo de la estación.");
 
-            if(!call || !band) {
-                alert("ERROR: MATRIZ INCOMPLETA");
-                return;
-            }
-
-            currentADIF = `ADIF Export\n<ADIF_VER:5>3.1.4\n<EOH>\n` +
-                          `<CALL:${call.length}>${call} <BAND:${band.length}>${band} ` +
-                          `<MODE:${mode.length}>${mode} <QSO_DATE:${date.length}>${date} <EOR>`;
-
-            document.getElementById('output').innerText = currentADIF;
+            qsoList.push(entry);
+            renderTable();
+            document.getElementById('status').innerText = `CONTACTO CON ${entry.call} REGISTRADO`;
+            
+            // Limpiar solo el campo de llamada para el siguiente
+            document.getElementById('call').value = "";
         }
 
-        function downloadADIF() {
-            if(!currentADIF) {
-                alert("GENERA PRIMERO EL REGISTRO");
-                return;
-            }
-            const element = document.createElement('a');
-            const file = new Blob([currentADIF], {type: 'text/plain'});
-            element.href = URL.createObjectURL(file);
-            element.download = "qso_radioaficion.adi";
-            document.body.appendChild(element);
-            element.click();
+        function renderTable() {
+            const body = document.getElementById('log-body');
+            body.innerHTML = "";
+            
+            qsoList.forEach(item => {
+                const row = `<tr>
+                    <td style="color: var(--neon-green)">${item.call}</td>
+                    <td>${item.name}</td>
+                    <td>${item.date}</td>
+                    <td>${item.time}</td>
+                    <td>${item.band}</td>
+                </tr>`;
+                body.innerHTML += row;
+            });
+        }
+
+        function exportADIF() {
+            if(qsoList.length === 0) return alert("La lista está vacía.");
+
+            let adifContent = `ADIF Export from NeonLogger\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+
+            qsoList.forEach(q => {
+                adifContent += `<CALL:${q.call.length}>${q.call} `;
+                adifContent += `<NAME:${q.name.length}>${q.name} `;
+                adifContent += `<QSO_DATE:${q.date.length}>${q.date} `;
+                adifContent += `<TIME_ON:${q.time.length}>${q.time} `;
+                adifContent += `<BAND:${q.band.length}>${q.band} `;
+                adifContent += `<EOR>\n`;
+            });
+
+            const blob = new Blob([adifContent], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `log_estacion_${new Date().getTime()}.adi`;
+            a.click();
+            
+            document.getElementById('status').innerText = "ARCHIVO .ADI EXPORTADO CON ÉXITO";
         }
     </script>
 </body>
