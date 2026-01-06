@@ -7,213 +7,283 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00f3ff;
+            --accent-blue: #008c9e;
             --neon-pink: #ff00ff;
-            --neon-green: #39ff14;
-            --bg-dark: #020205;
+            --neon-green: #2ecc71;
+            --bg-light: #f5f5dc; 
+            --text-dark: #2c3e50;
         }
 
-        /* --- RESET Y BASE --- */
         * { box-sizing: border-box; }
         body {
-            background-color: var(--bg-dark);
-            color: #fff;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
             font-family: 'Roboto Mono', monospace;
             margin: 0;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at center, #0a0a20 0%, #020205 100%);
             min-height: 100vh;
         }
 
-        /* --- CINEMÁTICA DE ENTRADA --- */
+        /* --- CINEMÁTICA LÁSER --- */
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
+            background: #fff;
             z-index: 9999;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 1s ease-in-out;
+            overflow: hidden;
+        }
+
+        .laser-beam {
+            position: absolute;
+            height: 4px;
+            background: var(--accent-blue);
+            box-shadow: 0 0 15px var(--accent-blue);
+            width: 0;
+            left: -100%;
+            animation: laserShoot 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+        }
+
+        @keyframes laserShoot {
+            0% { width: 0; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0; left: 100%; }
         }
 
         .intro-text {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.2rem, 5vw, 2.5rem);
-            color: var(--neon-blue);
-            text-shadow: 0 0 20px var(--neon-blue);
+            font-size: clamp(1rem, 4vw, 2rem);
+            color: var(--text-dark);
             text-align: center;
             opacity: 0;
-            animation: introAnimation 4s forwards;
+            animation: fadeInText 0.5s forwards 0.8s;
         }
 
-        @keyframes introAnimation {
-            0% { opacity: 0; transform: scale(0.8); }
-            20% { opacity: 1; transform: scale(1); }
-            80% { opacity: 1; transform: scale(1.05); }
-            100% { opacity: 0; transform: scale(1.1); }
-        }
+        @keyframes fadeInText { to { opacity: 1; } }
 
-        /* --- MARCA DE AGUA --- */
-        .watermark {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            color: rgba(0, 243, 255, 0.15);
-            pointer-events: none;
-            z-index: 1000;
+        /* --- CABECERA Y RELOJ --- */
+        .header-section { text-align: center; margin-bottom: 20px; position: relative; }
+        
+        .update-tag {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            font-family: 'Orbitron';
+            font-size: 0.6rem;
+            padding: 3px 10px;
+            border-radius: 4px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 5px;
             text-transform: uppercase;
+        }
+
+        #utc-clock {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--accent-blue);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* --- MODAL DE INFORMACIÓN --- */
+        #info-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 3px solid var(--accent-blue);
+            box-shadow: 0 0 30px rgba(0, 140, 158, 0.5);
+        }
+
+        .modal-header { font-family: 'Orbitron'; color: var(--accent-blue); margin-bottom: 15px; border-bottom: 2px solid var(--accent-blue); }
+
+        #info-btn {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            width: 45px; height: 45px;
+            background: #ffd700;
+            color: #000;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 24px;
+            cursor: pointer;
+            z-index: 2000;
+            border: 2px solid #b8860b;
         }
 
         /* --- CONTENEDOR PRINCIPAL --- */
         .terminal-container {
             width: 95%;
             max-width: 1100px;
-            margin: 20px auto;
-            border: 1px solid var(--neon-blue);
-            background: rgba(0, 0, 0, 0.9);
-            padding: clamp(15px, 3vw, 30px);
-            position: relative;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.1);
+            margin: 10px auto;
+            border: 2px solid var(--accent-blue);
+            background: white;
+            padding: 20px;
             opacity: 0;
-            animation: mainAppear 1s forwards 4.2s;
+            animation: mainAppear 1s forwards 2s;
         }
 
         @keyframes mainAppear { to { opacity: 1; } }
 
-        .scanner-line {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-            opacity: 0.1;
-            z-index: 1;
-            animation: scanMove 10s linear infinite;
-            pointer-events: none;
-        }
+        h1 { font-family: 'Orbitron'; text-align: center; color: var(--accent-blue); margin: 0; }
 
-        @keyframes scanMove { 0% { top: 0%; } 100% { top: 100%; } }
-
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            text-align: center;
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            font-size: clamp(1.2rem, 4vw, 2rem);
-            margin-bottom: 25px;
-        }
-
-        /* --- GRID RESPONSIVO --- */
         .input-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Móvil */
+            grid-template-columns: 1fr;
             gap: 15px;
-            background: rgba(255, 255, 255, 0.03);
+            background: #f9f9f9;
             padding: 20px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            margin-bottom: 20px;
-            z-index: 10;
-            position: relative;
+            border: 1px solid #ddd;
+            margin: 20px 0;
         }
 
         @media (min-width: 600px) { .input-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1000px) { .input-grid { grid-template-columns: repeat(4, 1fr); } }
 
-        .input-box { display: flex; flex-direction: column; }
-        .label { color: var(--neon-blue); font-size: 0.65rem; margin-bottom: 5px; text-transform: uppercase; }
+        .label { color: var(--accent-blue); font-size: 0.7rem; margin-bottom: 5px; font-weight: bold; display: block; }
         
         input, select {
-            background: #000;
-            border: 1px solid var(--neon-pink);
-            color: var(--neon-green);
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
             padding: 10px;
-            outline: none;
             font-family: 'Roboto Mono';
-            font-size: 16px; /* Evita zoom en iOS */
+            font-size: 16px;
         }
 
-        input:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
-
-        /* --- BOTONES --- */
-        .action-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
+        .action-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         @media (min-width: 600px) { .action-bar { flex-direction: row; justify-content: center; } }
 
         button {
             padding: 12px 25px;
             font-family: 'Orbitron';
-            background: transparent;
-            border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
+            background: var(--accent-blue);
+            border: none;
+            color: white;
             cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
         }
 
-        button:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
-
-        /* --- TABLA --- */
-        .table-container {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--neon-green);
-            max-height: 350px;
-            overflow-x: auto; /* Scroll lateral en móviles */
-        }
-
+        .table-container { border: 1px solid #ddd; max-height: 350px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: #111; color: var(--neon-green); padding: 12px; font-size: 0.7rem; border-bottom: 1px solid var(--neon-green); text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid rgba(57, 255, 20, 0.1); font-size: 0.8rem; }
+        th { background: var(--accent-blue); color: white; padding: 12px; font-size: 0.7rem; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; }
 
+        .footer-credits {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 30px;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .signature {
+            font-family: 'Orbitron';
+            color: var(--accent-blue);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        .refresh-btn {
+            background: #ddd;
+            color: #333;
+            padding: 2px 5px;
+            font-size: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+            border: 1px solid #bbb;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 
     <div id="intro-screen">
+        <div class="laser-beam"></div>
         <div class="intro-text">
             RADIOCLUB SANTA CRUZ DEL SUR<br>
-            <span style="color: var(--neon-pink); font-size: 1.5em;">CL7ADV</span>
+            <span style="color: var(--accent-blue); font-weight: bold;">CL7ADV PROJECT</span>
         </div>
     </div>
 
-    <div class="watermark">RADIOCLUB SANTA CRUZ DEL SUR / CL7ADV</div>
+    <div id="info-modal" onclick="closeInfo()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">LOGBOOK UPDATE: MANUAL UTC</div>
+            <div style="font-size: 0.85rem; line-height: 1.5;">
+                <strong>MEJORAS INCLUIDAS:</strong><br>
+                • Hora fija en Estándar UTC Mundial.<br>
+                • Entrada de Hora Manual (Texto).<br>
+                • Sin selector de tiempo emergente.<br><br>
+                <strong>HISTORIAL:</strong><br>
+                Actualizado: 06 de Enero, 2026<br>
+                Radio Club: Santa Cruz del Sur (Camagüey)<br><br>
+                <div class="signature">JONATHAN & ALFRED</div>
+                <br>
+                <button onclick="closeInfo()" style="width:100%">CERRAR PANEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-btn" onclick="toggleInfo()">?</div>
 
     <div class="terminal-container">
-        <div class="scanner-line"></div>
-        <h1>ADIF SYSTEM CL7ADV</h1>
+        <div class="header-section">
+            <div class="update-tag">Relieve Update v2.7 - MANUAL UTC</div>
+            <h1>ADIF COMMANDER</h1>
+        </div>
 
+        <div id="utc-clock">--:--:--</div>
+        
         <div class="input-grid">
             <input type="hidden" id="edit-index" value="-1">
-            <div class="input-box"><span class="label">Tu Indicativo</span><input type="text" id="my-call" placeholder="TU CALLSIGN" style="border-color: var(--neon-green);"></div>
-            
+            <div class="input-box"><span class="label">Tu Indicativo</span><input type="text" id="my-call" placeholder="TU CALLSIGN"></div>
             <div class="input-box"><span class="label">Estación</span><input type="text" id="call" placeholder="CALLSIGN"></div>
             <div class="input-box"><span class="label">Nombre</span><input type="text" id="name" placeholder="OPERADOR"></div>
-            <div class="input-box"><span class="label">Fecha (DD-MM-AA)</span><input type="text" id="date" placeholder="03-01-26"></div>
-            <div class="input-box"><span class="label">Hora</span><input type="text" id="time" placeholder="12:00"></div>
+            <div class="input-box"><span class="label">Fecha (UTC)</span><input type="date" id="date"></div>
+            <div class="input-box">
+                <span class="label">Hora QSO (UTC)</span>
+                <input type="text" id="time" placeholder="HH:MM" maxlength="5" style="text-align: center; letter-spacing: 1px;">
+                <button class="refresh-btn" onclick="forceUpdateTime()">CAPTURAR HORA UTC</button>
+            </div>
             <div class="input-box"><span class="label">Banda</span><input type="text" id="band" placeholder="40M"></div>
             <div class="input-box">
                 <span class="label">Modo</span>
                 <select id="mode">
                     <option value="SSB">SSB</option>
-                    <option value="FM">FM</option>
-                    <option value="DV">DIGITAL VOICE</option>
-                    <option value="FT8">FT8</option>
+                    <option value="USB">USB</option>
+                    <option value="LSB">LSB</option>
                     <option value="CW">CW</option>
+                    <option value="FT8">FT8</option>
+                    <option value="FT4">FT4</option>
+                    <option value="AM">AM</option>
+                    <option value="FM">FM</option>
+                    <option value="DMR">DMR</option>
+                    <option value="VARAC">VARAC</option>
+                    <option value="DV">DV</option>
+                    <option value="RTTY">RTTY</option>
+                    <option value="JS8">JS8</option>
                 </select>
             </div>
             <div class="input-box"><span class="label">RST</span><input type="text" id="rst" placeholder="59"></div>
         </div>
 
         <div class="action-bar">
-            <button onclick="handleEntry()" id="btn-main">[+] AÑADIR QSO</button>
-            <button style="border-color: var(--neon-pink); color: var(--neon-pink);" onclick="exportADIF()">[V] EXPORTAR ADIF</button>
+            <button onclick="handleEntry()" id="btn-main">AÑADIR QSO</button>
+            <button style="background: var(--neon-pink);" onclick="exportADIF()">EXPORTAR ADIF</button>
         </div>
 
         <div class="table-container">
@@ -224,30 +294,62 @@
                 <tbody id="log-body"></tbody>
             </table>
         </div>
+
+        <div class="footer-credits">
+            RADIO CLUB SANTA CRUZ DEL SUR, CUBA<br>
+            <div class="signature">JONATHAN & ALFRED</div>
+        </div>
     </div>
 
     <script>
         let qsoList = [];
-        let audioCtx;
 
-        document.body.addEventListener('click', () => { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }, {once: true});
+        function updateClock() {
+            const now = new Date();
+            // Sistema forzado a UTC
+            const h = now.getUTCHours();
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            const year = now.getUTCFullYear();
+            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(now.getUTCDate()).padStart(2, '0');
 
-        function playBeep(f, d=0.1) {
-            if(!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = f;
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
-            osc.start(); osc.stop(audioCtx.currentTime + d);
+            const displayH = String(h).padStart(2, '0');
+            document.getElementById('utc-clock').innerText = `UTC: ${displayH}:${m}:${s}`;
+
+            // Auto-relleno inicial solo si están vacíos
+            if(!document.getElementById('date').value) {
+                document.getElementById('date').value = `${year}-${month}-${day}`;
+            }
+            if(!document.getElementById('time').value) {
+                document.getElementById('time').value = `${displayH}:${m}`;
+            }
         }
+
+        function forceUpdateTime() {
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const year = now.getUTCFullYear();
+            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(now.getUTCDate()).padStart(2, '0');
+
+            document.getElementById('date').value = `${year}-${month}-${day}`;
+            // Se inserta como texto simple
+            document.getElementById('time').value = `${h}:${m}`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function toggleInfo() { document.getElementById('info-modal').style.display = 'flex'; }
+        function closeInfo() { document.getElementById('info-modal').style.display = 'none'; }
 
         setTimeout(() => {
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
-            setTimeout(() => intro.style.display = 'none', 1000);
-        }, 4000);
+            setTimeout(() => intro.style.display = 'none', 800);
+        }, 2200);
 
         function handleEntry() {
             const editIdx = document.getElementById('edit-index').value;
@@ -262,18 +364,15 @@
                 rst: document.getElementById('rst').value
             };
 
-            if(!entry.call) return alert("Inserte Indicativo del contacto");
+            if(!entry.call) return alert("Inserte el indicativo");
 
             if(editIdx === "-1") {
                 qsoList.push(entry);
-                playBeep(880);
             } else {
                 qsoList[editIdx] = entry;
                 document.getElementById('edit-index').value = "-1";
-                document.getElementById('btn-main').innerText = "[+] AÑADIR QSO";
-                playBeep(660);
+                document.getElementById('btn-main').innerText = "AÑADIR QSO";
             }
-
             renderTable();
             clearInputs();
         }
@@ -283,25 +382,25 @@
             body.innerHTML = "";
             qsoList.forEach((q, i) => {
                 body.innerHTML += `<tr>
-                    <td style="color:var(--neon-green)">${q.myCall}</td>
-                    <td style="color:var(--neon-blue)">${q.call}</td>
+                    <td style="font-weight:bold; color:var(--accent-blue)">${q.myCall}</td>
+                    <td style="font-weight:bold">${q.call}</td>
                     <td>${q.name}</td><td>${q.date}</td><td>${q.time}</td>
                     <td>${q.band}</td><td>${q.mode}</td><td>${q.rst}</td>
                     <td>
-                        <button onclick="editRow(${i})" style="padding:2px 5px; border-color:var(--neon-green); color:var(--neon-green); font-size:10px">E</button>
-                        <button onclick="deleteRow(${i})" style="padding:2px 5px; border-color:red; color:red; font-size:10px">X</button>
+                        <button onclick="editRow(${i})" style="padding:2px 8px; background:var(--neon-green); font-size:10px">E</button>
+                        <button onclick="deleteRow(${i})" style="padding:2px 8px; background:red; font-size:10px">X</button>
                     </td>
                 </tr>`;
             });
         }
 
         function clearInputs() {
-            // Se limpian todos EXCEPTO 'my-call'
-            ["call","name","date","time","band","rst"].forEach(id => document.getElementById(id).value = "");
+            ["call","name","band","rst"].forEach(id => document.getElementById(id).value = "");
+            forceUpdateTime();
             document.getElementById('call').focus();
         }
 
-        function deleteRow(i) { qsoList.splice(i, 1); renderTable(); playBeep(200); }
+        function deleteRow(i) { qsoList.splice(i, 1); renderTable(); }
 
         function editRow(i) {
             const q = qsoList[i];
@@ -314,7 +413,7 @@
             document.getElementById('mode').value = q.mode;
             document.getElementById('rst').value = q.rst;
             document.getElementById('edit-index').value = i;
-            document.getElementById('btn-main').innerText = "[V] GUARDAR";
+            document.getElementById('btn-main').innerText = "GUARDAR";
             window.scrollTo(0,0);
         }
 
@@ -322,14 +421,17 @@
             if(qsoList.length === 0) return alert("No hay datos");
             let adif = `ADIF Export from CL7ADV\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
             qsoList.forEach(q => {
+                const cleanDate = q.date.replace(/-/g, "");
+                // Limpieza extra por si el usuario escribe 14:30 o 1430
+                const cleanTime = q.time.replace(/:/g, "").substring(0,4);
                 adif += `<STATION_CALLSIGN:${q.myCall.length}>${q.myCall} ` +
                         `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
-                        `<QSO_DATE:${q.date.length}>${q.date} <TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
+                        `<QSO_DATE:${cleanDate.length}>${cleanDate} <TIME_ON:${cleanTime.length}>${cleanTime} ` +
                         `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
                         `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
             });
 
-            const fileName = prompt("Nombre del Log:", "CL7ADV_LOG.adi");
+            const fileName = prompt("Nombre del Log:", "CL7ADV_LOG_UTC.adi");
             if(fileName) {
                 const blob = new Blob([adif], {type: 'text/plain'});
                 const a = document.createElement('a');
