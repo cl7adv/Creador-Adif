@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<head> <link rel="manifest" href="manifest.json">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b1622">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ADIF COMMANDER | CL7ADV</title>
@@ -170,7 +168,7 @@
             overflow-x: auto; /* Scroll lateral en móviles */
         }
 
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { background: #111; color: var(--neon-green); padding: 12px; font-size: 0.7rem; border-bottom: 1px solid var(--neon-green); text-align: left; }
         td { padding: 10px; border-bottom: 1px solid rgba(57, 255, 20, 0.1); font-size: 0.8rem; }
 
@@ -193,6 +191,8 @@
 
         <div class="input-grid">
             <input type="hidden" id="edit-index" value="-1">
+            <div class="input-box"><span class="label">Tu Indicativo</span><input type="text" id="my-call" placeholder="TU CALLSIGN" style="border-color: var(--neon-green);"></div>
+            
             <div class="input-box"><span class="label">Estación</span><input type="text" id="call" placeholder="CALLSIGN"></div>
             <div class="input-box"><span class="label">Nombre</span><input type="text" id="name" placeholder="OPERADOR"></div>
             <div class="input-box"><span class="label">Fecha (DD-MM-AA)</span><input type="text" id="date" placeholder="03-01-26"></div>
@@ -219,7 +219,7 @@
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>CALL</th><th>NOMBRE</th><th>FECHA</th><th>HORA</th><th>BANDA</th><th>MODO</th><th>RST</th><th>ACC</th></tr>
+                    <tr><th>TU CALL</th><th>CALL</th><th>NOMBRE</th><th>FECHA</th><th>HORA</th><th>BANDA</th><th>MODO</th><th>RST</th><th>ACC</th></tr>
                 </thead>
                 <tbody id="log-body"></tbody>
             </table>
@@ -230,7 +230,6 @@
         let qsoList = [];
         let audioCtx;
 
-        // Iniciar audio al primer clic (politica navegadores)
         document.body.addEventListener('click', () => { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }, {once: true});
 
         function playBeep(f, d=0.1) {
@@ -244,7 +243,6 @@
             osc.start(); osc.stop(audioCtx.currentTime + d);
         }
 
-        // Quitar intro
         setTimeout(() => {
             const intro = document.getElementById('intro-screen');
             intro.style.opacity = '0';
@@ -254,6 +252,7 @@
         function handleEntry() {
             const editIdx = document.getElementById('edit-index').value;
             const entry = {
+                myCall: document.getElementById('my-call').value.toUpperCase(),
                 call: document.getElementById('call').value.toUpperCase(),
                 name: document.getElementById('name').value,
                 date: document.getElementById('date').value,
@@ -263,7 +262,7 @@
                 rst: document.getElementById('rst').value
             };
 
-            if(!entry.call) return alert("Inserte Indicativo");
+            if(!entry.call) return alert("Inserte Indicativo del contacto");
 
             if(editIdx === "-1") {
                 qsoList.push(entry);
@@ -284,6 +283,7 @@
             body.innerHTML = "";
             qsoList.forEach((q, i) => {
                 body.innerHTML += `<tr>
+                    <td style="color:var(--neon-green)">${q.myCall}</td>
                     <td style="color:var(--neon-blue)">${q.call}</td>
                     <td>${q.name}</td><td>${q.date}</td><td>${q.time}</td>
                     <td>${q.band}</td><td>${q.mode}</td><td>${q.rst}</td>
@@ -296,6 +296,7 @@
         }
 
         function clearInputs() {
+            // Se limpian todos EXCEPTO 'my-call'
             ["call","name","date","time","band","rst"].forEach(id => document.getElementById(id).value = "");
             document.getElementById('call').focus();
         }
@@ -304,6 +305,7 @@
 
         function editRow(i) {
             const q = qsoList[i];
+            document.getElementById('my-call').value = q.myCall;
             document.getElementById('call').value = q.call;
             document.getElementById('name').value = q.name;
             document.getElementById('date').value = q.date;
@@ -320,7 +322,8 @@
             if(qsoList.length === 0) return alert("No hay datos");
             let adif = `ADIF Export from CL7ADV\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
             qsoList.forEach(q => {
-                adif += `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
+                adif += `<STATION_CALLSIGN:${q.myCall.length}>${q.myCall} ` +
+                        `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
                         `<QSO_DATE:${q.date.length}>${q.date} <TIME_ON:${q.time.replace(/:/g,"").length}>${q.time.replace(/:/g,"")} ` +
                         `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
                         `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
