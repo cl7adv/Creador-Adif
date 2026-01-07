@@ -2,444 +2,397 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ADIF COMMANDER | CL7ADV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Club - Camag-Santa Cruz cl7adv Neon Log</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --accent-blue: #008c9e;
-            --neon-pink: #ff00ff;
-            --neon-green: #2ecc71;
-            --bg-light: #f5f5dc; 
-            --text-dark: #2c3e50;
-        }
-
-        * { box-sizing: border-box; }
-        body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            font-family: 'Roboto Mono', monospace;
-            margin: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* --- CINEMÁTICA LÁSER --- */
-        #intro-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .laser-beam {
-            position: absolute;
-            height: 4px;
-            background: var(--accent-blue);
-            box-shadow: 0 0 15px var(--accent-blue);
-            width: 0;
-            left: -100%;
-            animation: laserShoot 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
-        }
-
-        @keyframes laserShoot {
-            0% { width: 0; left: 0; }
-            50% { width: 100%; left: 0; }
-            100% { width: 0; left: 100%; }
-        }
-
-        .intro-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1rem, 4vw, 2rem);
-            color: var(--text-dark);
-            text-align: center;
-            opacity: 0;
-            animation: fadeInText 0.5s forwards 0.8s;
-        }
-
-        @keyframes fadeInText { to { opacity: 1; } }
-
-        /* --- CABECERA Y RELOJ --- */
-        .header-section { text-align: center; margin-bottom: 20px; position: relative; }
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        .update-tag {
-            display: inline-block;
-            background: var(--accent-blue);
-            color: white;
-            font-family: 'Orbitron';
-            font-size: 0.6rem;
-            padding: 3px 10px;
-            border-radius: 4px;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 5px;
-            text-transform: uppercase;
+        body { 
+            font-family: 'JetBrains+Mono', monospace; 
+            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+            background-attachment: fixed;
         }
 
-        #utc-clock {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.4rem;
-            color: var(--accent-blue);
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        .cuban-title {
+            font-family: 'Permanent+Marker', cursive;
+            text-shadow: 0 0 10px #f43f5e, 0 0 20px #f43f5e;
         }
 
-        /* --- MODAL DE INFORMACIÓN --- */
-        #info-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(8px);
+        .neon-border-blue {
+            box-shadow: 0 0 5px #22d3ee, inset 0 0 5px #22d3ee;
+            border: 1px solid #22d3ee;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            border: 3px solid var(--accent-blue);
-            box-shadow: 0 0 30px rgba(0, 140, 158, 0.5);
+        .neon-border-pink {
+            box-shadow: 0 0 5px #f43f5e, inset 0 0 5px #f43f5e;
+            border: 1px solid #f43f5e;
         }
 
-        .modal-header { font-family: 'Orbitron'; color: var(--accent-blue); margin-bottom: 15px; border-bottom: 2px solid var(--accent-blue); }
-
-        #info-btn {
-            position: fixed;
-            bottom: 20px; right: 20px;
-            width: 45px; height: 45px;
-            background: #ffd700;
-            color: #000;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 24px;
-            cursor: pointer;
-            z-index: 2000;
-            border: 2px solid #b8860b;
+        .neon-text-yellow {
+            text-shadow: 0 0 8px #fde047;
+            color: #fde047;
         }
 
-        /* --- CONTENEDOR PRINCIPAL --- */
-        .terminal-container {
-            width: 95%;
-            max-width: 1100px;
-            margin: 10px auto;
-            border: 2px solid var(--accent-blue);
-            background: white;
-            padding: 20px;
-            opacity: 0;
-            animation: mainAppear 1s forwards 2s;
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        @keyframes mainAppear { to { opacity: 1; } }
-
-        h1 { font-family: 'Orbitron'; text-align: center; color: var(--accent-blue); margin: 0; }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            background: #f9f9f9;
-            padding: 20px;
-            border: 1px solid #ddd;
-            margin: 20px 0;
-        }
-
-        @media (min-width: 600px) { .input-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1000px) { .input-grid { grid-template-columns: repeat(4, 1fr); } }
-
-        .label { color: var(--accent-blue); font-size: 0.7rem; margin-bottom: 5px; font-weight: bold; display: block; }
-        
         input, select {
-            width: 100%;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-family: 'Roboto Mono';
-            font-size: 16px;
+            transition: all 0.2s ease;
+            appearance: none;
         }
 
-        .action-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        @media (min-width: 600px) { .action-bar { flex-direction: row; justify-content: center; } }
-
-        button {
-            padding: 12px 25px;
-            font-family: 'Orbitron';
-            background: var(--accent-blue);
-            border: none;
-            color: white;
-            cursor: pointer;
+        input:focus, select:focus {
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+            outline: none;
+            border-color: #22d3ee !important;
         }
 
-        .table-container { border: 1px solid #ddd; max-height: 350px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: var(--accent-blue); color: white; padding: 12px; font-size: 0.7rem; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; }
-
-        .footer-credits {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #777;
-            margin-top: 30px;
-            padding: 20px;
-            line-height: 1.6;
+        .btn-neon-green {
+            background: transparent;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            text-shadow: 0 0 5px #4ade80;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
         }
-        
+
+        .btn-neon-green:hover {
+            background: #4ade80;
+            color: #000;
+            box-shadow: 0 0 20px #4ade80;
+        }
+
+        /* Estilos para móviles */
+        @media (max-width: 640px) {
+            .cuban-title { font-size: 2.5rem; }
+            input, select, button { font-size: 16px !important; } /* Evita zoom en iOS */
+            .mobile-stack { flex-direction: column; align-items: stretch; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
         .signature {
-            font-family: 'Orbitron';
-            color: var(--accent-blue);
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-top: 10px;
-        }
-
-        .refresh-btn {
-            background: #ddd;
-            color: #333;
-            padding: 2px 5px;
-            font-size: 10px;
-            margin-top: 5px;
-            cursor: pointer;
-            border: 1px solid #bbb;
-            width: 100%;
+            font-family: 'Permanent+Marker', cursive;
+            text-shadow: 0 0 5px #22d3ee;
         }
     </style>
 </head>
-<body>
+<body class="text-slate-100 min-h-screen p-3 md:p-8">
 
-    <div id="intro-screen">
-        <div class="laser-beam"></div>
-        <div class="intro-text">
-            RADIOCLUB SANTA CRUZ DEL SUR<br>
-            <span style="color: var(--accent-blue); font-weight: bold;">CL7ADV PROJECT</span>
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-6 md:mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl md:text-6xl cuban-title text-rose-500 md:-rotate-2">Camag-Santa Cruz</h1>
+                <p class="text-cyan-400 font-bold tracking-widest mt-2 uppercase flex items-center justify-center md:justify-start gap-2 text-xs md:text-base">
+                    <span class="animate-pulse">●</span> Log Master Neon Edition
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                <div class="glass-panel p-3 rounded-lg neon-border-blue w-full sm:w-auto">
+                    <label class="block text-[10px] text-cyan-400 uppercase font-black mb-1">Operador Estación</label>
+                    <input type="text" id="my-call" placeholder="TU INDICATIVO" class="bg-transparent border-none outline-none text-xl font-black uppercase placeholder-slate-700 w-full sm:w-40 text-white text-center sm:text-left">
+                </div>
+                <div class="flex items-center">
+                    <span id="qso-count" class="bg-rose-600 text-white px-6 py-2 rounded-full text-sm font-black shadow-[0_0_15px_#e11d48] whitespace-nowrap">0 QSOs</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+            <!-- Formulario de Entrada -->
+            <section class="lg:col-span-4 glass-panel p-5 md:p-6 rounded-2xl shadow-2xl neon-border-pink relative overflow-hidden">
+                <h2 class="text-xl md:text-2xl font-black mb-6 flex items-center gap-3 text-rose-400 uppercase italic">
+                    <span class="w-8 h-1 bg-rose-500"></span> Registro Manual
+                </h2>
+                
+                <form id="qso-form" class="space-y-4 md:space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-cyan-300 uppercase mb-2 tracking-tighter">Indicativo Corresponsal</label>
+                        <input type="text" id="call" required placeholder="DX CALLSIGN" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 md:p-4 focus:ring-2 focus:ring-cyan-500 outline-none uppercase font-black text-2xl text-yellow-300 placeholder-slate-800">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Fecha UTC</label>
+                            <input type="date" id="date" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-rose-500 outline-none text-sm font-bold text-white">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-xs font-bold text-slate-400 uppercase">Hora HHMM</label>
+                                <button type="button" onclick="setUTCNow()" class="text-[10px] text-cyan-400 hover:neon-text-yellow font-black uppercase">Sinc UTC</button>
+                            </div>
+                            <input type="text" id="time" required placeholder="1430" maxlength="4" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-rose-500 outline-none text-xl font-black text-white text-center tracking-widest">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Banda</label>
+                            <select id="band" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-cyan-500 outline-none font-bold text-cyan-300">
+                                <option value="40m">40m</option>
+                                <option value="20m">20m</option>
+                                <option value="80m">80m</option>
+                                <option value="15m">15m</option>
+                                <option value="10m">10m</option>
+                                <option value="2m">2m</option>
+                                <option value="70cm">70cm</option>
+                                <option value="23cm">23cm</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Modo</label>
+                            <select id="mode" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-cyan-500 outline-none font-black text-rose-400">
+                                <optgroup label="Analógico" class="bg-slate-900">
+                                    <option value="SSB">SSB</option>
+                                    <option value="CW">CW</option>
+                                    <option value="FM">FM</option>
+                                </optgroup>
+                                <optgroup label="Digital Voz" class="bg-slate-900">
+                                    <option value="DV">DV</option>
+                                    <option value="DMR">DMR</option>
+                                    <option value="C4FM">C4FM</option>
+                                    <option value="DSTAR">D-STAR</option>
+                                </optgroup>
+                                <optgroup label="Datos" class="bg-slate-900">
+                                    <option value="FT8">FT8</option>
+                                    <option value="FT4">FT4</option>
+                                    <option value="RTTY">RTTY</option>
+                                    <option value="VARAC">VARAC</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">RST Env</label>
+                            <input type="text" id="rst_sent" value="59" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 outline-none text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">RST Rec</label>
+                            <input type="text" id="rst_rcvd" value="59" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 outline-none text-center font-bold">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl transition-all shadow-[0_0_20px_#e11d48] uppercase italic tracking-widest active:scale-95 touch-manipulation">
+                        Añadir Contacto
+                    </button>
+                </form>
+            </section>
+
+            <!-- Tabla de Datos -->
+            <section class="lg:col-span-8 space-y-6 flex flex-col min-h-0">
+                <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-900/40 p-4 rounded-2xl border border-cyan-900 shadow-xl gap-4">
+                    <h2 class="text-xl md:text-2xl font-black italic neon-text-yellow uppercase tracking-widest">Registros</h2>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button onclick="exportADIF()" class="btn-neon-green flex-1 sm:flex-none px-4 md:px-6 py-2 rounded-lg text-xs md:text-sm font-black transition-all uppercase italic">
+                            ADIF
+                        </button>
+                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 flex-1 sm:flex-none px-4 py-2 text-[10px] md:text-xs font-bold uppercase transition-colors rounded-lg">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl flex-grow flex flex-col">
+                    <div class="overflow-x-auto overflow-y-auto max-h-[500px] lg:max-h-none">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead class="sticky top-0 z-10">
+                                <tr class="bg-slate-950 text-cyan-400 text-[10px] md:text-xs uppercase font-black italic">
+                                    <th class="p-3 md:p-4 border-b border-slate-800">Callsign</th>
+                                    <th class="p-3 md:p-4 border-b border-slate-800">Info UTC</th>
+                                    <th class="p-3 md:p-4 border-b border-slate-800">Banda/Modo</th>
+                                    <th class="p-3 md:p-4 border-b border-slate-800">RST</th>
+                                    <th class="p-3 md:p-4 border-b border-slate-800 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-body" class="divide-y divide-slate-800/50">
+                                <!-- Filas dinámicas -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="empty-msg" class="p-12 text-center text-slate-600 italic font-bold uppercase tracking-widest opacity-50 flex-grow flex items-center justify-center">
+                        Esperando señal... Log vacío.
+                    </div>
+                </div>
+
+                <!-- Footer / Firma -->
+                <footer class="mt-auto pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-cyan-500/50">
+                    <p class="text-[10px] uppercase font-bold tracking-widest text-center sm:text-left">Havana Neon ADIF Logger • Santa Cruz del Sur</p>
+                    <p class="signature text-sm text-cyan-400">cl7adv, vercion v3.5</p>
+                </footer>
+            </section>
         </div>
     </div>
 
-    <div id="info-modal" onclick="closeInfo()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">LOGBOOK UPDATE: MANUAL UTC</div>
-            <div style="font-size: 0.85rem; line-height: 1.5;">
-                <strong>MEJORAS INCLUIDAS:</strong><br>
-                • Hora fija en Estándar UTC Mundial.<br>
-                • Entrada de Hora Manual (Texto).<br>
-                • Sin selector de tiempo emergente.<br><br>
-                <strong>HISTORIAL:</strong><br>
-                Actualizado: 06 de Enero, 2026<br>
-                Radio Club: Santa Cruz del Sur (Camagüey)<br><br>
-                <div class="signature">JONATHAN & ALFRED</div>
-                <br>
-                <button onclick="closeInfo()" style="width:100%">CERRAR PANEL</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="info-btn" onclick="toggleInfo()">?</div>
-
-    <div class="terminal-container">
-        <div class="header-section">
-            <div class="update-tag">Relieve Update v2.7 - MANUAL UTC</div>
-            <h1>ADIF COMMANDER</h1>
-        </div>
-
-        <div id="utc-clock">--:--:--</div>
-        
-        <div class="input-grid">
-            <input type="hidden" id="edit-index" value="-1">
-            <div class="input-box"><span class="label">Tu Indicativo</span><input type="text" id="my-call" placeholder="TU CALLSIGN"></div>
-            <div class="input-box"><span class="label">Estación</span><input type="text" id="call" placeholder="CALLSIGN"></div>
-            <div class="input-box"><span class="label">Nombre</span><input type="text" id="name" placeholder="OPERADOR"></div>
-            <div class="input-box"><span class="label">Fecha</span><input type="date" id="date"></div>
-            <div class="input-box">
-                <span class="label">Hora QSO (UTC)</span>
-                <input type="text" id="time" placeholder="HH:MM" maxlength="5" style="text-align: center; letter-spacing: 1px;">
-                <button class="refresh-btn" onclick="forceUpdateTime()">CAPTURAR HORA UTC</button>
-            </div>
-            <div class="input-box"><span class="label">Banda</span><input type="text" id="band" placeholder="40M"></div>
-            <div class="input-box">
-                <span class="label">Modo</span>
-                <select id="mode">
-                    <option value="SSB">SSB</option>
-                    <option value="USB">USB</option>
-                    <option value="LSB">LSB</option>
-                    <option value="CW">CW</option>
-                    <option value="FT8">FT8</option>
-                    <option value="FT4">FT4</option>
-                    <option value="AM">AM</option>
-                    <option value="FM">FM</option>
-                    <option value="DMR">DMR</option>
-                    <option value="VARAC">VARAC</option>
-                    <option value="DV">DV</option>
-                    <option value="RTTY">RTTY</option>
-                    <option value="JS8">JS8</option>
-                </select>
-            </div>
-            <div class="input-box"><span class="label">RST</span><input type="text" id="rst" placeholder="59"></div>
-        </div>
-
-        <div class="action-bar">
-            <button onclick="handleEntry()" id="btn-main">AÑADIR QSO</button>
-            <button style="background: var(--neon-pink);" onclick="exportADIF()">EXPORTAR ADIF</button>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>TU CALL</th><th>CALL</th><th>NOMBRE</th><th>FECHA</th><th>HORA</th><th>BANDA</th><th>MODO</th><th>RST</th><th>ACC</th></tr>
-                </thead>
-                <tbody id="log-body"></tbody>
-            </table>
-        </div>
-
-        <div class="footer-credits">
-            RADIO CLUB SANTA CRUZ DEL SUR, CUBA<br>
-            <div class="signature">JONATHAN & ALFRED</div>
-        </div>
+    <!-- Toast Neon -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-8 sm:translate-x-0 bg-slate-950 border-2 border-green-500 text-green-400 px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(74,222,128,0.4)] transform translate-y-32 transition-transform duration-500 z-50 font-black italic uppercase text-sm">
+        QSO Confirmado 📻
     </div>
 
     <script>
-        let qsoList = [];
+        let qsoList = JSON.parse(localStorage.getItem('radio_log_neon')) || [];
+        document.getElementById('my-call').value = ''; 
 
-        function updateClock() {
+        const form = document.getElementById('qso-form');
+        const logBody = document.getElementById('log-body');
+        const emptyMsg = document.getElementById('empty-msg');
+        const qsoCountEl = document.getElementById('qso-count');
+        const toast = document.getElementById('toast');
+
+        // Configurar fecha por defecto
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+
+        function setUTCNow() {
             const now = new Date();
-            // Sistema forzado a UTC
-            const h = now.getUTCHours();
-            const m = String(now.getUTCMinutes()).padStart(2, '0');
-            const s = String(now.getUTCSeconds()).padStart(2, '0');
             const year = now.getUTCFullYear();
             const month = String(now.getUTCMonth() + 1).padStart(2, '0');
             const day = String(now.getUTCDate()).padStart(2, '0');
-
-            const displayH = String(h).padStart(2, '0');
-            document.getElementById('utc-clock').innerText = `UTC: ${displayH}:${m}:${s}`;
-
-            // Auto-relleno inicial solo si están vacíos
-            if(!document.getElementById('date').value) {
-                document.getElementById('date').value = `${year}-${month}-${day}`;
-            }
-            if(!document.getElementById('time').value) {
-                document.getElementById('time').value = `${displayH}:${m}`;
-            }
-        }
-
-        function forceUpdateTime() {
-            const now = new Date();
-            const h = String(now.getUTCHours()).padStart(2, '0');
-            const m = String(now.getUTCMinutes()).padStart(2, '0');
-            const year = now.getUTCFullYear();
-            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(now.getUTCDate()).padStart(2, '0');
-
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            
             document.getElementById('date').value = `${year}-${month}-${day}`;
-            // Se inserta como texto simple
-            document.getElementById('time').value = `${h}:${m}`;
+            document.getElementById('time').value = `${hours}${minutes}`;
         }
 
-        setInterval(updateClock, 1000);
-        updateClock();
+        function updateUI() {
+            logBody.innerHTML = '';
+            qsoCountEl.innerText = `${qsoList.length} QSOs`;
+            
+            if (qsoList.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                qsoList.slice().reverse().forEach((qso, index) => {
+                    const realIndex = qsoList.length - 1 - index;
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-cyan-500/5 transition-colors group";
+                    
+                    const displayTime = qso.time.length === 4 ? 
+                        qso.time.substring(0,2) + ":" + qso.time.substring(2,4) : qso.time;
 
-        function toggleInfo() { document.getElementById('info-modal').style.display = 'flex'; }
-        function closeInfo() { document.getElementById('info-modal').style.display = 'none'; }
+                    row.innerHTML = `
+                        <td class="p-3 md:p-4">
+                            <span class="font-black text-xl md:text-2xl text-yellow-300 group-hover:neon-text-yellow transition-all block">${qso.call}</span>
+                            <span class="text-[9px] text-slate-500 uppercase font-bold">OP: ${qso.myCall}</span>
+                        </td>
+                        <td class="p-3 md:p-4 text-xs font-mono text-slate-400">
+                            <div class="whitespace-nowrap">${qso.date}</div>
+                            <div class="text-white font-bold">${displayTime}z</div>
+                        </td>
+                        <td class="p-3 md:p-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="bg-cyan-950/50 text-cyan-300 border border-cyan-800/50 px-2 py-0.5 rounded text-[10px] font-black uppercase w-fit">${qso.band}</span>
+                                <span class="text-[10px] font-black text-rose-400 uppercase italic">${qso.mode}</span>
+                            </div>
+                        </td>
+                        <td class="p-3 md:p-4 text-xs text-slate-400 font-bold italic">${qso.rst_sent}/${qso.rst_rcvd}</td>
+                        <td class="p-3 md:p-4 text-center">
+                            <button onclick="deleteQSO(${realIndex})" class="text-slate-700 hover:text-rose-500 transition-colors p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    logBody.appendChild(row);
+                });
+            }
+            localStorage.setItem('radio_log_neon', JSON.stringify(qsoList));
+        }
 
-        setTimeout(() => {
-            const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0';
-            setTimeout(() => intro.style.display = 'none', 800);
-        }, 2200);
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            
+            const operatorCall = document.getElementById('my-call').value.toUpperCase().trim();
+            if (!operatorCall) {
+                document.getElementById('my-call').classList.add('neon-border-pink');
+                setTimeout(() => document.getElementById('my-call').classList.remove('neon-border-pink'), 1000);
+                return;
+            }
 
-        function handleEntry() {
-            const editIdx = document.getElementById('edit-index').value;
-            const entry = {
-                myCall: document.getElementById('my-call').value.toUpperCase(),
-                call: document.getElementById('call').value.toUpperCase(),
-                name: document.getElementById('name').value,
+            let timeVal = document.getElementById('time').value.replace(/[:.-]/g, '');
+            if(timeVal.length < 4) timeVal = timeVal.padStart(4, '0');
+
+            const newQso = {
+                call: document.getElementById('call').value.toUpperCase().trim(),
+                myCall: operatorCall,
                 date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
-                band: document.getElementById('band').value.toUpperCase(),
+                time: timeVal,
+                band: document.getElementById('band').value,
                 mode: document.getElementById('mode').value,
-                rst: document.getElementById('rst').value
+                rst_sent: document.getElementById('rst_sent').value,
+                rst_rcvd: document.getElementById('rst_rcvd').value,
+                timestamp: new Date().getTime()
             };
 
-            if(!entry.call) return alert("Inserte el indicativo");
-
-            if(editIdx === "-1") {
-                qsoList.push(entry);
-            } else {
-                qsoList[editIdx] = entry;
-                document.getElementById('edit-index').value = "-1";
-                document.getElementById('btn-main').innerText = "AÑADIR QSO";
-            }
-            renderTable();
-            clearInputs();
-        }
-
-        function renderTable() {
-            const body = document.getElementById('log-body');
-            body.innerHTML = "";
-            qsoList.forEach((q, i) => {
-                body.innerHTML += `<tr>
-                    <td style="font-weight:bold; color:var(--accent-blue)">${q.myCall}</td>
-                    <td style="font-weight:bold">${q.call}</td>
-                    <td>${q.name}</td><td>${q.date}</td><td>${q.time}</td>
-                    <td>${q.band}</td><td>${q.mode}</td><td>${q.rst}</td>
-                    <td>
-                        <button onclick="editRow(${i})" style="padding:2px 8px; background:var(--neon-green); font-size:10px">E</button>
-                        <button onclick="deleteRow(${i})" style="padding:2px 8px; background:red; font-size:10px">X</button>
-                    </td>
-                </tr>`;
-            });
-        }
-
-        function clearInputs() {
-            ["call","name","band","rst"].forEach(id => document.getElementById(id).value = "");
-            forceUpdateTime();
+            qsoList.push(newQso);
+            updateUI();
+            
+            document.getElementById('call').value = '';
             document.getElementById('call').focus();
+            showToast();
+        };
+
+        function deleteQSO(index) {
+            if(confirm('¿Eliminar este registro?')) {
+                qsoList.splice(index, 1);
+                updateUI();
+            }
         }
 
-        function deleteRow(i) { qsoList.splice(i, 1); renderTable(); }
+        function clearLog() {
+            if (confirm('¿Vaciar todo el log? Esta acción es irreversible.')) {
+                qsoList = [];
+                updateUI();
+            }
+        }
 
-        function editRow(i) {
-            const q = qsoList[i];
-            document.getElementById('my-call').value = q.myCall;
-            document.getElementById('call').value = q.call;
-            document.getElementById('name').value = q.name;
-            document.getElementById('date').value = q.date;
-            document.getElementById('time').value = q.time;
-            document.getElementById('band').value = q.band;
-            document.getElementById('mode').value = q.mode;
-            document.getElementById('rst').value = q.rst;
-            document.getElementById('edit-index').value = i;
-            document.getElementById('btn-main').innerText = "GUARDAR";
-            window.scrollTo(0,0);
+        function showToast() {
+            toast.classList.remove('translate-y-32');
+            setTimeout(() => toast.classList.add('translate-y-32'), 2500);
         }
 
         function exportADIF() {
-            if(qsoList.length === 0) return alert("No hay datos");
-            let adif = `ADIF Export from CL7ADV\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
-            qsoList.forEach(q => {
-                const cleanDate = q.date.replace(/-/g, "");
-                // Limpieza extra por si el usuario escribe 14:30 o 1430
-                const cleanTime = q.time.replace(/:/g, "").substring(0,4);
-                adif += `<STATION_CALLSIGN:${q.myCall.length}>${q.myCall} ` +
-                        `<CALL:${q.call.length}>${q.call} <NAME:${q.name.length}>${q.name} ` +
-                        `<QSO_DATE:${cleanDate.length}>${cleanDate} <TIME_ON:${cleanTime.length}>${cleanTime} ` +
-                        `<BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} ` +
-                        `<RST_SENT:${q.rst.length}>${q.rst} <EOR>\n`;
+            if (qsoList.length === 0) return;
+            
+            const currentOp = document.getElementById('my-call').value.toUpperCase().trim();
+            
+            let adif = "ADIF Export - Camag-Santa Cruz Neon\n";
+            adif += "<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonRadioLog\n<EOH>\n\n";
+
+            qsoList.forEach(qso => {
+                const dateAdi = qso.date.replace(/-/g, '');
+                const mCall = qso.myCall || currentOp || 'STATION';
+                
+                adif += `<STATION_CALLSIGN:${mCall.length}>${mCall} `;
+                adif += `<CALL:${qso.call.length}>${qso.call} `;
+                adif += `<QSO_DATE:${dateAdi.length}>${dateAdi} `;
+                adif += `<TIME_ON:${qso.time.length}>${qso.time} `;
+                adif += `<BAND:${qso.band.length}>${qso.band} `;
+                adif += `<MODE:${qso.mode.length}>${qso.mode} `;
+                adif += `<RST_SENT:${qso.rst_sent.length}>${qso.rst_sent} `;
+                adif += `<RST_RCVD:${qso.rst_rcvd.length}>${qso.rst_rcvd} <EOR>\n`;
             });
 
-            const fileName = prompt("Nombre del Log:", "CL7ADV_LOG_UTC.adi");
-            if(fileName) {
-                const blob = new Blob([adif], {type: 'text/plain'});
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = fileName.endsWith('.adi') ? fileName : fileName + '.adi';
-                a.click();
-            }
+            const blob = new Blob([adif], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `LOG_${currentOp || 'STATION'}_${new Date().toISOString().split('T')[0]}.adi`;
+            a.click();
         }
+
+        updateUI();
     </script>
 </body>
 </html>
