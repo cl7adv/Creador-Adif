@@ -114,7 +114,7 @@
                             <input type="text" id="my-call" placeholder="TU CALL" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
                         </div>
                         <div>
-                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Email Log</label>
+                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Mi Email Log</label>
                             <input type="email" id="my-email" placeholder="email@example.com" class="w-full p-2 rounded bg-dark border-none text-xs">
                         </div>
                     </div>
@@ -143,6 +143,12 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- NUEVO CAMPO: EMAIL DEL CORRESPONSAL -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email del Destinatario</label>
+                        <input type="email" id="dx-email" placeholder="correo@corresponsal.com" class="w-full p-3 rounded-lg text-sm">
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -355,7 +361,7 @@
                                 <span class="font-black text-2xl text-yellow-300 block leading-none">${qso.call}</span>
                                 <button onclick="window.open('https://www.qrz.com/db/${qso.call}', '_blank')" class="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] bg-orange-600 px-1 rounded font-bold text-white">QRZ</button>
                             </div>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase">${qso.email || 'NO EMAIL'}</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase">${qso.email || 'SIN CORREO'}</span>
                         </td>
                         <td class="p-4 text-xs font-mono">
                             <div class="text-slate-400">${qso.date}</div>
@@ -390,7 +396,7 @@
 
             const newQso = {
                 call: dxCallInput.value.toUpperCase().trim(),
-                email: document.getElementById('email') ? document.getElementById('email').value.trim() : '',
+                email: document.getElementById('dx-email').value.trim(),
                 date: document.getElementById('date').value,
                 time: document.getElementById('time').value.replace(/\D/g, '').padStart(4, '0'),
                 band: document.getElementById('band').value,
@@ -405,7 +411,9 @@
             qsoList.push(newQso);
             updateUI();
             
+            // Limpiar campos específicos del corresponsal
             dxCallInput.value = '';
+            document.getElementById('dx-email').value = '';
             document.getElementById('freq').value = '';
             document.getElementById('comment').value = '';
             autoFocus();
@@ -436,6 +444,7 @@
                 const cleanDate = q.date.replace(/-/g, '');
                 const cleanTime = q.time.replace(/:/g, '');
                 let line = `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator} <CALL:${q.call.length}>${q.call} <QSO_DATE:8>${cleanDate} <TIME_ON:4>${cleanTime} <BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} <RST_SENT:${q.rst_sent.length}>${q.rst_sent} <RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
+                if (q.email) line += `<EMAIL:${q.email.length}>${q.email} `;
                 if (q.freq) line += `<FREQ:${q.freq.length}>${q.freq} `;
                 if (q.comment) line += `<COMMENT:${q.comment.length}>${q.comment} `;
                 line += `<EOR>\n`;
