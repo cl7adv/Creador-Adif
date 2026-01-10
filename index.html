@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Radio Club - Camag-Santa Cruz CL7ADV Neon Log V4</title>
+    <title>Neon Log Master V4.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -13,6 +13,7 @@
             --cuban-blue: #3b82f6;
             --neon-cyan: #22d3ee;
             --neon-pink: #f43f5e;
+            --neon-yellow: #facc15;
             --deep-dark: #020617;
         }
 
@@ -37,8 +38,9 @@
 
         .neon-border-cyan { border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.15); }
         .neon-border-pink { border: 1px solid var(--neon-pink); box-shadow: 0 0 10px rgba(244, 63, 94, 0.15); }
+        .neon-text-yellow { color: var(--neon-yellow); text-shadow: 0 0 8px rgba(250, 204, 21, 0.5); }
 
-        .cuban-title {
+        .main-title {
             font-family: 'Permanent Marker', cursive;
             background: linear-gradient(135deg, #fff 30%, var(--neon-cyan));
             -webkit-background-clip: text;
@@ -60,15 +62,6 @@
         tr { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .btn-qrz {
-            background: #ff8c00;
-            color: #000;
-            font-weight: 900;
-            text-transform: uppercase;
-            transition: 0.3s;
-        }
-        .btn-qrz:hover { background: #ffa500; box-shadow: 0 0 15px #ff8c00; }
-        
         .btn-adif {
             background: var(--neon-cyan);
             color: #000;
@@ -77,63 +70,90 @@
             transition: 0.3s;
         }
         .btn-adif:hover { background: #67e8f9; box-shadow: 0 0 15px var(--neon-cyan); }
+
+        .utc-clock-container {
+            background: rgba(0,0,0,0.4);
+            border-bottom: 2px solid var(--neon-yellow);
+        }
+
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(2, 6, 23, 0.9);
+        }
     </style>
 </head>
 <body class="min-h-screen pb-10">
 
+    <!-- BARRA SUPERIOR UTC -->
+    <div class="utc-clock-container w-full py-2 px-4 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Radio Link Status:</span>
+            <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-[10px] font-bold text-green-400">ACTIVE</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <span class="text-[10px] font-black text-slate-400 uppercase block leading-none">Hora UTC</span>
+                <span id="real-time-utc" class="neon-text-yellow text-xl md:text-2xl font-black tracking-tighter">00:00:00 UTC</span>
+            </div>
+        </div>
+    </div>
+
     <div id="main-content" class="p-4 md:p-8 max-w-7xl mx-auto">
-        <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div class="text-center lg:text-left">
-                <h1 class="text-4xl md:text-5xl cuban-title mb-2">CL7ADV Log Master</h1>
-                <p class="text-cyan-400 text-xs tracking-[0.3em] uppercase font-bold">Camagüey - Santa Cruz del Sur • V4.0</p>
+        <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
+            <div>
+                <h1 class="text-4xl md:text-5xl main-title mb-2">Neon Log Station</h1>
+                <p class="text-cyan-400 text-xs tracking-[0.3em] uppercase font-bold">Camagüey - Santa Cruz del Sur • Digital V4.2</p>
             </div>
             
             <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                 <div class="glass-panel p-4 rounded-xl neon-border-cyan flex-1">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Indicativo Operador</label>
-                            <input type="text" id="my-call" placeholder="CALLSIGN" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
+                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Operador</label>
+                            <input type="text" id="my-call" placeholder="TU CALL" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
                         </div>
                         <div>
-                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Email (para QRZ)</label>
+                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Email Log</label>
                             <input type="email" id="my-email" placeholder="email@example.com" class="w-full p-2 rounded bg-dark border-none text-xs">
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center justify-center bg-rose-600 px-6 py-4 rounded-xl shadow-lg">
+                <div class="flex items-center justify-center bg-rose-600 px-6 py-4 rounded-xl shadow-lg border-2 border-rose-400 min-w-[120px]">
                     <span id="qso-count" class="text-2xl font-black italic">0 QSOs</span>
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- COLUMNA REGISTRO -->
             <section class="lg:col-span-4 glass-panel p-6 rounded-2xl neon-border-pink">
                 <h2 class="text-xl font-black mb-6 flex items-center gap-3 text-rose-400 uppercase">
-                    <span class="w-2 h-6 bg-rose-500 rounded-full"></span> Nuevo Contacto
+                    <span class="w-2 h-6 bg-rose-500 rounded-full"></span> Log In
                 </h2>
                 
                 <form id="qso-form" class="space-y-4">
                     <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Indicativo Corresponsal</label>
-                            <input type="text" id="call" required placeholder="DX STATION" class="w-full p-4 rounded-lg font-black text-2xl text-yellow-400 uppercase">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email (Opcional)</label>
-                            <input type="email" id="email" placeholder="dx-station@email.com" class="w-full p-3 rounded-lg text-sm italic">
+                        <div class="relative">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Corresponsal</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="call" required placeholder="CALLSIGN" class="flex-grow p-4 rounded-lg font-black text-2xl text-yellow-400 uppercase">
+                                <button type="button" onclick="checkQRZ()" title="Verificar en QRZ.com" class="bg-orange-600 hover:bg-orange-500 p-3 rounded-lg flex items-center justify-center transition-all active:scale-90">
+                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha UTC</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha</label>
                             <input type="date" id="date" required class="w-full p-3 rounded-lg text-xs">
                         </div>
                         <div>
                             <div class="flex justify-between mb-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Hora UTC</label>
-                                <button type="button" onclick="setUTCNow()" class="text-[9px] text-cyan-400 font-bold">AHORA</button>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Hora On</label>
+                                <button type="button" onclick="setUTCNow()" class="text-[9px] text-cyan-400 font-bold">SYNC</button>
                             </div>
                             <input type="text" id="time" required placeholder="HHMM" maxlength="4" class="w-full p-3 rounded-lg text-center font-bold tracking-widest">
                         </div>
@@ -182,21 +202,24 @@
 
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label>
-                        <textarea id="comment" rows="2" placeholder="Notas del QSO..." class="w-full p-3 rounded-lg text-xs italic"></textarea>
+                        <textarea id="comment" rows="2" placeholder="Notas..." class="w-full p-3 rounded-lg text-xs italic"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest italic">
+                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest italic border-b-4 border-rose-800">
                         Registrar QSO
                     </button>
                 </form>
             </section>
 
+            <!-- COLUMNA LISTA -->
             <section class="lg:col-span-8 flex flex-col">
-                <div class="glass-panel p-4 rounded-t-2xl border-b-0 flex justify-between items-center bg-slate-900/80">
-                    <h2 class="text-lg font-black italic text-yellow-400 uppercase tracking-widest">Libro de Guardia</h2>
-                    <div class="flex gap-2">
-                        <button onclick="exportADIF()" class="btn-adif px-4 py-2 rounded-lg text-[10px]">Exportar .ADIF</button>
-                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Limpiar</button>
+                <div class="glass-panel p-4 rounded-t-2xl border-b-0 flex flex-wrap gap-4 justify-between items-center bg-slate-900/80">
+                    <h2 class="text-lg font-black italic text-yellow-400 uppercase tracking-widest">LOG BOOK</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportADIF()" class="btn-adif px-4 py-2 rounded-lg text-[10px]">Export .ADIF</button>
+                        <button onclick="openExternal('qrz')" class="bg-orange-700 hover:bg-orange-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">QRZ Log</button>
+                        <button onclick="openExternal('eqsl')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">eQSL</button>
+                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Clear</button>
                     </div>
                 </div>
 
@@ -214,11 +237,21 @@
                         </thead>
                         <tbody id="log-body" class="divide-y divide-slate-800/50"></tbody>
                     </table>
-                    <div id="empty-msg" class="p-20 text-center text-slate-600 italic font-bold uppercase tracking-widest">Esperando señales del espacio...</div>
+                    <div id="empty-msg" class="p-20 text-center text-slate-600 italic font-bold uppercase tracking-widest">No Signals Logged Yet...</div>
                 </div>
             </section>
         </div>
     </div>
+
+    <!-- FIRMA DE DERECHOS / FOOTER -->
+    <footer class="mt-12 py-8 w-full text-center">
+        <div class="flex flex-col items-center gap-2">
+            <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-4"></div>
+            <p class="text-[10px] text-slate-500 uppercase tracking-[0.4em] font-black">Developed & Designed by</p>
+            <p class="text-xl font-black italic text-cyan-400 tracking-wider">cl7adv cuba</p>
+            <p class="text-[9px] text-slate-600 mt-2">© 2025-2026 • Todos los derechos reservados</p>
+        </div>
+    </footer>
 
     <script>
         let currentOperator = '';
@@ -227,6 +260,16 @@
         const myCallInput = document.getElementById('my-call');
         const myEmailInput = document.getElementById('my-email');
         const dxCallInput = document.getElementById('call');
+        const clockEl = document.getElementById('real-time-utc');
+
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getUTCHours()).padStart(2, '0');
+            const m = String(now.getUTCMinutes()).padStart(2, '0');
+            const s = String(now.getUTCSeconds()).padStart(2, '0');
+            clockEl.innerText = `${h}:${m}:${s} UTC`;
+        }
+        setInterval(updateClock, 1000);
 
         window.onload = () => {
             const lastOp = localStorage.getItem('last_op_v4') || '';
@@ -241,6 +284,7 @@
             }
 
             setUTCNow();
+            updateClock();
             autoFocus();
         };
 
@@ -268,9 +312,7 @@
             updateUI();
         }
 
-        function autoFocus() {
-            dxCallInput.focus();
-        }
+        function autoFocus() { dxCallInput.focus(); }
 
         function setUTCNow() {
             const now = new Date();
@@ -278,6 +320,17 @@
             const hh = String(now.getUTCHours()).padStart(2, '0');
             const mm = String(now.getUTCMinutes()).padStart(2, '0');
             document.getElementById('time').value = `${hh}${mm}`;
+        }
+
+        function checkQRZ() {
+            const call = dxCallInput.value.trim();
+            if (!call) return;
+            window.open(`https://www.qrz.com/db/${call}`, '_blank');
+        }
+
+        function openExternal(site) {
+            if (site === 'qrz') window.open('https://logbook.qrz.com/', '_blank');
+            else if (site === 'eqsl') window.open('https://www.eqsl.cc/qslcard/Logbook.cfm', '_blank');
         }
 
         function updateUI() {
@@ -298,8 +351,11 @@
                     row.className = "hover:bg-cyan-500/5 transition-colors group";
                     row.innerHTML = `
                         <td class="p-4">
-                            <span class="font-black text-2xl text-yellow-300 block leading-none">${qso.call}</span>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase">${qso.email || 'SIN EMAIL'}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-black text-2xl text-yellow-300 block leading-none">${qso.call}</span>
+                                <button onclick="window.open('https://www.qrz.com/db/${qso.call}', '_blank')" class="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] bg-orange-600 px-1 rounded font-bold text-white">QRZ</button>
+                            </div>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase">${qso.email || 'NO EMAIL'}</span>
                         </td>
                         <td class="p-4 text-xs font-mono">
                             <div class="text-slate-400">${qso.date}</div>
@@ -334,7 +390,7 @@
 
             const newQso = {
                 call: dxCallInput.value.toUpperCase().trim(),
-                email: document.getElementById('email').value.trim(),
+                email: document.getElementById('email') ? document.getElementById('email').value.trim() : '',
                 date: document.getElementById('date').value,
                 time: document.getElementById('time').value.replace(/\D/g, '').padStart(4, '0'),
                 band: document.getElementById('band').value,
@@ -350,7 +406,6 @@
             updateUI();
             
             dxCallInput.value = '';
-            document.getElementById('email').value = '';
             document.getElementById('freq').value = '';
             document.getElementById('comment').value = '';
             autoFocus();
@@ -358,43 +413,31 @@
         };
 
         function deleteQSO(i) {
-            if(confirm('¿Eliminar registro seleccionado?')) {
+            if(confirm('¿Eliminar registro?')) {
                 qsoList.splice(i, 1);
                 updateUI();
             }
         }
 
         function clearLog() {
-            if (confirm(`¿Vaciar completamente el libro de ${currentOperator}?`)) {
+            if (confirm(`¿Vaciar libro de ${currentOperator}?`)) {
                 qsoList = [];
                 updateUI();
             }
         }
 
         function exportADIF() {
-            if (qsoList.length === 0) return alert("El libro está vacío.");
-            if (!currentOperator) return alert("Por favor, introduce tu indicativo antes de exportar.");
+            if (qsoList.length === 0) return alert("Libro vacío.");
+            if (!currentOperator) return alert("Falta indicativo.");
             
-            let adif = `ADIF Export para QRZ/LoTW\n<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonLog_CL7ADV\n<EOH>\n\n`;
+            let adif = `ADIF Export\n<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonLog_CL7ADV\n<EOH>\n\n`;
             
             qsoList.forEach(q => {
                 const cleanDate = q.date.replace(/-/g, '');
                 const cleanTime = q.time.replace(/:/g, '');
-                
-                let line = `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator} `;
-                line += `<CALL:${q.call.length}>${q.call} `;
-                line += `<QSO_DATE:8>${cleanDate} `;
-                line += `<TIME_ON:4>${cleanTime} `;
-                line += `<BAND:${q.band.length}>${q.band} `;
-                line += `<MODE:${q.mode.length}>${q.mode} `;
-                line += `<RST_SENT:${q.rst_sent.length}>${q.rst_sent} `;
-                line += `<RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
-                
+                let line = `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator} <CALL:${q.call.length}>${q.call} <QSO_DATE:8>${cleanDate} <TIME_ON:4>${cleanTime} <BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} <RST_SENT:${q.rst_sent.length}>${q.rst_sent} <RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
                 if (q.freq) line += `<FREQ:${q.freq.length}>${q.freq} `;
                 if (q.comment) line += `<COMMENT:${q.comment.length}>${q.comment} `;
-                if (q.email) line += `<EMAIL:${q.email.length}>${q.email} `;
-                if (q.op_email) line += `<MY_EMAIL:${q.op_email.length}>${q.op_email} `;
-                
                 line += `<EOR>\n`;
                 adif += line;
             });
@@ -403,8 +446,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            const timestamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
-            a.download = `LOG_${currentOperator}_${timestamp}.adif`;
+            a.download = `LOG_${currentOperator}.adif`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
