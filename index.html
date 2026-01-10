@@ -2,669 +2,414 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Club - Camag-Santa Cruz cl7adv Neon Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Radio Club - Camag-Santa Cruz CL7ADV Neon Log V4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=JetBrains+Mono:wght@400;700&display=swap');
         
         :root {
-            --cuban-red: #d52b1e;
-            --cuban-blue: #002590;
+            --cuban-red: #ef4444;
+            --cuban-blue: #3b82f6;
             --neon-cyan: #22d3ee;
             --neon-pink: #f43f5e;
+            --deep-dark: #020617;
         }
 
         body { 
-            font-family: 'JetBrains+Mono', monospace; 
-            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+            font-family: 'JetBrains Mono', monospace; 
+            background: radial-gradient(circle at top right, #0f172a 0%, #020617 100%);
             background-attachment: fixed;
-            overflow-x: hidden;
+            color: #f1f5f9;
         }
 
-        /* Pantalla de Bienvenida */
-        #welcome-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: #020617;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease-in-out, visibility 0.8s;
-        }
-
-        .welcome-text {
-            font-family: 'Permanent+Marker', cursive;
-            font-size: 4rem;
-            text-align: center;
-            background: linear-gradient(to right, var(--cuban-blue), #ffffff, var(--cuban-red));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
-            animation: pulse-welcome 2s infinite alternate;
-        }
-
-        @keyframes pulse-welcome {
-            from { transform: scale(1); filter: brightness(1); }
-            to { transform: scale(1.05); filter: brightness(1.3) drop-shadow(0 0 25px var(--neon-cyan)); }
-        }
-
-        .flag-line {
-            height: 4px;
-            width: 0;
-            margin-top: 10px;
-            background: linear-gradient(90deg, var(--cuban-blue) 0%, #fff 50%, var(--cuban-red) 100%);
-            animation: line-grow 1.5s forwards ease-out;
-        }
-
-        @keyframes line-grow {
-            to { width: 300px; }
-        }
-
-        /* Estilos de la App */
-        .cuban-title {
-            font-family: 'Permanent+Marker', cursive;
-            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-        }
-
-        .neon-border-blue {
-            box-shadow: 0 0 5px var(--neon-cyan), inset 0 0 5px var(--neon-cyan);
-            border: 1px solid var(--neon-cyan);
-        }
-
-        .neon-border-pink {
-            box-shadow: 0 0 5px var(--neon-pink), inset 0 0 5px var(--neon-pink);
-            border: 1px solid var(--neon-pink);
-        }
-
-        .neon-text-yellow {
-            text-shadow: 0 0 8px #fde047;
-            color: #fde047;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
-        .btn-neon-green {
-            background: transparent;
-            border: 2px solid #4ade80;
-            color: #4ade80;
-            text-shadow: 0 0 5px #4ade80;
-            box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
-        }
+        .neon-border-cyan { border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.15); }
+        .neon-border-pink { border: 1px solid var(--neon-pink); box-shadow: 0 0 10px rgba(244, 63, 94, 0.15); }
 
-        .btn-neon-green:hover {
-            background: #4ade80;
-            color: #000;
-            box-shadow: 0 0 20px #4ade80;
-        }
-
-        .signature {
-            font-family: 'Permanent+Marker', cursive;
-            text-shadow: 0 0 5px var(--neon-cyan);
-        }
-
-        #main-content {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 1s ease-out;
-        }
-
-        .app-visible #main-content {
-            opacity: 1;
-            transform: translateY(0);
+        .cuban-title {
+            font-family: 'Permanent Marker', cursive;
+            background: linear-gradient(135deg, #fff 30%, var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         input, select, textarea {
-            appearance: none;
-            transition: all 0.2s ease;
+            background: rgba(2, 6, 23, 0.8) !important;
+            border: 1px solid #1e293b !important;
+            color: white !important;
+            outline: none !important;
         }
 
         input:focus, textarea:focus {
-            box-shadow: 0 0 15px var(--neon-cyan);
             border-color: var(--neon-cyan) !important;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
         }
 
-        optgroup {
-            background: #0f172a;
-            color: #94a3b8;
-            font-style: normal;
-            font-weight: bold;
-        }
+        tr { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        @media (max-width: 640px) {
-            .welcome-text { font-size: 2.5rem; }
-            input, select, button { font-size: 16px !important; }
+        .btn-qrz {
+            background: #ff8c00;
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: 0.3s;
         }
+        .btn-qrz:hover { background: #ffa500; box-shadow: 0 0 15px #ff8c00; }
+        
+        .btn-adif {
+            background: var(--neon-cyan);
+            color: #000;
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-adif:hover { background: #67e8f9; box-shadow: 0 0 15px var(--neon-cyan); }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen">
+<body class="min-h-screen pb-10">
 
-    <!-- Pantalla de Bienvenida -->
-    <div id="welcome-screen">
-        <div class="welcome-text">¡73 Cordiales!</div>
-        <div class="text-cyan-400 font-bold tracking-widest mt-4 uppercase animate-bounce">Camag-Santa Cruz</div>
-        <div class="flag-line"></div>
-        <p class="text-slate-500 text-[10px] mt-8 uppercase tracking-[0.5em]">Iniciando Estación...</p>
-    </div>
-
-    <!-- Contenido Principal -->
-    <div id="main-content" class="p-3 md:p-8 max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="mb-6 md:mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-center md:text-left">
-                <h1 class="text-4xl md:text-6xl cuban-title text-rose-500 md:-rotate-2">Camag-Santa Cruz</h1>
-                <p class="text-cyan-400 font-bold tracking-widest mt-2 uppercase flex items-center justify-center md:justify-start gap-2 text-xs md:text-base">
-                    <span class="animate-pulse">●</span> Log Master Neon Edition
-                </p>
+    <div id="main-content" class="p-4 md:p-8 max-w-7xl mx-auto">
+        <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6">
+            <div class="text-center lg:text-left">
+                <h1 class="text-4xl md:text-5xl cuban-title mb-2">CL7ADV Log Master</h1>
+                <p class="text-cyan-400 text-xs tracking-[0.3em] uppercase font-bold">Camagüey - Santa Cruz del Sur • V4.0</p>
             </div>
             
-            <div class="flex flex-col gap-4 w-full md:w-auto items-end">
-                <!-- Reloj UTC -->
-                <div class="text-xs font-mono text-slate-400 bg-slate-900/50 px-3 py-1 rounded border border-slate-800 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    UTC: <span id="utc-clock" class="text-white font-bold">00:00:00</span>
+            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div class="glass-panel p-4 rounded-xl neon-border-cyan flex-1">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Indicativo Operador</label>
+                            <input type="text" id="my-call" placeholder="CALLSIGN" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Email (para QRZ)</label>
+                            <input type="email" id="my-email" placeholder="email@example.com" class="w-full p-2 rounded bg-dark border-none text-xs">
+                        </div>
+                    </div>
                 </div>
-
-                <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                    <div class="glass-panel p-3 rounded-lg neon-border-blue w-full sm:w-auto">
-                        <label class="block text-[10px] text-cyan-400 uppercase font-black mb-1">Operador Estación</label>
-                        <input type="text" id="my-call" placeholder="VACÍO" class="bg-transparent border-none outline-none text-xl font-black uppercase placeholder-slate-700 w-full sm:w-40 text-white text-center sm:text-left">
-                    </div>
-                    <div class="flex items-center">
-                        <span id="qso-count" class="bg-rose-600 text-white px-6 py-2 rounded-full text-sm font-black shadow-[0_0_15px_#e11d48]">0 QSOs</span>
-                    </div>
+                <div class="flex items-center justify-center bg-rose-600 px-6 py-4 rounded-xl shadow-lg">
+                    <span id="qso-count" class="text-2xl font-black italic">0 QSOs</span>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-            <!-- Formulario -->
-            <section class="lg:col-span-4 glass-panel p-5 md:p-6 rounded-2xl shadow-2xl neon-border-pink relative h-fit sticky top-4">
-                <h2 class="text-xl md:text-2xl font-black mb-6 flex items-center gap-3 text-rose-400 uppercase italic">
-                    <span class="w-8 h-1 bg-rose-500"></span> Registro
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <section class="lg:col-span-4 glass-panel p-6 rounded-2xl neon-border-pink">
+                <h2 class="text-xl font-black mb-6 flex items-center gap-3 text-rose-400 uppercase">
+                    <span class="w-2 h-6 bg-rose-500 rounded-full"></span> Nuevo Contacto
                 </h2>
                 
-                <form id="qso-form" class="space-y-4 md:space-y-5">
-                    <!-- Call & Lookup -->
-                    <div>
-                        <label class="block text-xs font-bold text-cyan-300 uppercase mb-2">Indicativo Corresponsal</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="call" required placeholder="DX CALL" class="flex-grow bg-slate-900/50 border border-slate-700 rounded-lg p-3 md:p-4 focus:ring-2 outline-none uppercase font-black text-2xl text-yellow-300 placeholder-slate-800 transition-all">
-                            <a id="lookup-link" href="#" target="_blank" class="bg-slate-800 hover:bg-cyan-900/50 border border-slate-700 text-cyan-400 w-12 flex items-center justify-center rounded-lg transition-colors" title="Buscar en QRZ.com">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </a>
+                <form id="qso-form" class="space-y-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Indicativo Corresponsal</label>
+                            <input type="text" id="call" required placeholder="DX STATION" class="w-full p-4 rounded-lg font-black text-2xl text-yellow-400 uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email (Opcional)</label>
+                            <input type="email" id="email" placeholder="dx-station@email.com" class="w-full p-3 rounded-lg text-sm italic">
                         </div>
                     </div>
 
-                    <!-- Name Field -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Nombre Operador</label>
-                        <input type="text" id="op-name" placeholder="Nombre..." class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none text-white font-bold placeholder-slate-700">
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Fecha UTC</label>
-                            <input type="date" id="date" required class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none text-sm font-bold text-white">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha UTC</label>
+                            <input type="date" id="date" required class="w-full p-3 rounded-lg text-xs">
                         </div>
                         <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="block text-xs font-bold text-slate-400 uppercase">Hora HHMM</label>
-                                <button type="button" onclick="setUTCNow()" class="text-[10px] text-cyan-400 hover:text-white font-black uppercase">Ahora</button>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Hora UTC</label>
+                                <button type="button" onclick="setUTCNow()" class="text-[9px] text-cyan-400 font-bold">AHORA</button>
                             </div>
-                            <input type="text" id="time" required placeholder="0000" maxlength="4" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none text-xl font-black text-white text-center tracking-widest">
+                            <input type="text" id="time" required placeholder="HHMM" maxlength="4" class="w-full p-3 rounded-lg text-center font-bold tracking-widest">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Banda</label>
-                            <select id="band" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 font-bold text-cyan-300">
-                                <option value="160m">160m</option>
-                                <option value="80m">80m</option>
-                                <option value="60m">60m</option>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Banda</label>
+                            <select id="band" class="w-full p-3 rounded-lg font-bold text-cyan-400">
                                 <option value="40m" selected>40m</option>
-                                <option value="30m">30m</option>
                                 <option value="20m">20m</option>
-                                <option value="17m">17m</option>
+                                <option value="80m">80m</option>
                                 <option value="15m">15m</option>
-                                <option value="12m">12m</option>
                                 <option value="10m">10m</option>
-                                <option value="6m">6m</option>
-                                <option value="4m">4m</option>
                                 <option value="2m">2m</option>
-                                <option value="1.25m">1.25m</option>
                                 <option value="70cm">70cm</option>
-                                <option value="23cm">23cm</option>
                             </select>
                         </div>
+                        <div class="col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Frecuencia (MHz)</label>
+                            <input type="text" id="freq" placeholder="7.150" class="w-full p-3 rounded-lg font-bold text-cyan-400">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Modo</label>
-                            <select id="mode" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 font-black text-rose-400">
-                                <optgroup label="Analógicos">
-                                    <option value="SSB">SSB</option>
-                                    <option value="USB">USB</option>
-                                    <option value="LSB">LSB</option>
-                                    <option value="CW">CW</option>
-                                    <option value="AM">AM</option>
-                                    <option value="FM">FM</option>
-                                </optgroup>
-                                <optgroup label="Digitales Populares">
-                                    <option value="FT8">FT8</option>
-                                    <option value="FT4">FT4</option>
-                                    <option value="JS8">JS8</option>
-                                    <option value="VARAC">VARAC</option>
-                                    <option value="WSPR">WSPR</option>
-                                </optgroup>
-                                <optgroup label="Modos de Texto/Data">
-                                    <option value="RTTY">RTTY</option>
-                                    <option value="PSK31">PSK31</option>
-                                    <option value="PSK63">PSK63</option>
-                                    <option value="PSK125">PSK125</option>
-                                    <option value="OLIVIA">OLIVIA</option>
-                                    <option value="CONTESTIA">CONTESTIA</option>
-                                    <option value="THOR">THOR</option>
-                                    <option value="HELL">HELL</option>
-                                    <option value="MFSK16">MFSK16</option>
-                                    <option value="MFSK8">MFSK8</option>
-                                    <option value="MT63">MT63</option>
-                                </optgroup>
-                                <optgroup label="Voz Digital">
-                                    <option value="DMR">DMR</option>
-                                    <option value="C4FM">C4FM (YSF)</option>
-                                    <option value="DSTAR">D-STAR</option>
-                                    <option value="FREEDV">FreeDV</option>
-                                    <option value="DV">DV</option>
-                                </optgroup>
-                                <optgroup label="Otros/Especiales">
-                                    <option value="SSTV">SSTV</option>
-                                    <option value="PACKET">PACKET</option>
-                                    <option value="ARDOP">ARDOP</option>
-                                    <option value="VARAFM">VARA FM</option>
-                                    <option value="VARAHF">VARA HF</option>
-                                </optgroup>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modo</label>
+                            <select id="mode" class="w-full p-3 rounded-lg font-bold text-rose-400">
+                                <option value="SSB">SSB</option>
+                                <option value="CW">CW</option>
+                                <option value="FT8">FT8</option>
+                                <option value="FM">FM</option>
+                                <option value="DMR">DMR</option>
+                                <option value="DV">DV</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
                         <div class="relative">
-                            <span class="absolute left-3 top-1 text-[8px] text-slate-500 uppercase font-bold">Sent</span>
-                            <input type="text" id="rst_sent" value="59" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 pt-5 text-center font-bold text-yellow-500" title="RST Enviado">
+                            <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Sent</span>
+                            <input type="text" id="rst_sent" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
                         </div>
                         <div class="relative">
-                            <span class="absolute left-3 top-1 text-[8px] text-slate-500 uppercase font-bold">Rcvd</span>
-                            <input type="text" id="rst_rcvd" value="59" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 pt-5 text-center font-bold text-yellow-500" title="RST Recibido">
+                            <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Rcvd</span>
+                            <input type="text" id="rst_rcvd" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
                         </div>
                     </div>
 
-                    <!-- Comments -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Comentarios / Notas</label>
-                        <textarea id="comments" rows="2" placeholder="Notas sobre el contacto..." class="w-full bg-slate-900/50 border border-slate-700 rounded-lg p-3 outline-none text-white text-sm placeholder-slate-700 resize-none"></textarea>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label>
+                        <textarea id="comment" rows="2" placeholder="Notas del QSO..." class="w-full p-3 rounded-lg text-xs italic"></textarea>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button id="cancel-edit" type="button" onclick="cancelEdit()" class="hidden flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-4 rounded-xl uppercase italic tracking-widest">
-                            Cancelar
-                        </button>
-                        <button id="submit-btn" type="submit" class="w-full flex-[2] bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-[0_0_20px_#e11d48] uppercase italic tracking-widest active:scale-95 transition-all">
-                            Añadir Contacto
-                        </button>
-                    </div>
+                    <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest italic">
+                        Registrar QSO
+                    </button>
                 </form>
             </section>
 
-            <!-- Tabla -->
-            <section class="lg:col-span-8 space-y-6 flex flex-col">
-                <div class="flex flex-col sm:flex-row justify-between items-center bg-slate-900/40 p-4 rounded-2xl border border-cyan-900 gap-4">
-                    <h2 class="text-xl font-black italic neon-text-yellow uppercase tracking-widest">Estación de Registro</h2>
-                    
-                    <!-- Buscador -->
-                    <div class="relative w-full sm:w-auto flex-grow max-w-xs mx-4">
-                        <input type="text" id="search-input" onkeyup="updateUI()" placeholder="BUSCAR INDICATIVO..." class="w-full bg-slate-800/80 border border-slate-700 rounded-lg py-2 px-4 text-xs font-bold text-white uppercase placeholder-slate-500 focus:border-cyan-400 outline-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute right-3 top-2.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <button onclick="exportADIF()" class="btn-neon-green flex-1 px-4 py-2 rounded-lg text-xs font-black uppercase italic whitespace-nowrap">Exportar ADIF</button>
-                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-red-900/50 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Borrar Todo</button>
+            <section class="lg:col-span-8 flex flex-col">
+                <div class="glass-panel p-4 rounded-t-2xl border-b-0 flex justify-between items-center bg-slate-900/80">
+                    <h2 class="text-lg font-black italic text-yellow-400 uppercase tracking-widest">Libro de Guardia</h2>
+                    <div class="flex gap-2">
+                        <button onclick="exportADIF()" class="btn-adif px-4 py-2 rounded-lg text-[10px]">Exportar .ADIF</button>
+                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Limpiar</button>
                     </div>
                 </div>
 
-                <div class="glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-2xl flex-grow overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[500px]">
+                <div class="glass-panel rounded-b-2xl overflow-hidden flex-grow overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
                         <thead>
-                            <tr class="bg-slate-950 text-cyan-400 text-[10px] uppercase font-black italic">
-                                <th class="p-4 border-b border-slate-800">Callsign</th>
-                                <th class="p-4 border-b border-slate-800">Fecha/Hora</th>
-                                <th class="p-4 border-b border-slate-800">Info</th>
-                                <th class="p-4 border-b border-slate-800">RST</th>
-                                <th class="p-4 border-b border-slate-800 text-center">Acción</th>
+                            <tr class="bg-slate-950/80 text-cyan-400 text-[10px] uppercase font-black italic">
+                                <th class="p-4">Corresponsal</th>
+                                <th class="p-4">Info UTC</th>
+                                <th class="p-4">Frec/Modo</th>
+                                <th class="p-4">Reporte</th>
+                                <th class="p-4">Comentarios</th>
+                                <th class="p-4 text-center">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="log-body" class="divide-y divide-slate-800/50"></tbody>
                     </table>
-                    <div id="empty-msg" class="p-12 text-center text-slate-600 italic font-bold uppercase opacity-50">Log Vacío</div>
+                    <div id="empty-msg" class="p-20 text-center text-slate-600 italic font-bold uppercase tracking-widest">Esperando señales del espacio...</div>
                 </div>
-
-                <footer class="mt-auto pt-6 border-t border-slate-800/50 flex flex-col items-center gap-4 text-cyan-500/60 pb-4">
-                    <div class="flex flex-col md:flex-row w-full justify-between items-center gap-4">
-                        <div class="text-left">
-                            <p class="text-[10px] font-bold tracking-[0.2em] text-slate-500">CAMAGÜEY - SANTA CRUZ DEL SUR</p>
-                            <p class="text-[9px] text-slate-600 uppercase tracking-widest mt-1">Cuba Amateur Radio Log</p>
-                        </div>
-                        
-                        <div class="text-center md:text-right group cursor-default">
-                            <div class="flex items-center gap-2 justify-center md:justify-end">
-                                <span class="text-xl">&copy;</span>
-                                <p class="signature text-lg text-cyan-400 group-hover:text-cyan-300 transition-colors drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]">
-                                    Alfred <span class="text-rose-500 font-bold">CL7ADV</span>
-                                </p>
-                            </div>
-                            <p class="text-[10px] font-mono text-slate-500 uppercase tracking-widest mt-1 group-hover:text-slate-400 transition-colors">
-                                Derechos de Autor Reservados
-                            </p>
-                        </div>
-                    </div>
-                </footer>
             </section>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-950 border-2 border-green-500 text-green-400 px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(74,222,128,0.4)] transform translate-y-32 transition-transform duration-500 z-50 font-black italic uppercase text-sm">
-        QSO Guardado 📻
-    </div>
-
     <script>
-        // Manejo de Pantalla de Bienvenida
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const welcome = document.getElementById('welcome-screen');
-                welcome.style.opacity = '0';
-                welcome.style.visibility = 'hidden';
-                document.body.classList.add('app-visible');
-            }, 2500);
+        let currentOperator = '';
+        let qsoList = [];
+
+        const myCallInput = document.getElementById('my-call');
+        const myEmailInput = document.getElementById('my-email');
+        const dxCallInput = document.getElementById('call');
+
+        window.onload = () => {
+            const lastOp = localStorage.getItem('last_op_v4') || '';
+            const lastEmail = localStorage.getItem('last_email_v4') || '';
             
-            // Iniciar Reloj UTC
-            setInterval(updateUTCClock, 1000);
-            updateUTCClock();
-        });
+            myCallInput.value = lastOp;
+            myEmailInput.value = lastEmail;
+            
+            if (lastOp) {
+                currentOperator = lastOp.toUpperCase();
+                loadOperatorLog();
+            }
 
-        function updateUTCClock() {
-            const now = new Date();
-            const timeString = now.toISOString().split('T')[1].split('.')[0];
-            document.getElementById('utc-clock').textContent = timeString;
-        }
+            setUTCNow();
+            autoFocus();
+        };
 
-        let qsoList = JSON.parse(localStorage.getItem('radio_log_neon')) || [];
-        let editingIndex = -1; // -1 significa que no estamos editando
-        
-        // Cargar el último operador usado si existe
-        const lastOp = localStorage.getItem('last_operator') || '';
-        document.getElementById('my-call').value = lastOp;
-
-        const form = document.getElementById('qso-form');
-        const logBody = document.getElementById('log-body');
-        const emptyMsg = document.getElementById('empty-msg');
-        const qsoCountEl = document.getElementById('qso-count');
-        const toast = document.getElementById('toast');
-        const submitBtn = document.getElementById('submit-btn');
-        const cancelBtn = document.getElementById('cancel-edit');
-        const searchInput = document.getElementById('search-input');
-        const callInput = document.getElementById('call');
-        const lookupLink = document.getElementById('lookup-link');
-
-        document.getElementById('date').value = new Date().toISOString().split('T')[0];
-
-        // Actualizar enlace de búsqueda dinámicamente
-        callInput.addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-            if(val) {
-                lookupLink.href = `https://www.qrz.com/db/${val}`;
-            } else {
-                lookupLink.href = "#";
+        myCallInput.addEventListener('input', (e) => {
+            const op = e.target.value.toUpperCase().trim();
+            if (op !== currentOperator) {
+                currentOperator = op;
+                localStorage.setItem('last_op_v4', op);
+                loadOperatorLog();
             }
         });
 
+        myEmailInput.addEventListener('input', (e) => {
+            localStorage.setItem('last_email_v4', e.target.value.trim());
+        });
+
+        function loadOperatorLog() {
+            if (!currentOperator) {
+                qsoList = [];
+                updateUI();
+                return;
+            }
+            const savedLog = localStorage.getItem(`log_v4_${currentOperator}`);
+            qsoList = savedLog ? JSON.parse(savedLog) : [];
+            updateUI();
+        }
+
+        function autoFocus() {
+            dxCallInput.focus();
+        }
+
         function setUTCNow() {
             const now = new Date();
-            const year = now.getUTCFullYear();
-            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(now.getUTCDate()).padStart(2, '0');
-            const hours = String(now.getUTCHours()).padStart(2, '0');
-            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
-            document.getElementById('date').value = `${year}-${month}-${day}`;
-            document.getElementById('time').value = `${hours}${minutes}`;
+            document.getElementById('date').value = now.toISOString().split('T')[0];
+            const hh = String(now.getUTCHours()).padStart(2, '0');
+            const mm = String(now.getUTCMinutes()).padStart(2, '0');
+            document.getElementById('time').value = `${hh}${mm}`;
         }
 
         function updateUI() {
+            const logBody = document.getElementById('log-body');
+            const emptyMsg = document.getElementById('empty-msg');
+            const qsoCountEl = document.getElementById('qso-count');
+            
             logBody.innerHTML = '';
             qsoCountEl.innerText = `${qsoList.length} QSOs`;
-            const filterText = searchInput.value.toUpperCase();
             
-            // Filtrar lista
-            const filteredList = qsoList.map((qso, index) => ({...qso, originalIndex: index}))
-                                        .filter(qso => qso.call.includes(filterText));
-
-            if (filteredList.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                emptyMsg.textContent = filterText ? "NO SE ENCONTRARON RESULTADOS" : "LOG VACÍO";
+            if (qsoList.length === 0) {
+                emptyMsg.style.display = 'block';
             } else {
-                emptyMsg.classList.add('hidden');
-                // Mostrar en orden inverso (más reciente primero)
-                filteredList.slice().reverse().forEach((qso) => {
+                emptyMsg.style.display = 'none';
+                [...qsoList].reverse().forEach((qso, index) => {
+                    const realIndex = qsoList.length - 1 - index;
                     const row = document.createElement('tr');
-                    row.className = "hover:bg-cyan-500/5 transition-colors group border-b border-slate-800/30";
-                    
-                    // Resaltar si estamos editando esta fila
-                    if(qso.originalIndex === editingIndex) {
-                        row.classList.add("bg-cyan-900/20", "border-l-2", "border-l-cyan-400");
-                    }
-
-                    // Icono de comentario si existe
-                    const commentIcon = qso.comments ? `
-                        <div class="mt-1" title="${qso.comments}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-600 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            <span class="text-[10px] text-slate-500 italic truncate max-w-[100px] inline-block align-bottom ml-1">${qso.comments}</span>
-                        </div>
-                    ` : '';
-
-                    // Nombre si existe
-                    const nameDisplay = qso.name ? `<div class="text-[10px] text-slate-300 font-bold uppercase truncate max-w-[120px]">Op: ${qso.name}</div>` : '';
-
+                    row.className = "hover:bg-cyan-500/5 transition-colors group";
                     row.innerHTML = `
                         <td class="p-4">
-                            <span class="font-black text-2xl text-yellow-300 block">${qso.call}</span>
-                            <span class="text-[9px] text-slate-500 font-bold uppercase">DE: ${qso.myCall}</span>
+                            <span class="font-black text-2xl text-yellow-300 block leading-none">${qso.call}</span>
+                            <span class="text-[9px] text-slate-500 font-bold uppercase">${qso.email || 'SIN EMAIL'}</span>
                         </td>
-                        <td class="p-4 text-xs font-mono text-slate-400">
-                            <div>${qso.date}</div>
-                            <div class="text-white font-bold">${qso.time}z</div>
+                        <td class="p-4 text-xs font-mono">
+                            <div class="text-slate-400">${qso.date}</div>
+                            <div class="text-white font-bold">${qso.time}Z</div>
                         </td>
                         <td class="p-4">
                             <div class="flex flex-col gap-1">
-                                <div class="flex gap-2 items-center">
-                                    <span class="bg-cyan-950/50 text-cyan-300 border border-cyan-800/50 px-2 py-0.5 rounded text-[10px] font-black w-fit">${qso.band}</span>
-                                    <span class="text-[10px] font-black text-rose-400 italic">${qso.mode}</span>
-                                </div>
-                                ${nameDisplay}
-                                ${commentIcon}
+                                <span class="bg-cyan-950/50 text-cyan-300 border border-cyan-800/50 px-2 py-0.5 rounded text-[10px] font-black w-fit">${qso.freq ? qso.freq + ' MHz' : qso.band}</span>
+                                <span class="text-[10px] font-black text-rose-400 italic">${qso.mode}</span>
                             </div>
                         </td>
-                        <td class="p-4 text-xs text-slate-400 font-bold italic">${qso.rst_sent}/${qso.rst_rcvd}</td>
+                        <td class="p-4 text-xs text-slate-400 font-bold italic">S:${qso.rst_sent} / R:${qso.rst_rcvd}</td>
+                        <td class="p-4 text-[10px] text-slate-300 italic max-w-[150px] truncate" title="${qso.comment || ''}">${qso.comment || '-'}</td>
                         <td class="p-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editQSO(${qso.originalIndex})" class="text-cyan-600 hover:text-cyan-400 p-2 transition-colors" title="Editar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                                <button onclick="deleteQSO(${qso.originalIndex})" class="text-slate-700 hover:text-rose-500 p-2 transition-colors" title="Borrar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <button onclick="deleteQSO(${realIndex})" class="text-slate-700 hover:text-rose-500 p-2 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
                         </td>
                     `;
                     logBody.appendChild(row);
                 });
             }
-            localStorage.setItem('radio_log_neon', JSON.stringify(qsoList));
+            
+            if (currentOperator) {
+                localStorage.setItem(`log_v4_${currentOperator}`, JSON.stringify(qsoList));
+            }
         }
 
-        function editQSO(index) {
-            const qso = qsoList[index];
-            if(!qso) return;
-
-            // Rellenar formulario
-            document.getElementById('call').value = qso.call;
-            document.getElementById('op-name').value = qso.name || '';
-            document.getElementById('date').value = qso.date;
-            document.getElementById('time').value = qso.time;
-            document.getElementById('band').value = qso.band;
-            document.getElementById('mode').value = qso.mode;
-            document.getElementById('rst_sent').value = qso.rst_sent;
-            document.getElementById('rst_rcvd').value = qso.rst_rcvd;
-            document.getElementById('comments').value = qso.comments || '';
-
-            // Trigger input event to update lookup link
-            callInput.dispatchEvent(new Event('input'));
-
-            // Cambiar estado a modo edición
-            editingIndex = index;
-            submitBtn.textContent = "Actualizar Contacto";
-            submitBtn.classList.remove('bg-rose-600', 'hover:bg-rose-500', 'shadow-[0_0_20px_#e11d48]');
-            submitBtn.classList.add('bg-cyan-600', 'hover:bg-cyan-500', 'shadow-[0_0_20px_#22d3ee]');
-            cancelBtn.classList.remove('hidden');
-
-            // Scroll suave hacia el formulario
-            document.querySelector('#qso-form').scrollIntoView({behavior: 'smooth'});
-            
-            // Actualizar tabla para resaltar la fila
-            updateUI();
-        }
-
-        function cancelEdit() {
-            editingIndex = -1;
-            form.reset();
-            
-            // Restaurar valores por defecto
-            document.getElementById('my-call').value = localStorage.getItem('last_operator') || '';
-            document.getElementById('date').value = new Date().toISOString().split('T')[0];
-            lookupLink.href = "#";
-
-            // Restaurar botones
-            submitBtn.textContent = "Añadir Contacto";
-            submitBtn.classList.add('bg-rose-600', 'hover:bg-rose-500', 'shadow-[0_0_20px_#e11d48]');
-            submitBtn.classList.remove('bg-cyan-600', 'hover:bg-cyan-500', 'shadow-[0_0_20px_#22d3ee]');
-            cancelBtn.classList.add('hidden');
-            
-            updateUI();
-        }
-
-        form.onsubmit = (e) => {
+        document.getElementById('qso-form').onsubmit = (e) => {
             e.preventDefault();
-            const op = document.getElementById('my-call').value.toUpperCase().trim();
-            if (!op) return alert("Indique el Operador de la Estación");
-            
-            localStorage.setItem('last_operator', op);
+            if (!currentOperator) return alert("¡Atención! Falta indicativo del operador.");
 
-            let tVal = document.getElementById('time').value.replace(/[:.-]/g, '').padStart(4, '0');
-
-            const qsoData = {
-                call: document.getElementById('call').value.toUpperCase().trim(),
-                name: document.getElementById('op-name').value.trim(),
-                myCall: op,
+            const newQso = {
+                call: dxCallInput.value.toUpperCase().trim(),
+                email: document.getElementById('email').value.trim(),
                 date: document.getElementById('date').value,
-                time: tVal,
+                time: document.getElementById('time').value.replace(/\D/g, '').padStart(4, '0'),
                 band: document.getElementById('band').value,
+                freq: document.getElementById('freq').value.trim(),
                 mode: document.getElementById('mode').value,
                 rst_sent: document.getElementById('rst_sent').value,
                 rst_rcvd: document.getElementById('rst_rcvd').value,
-                comments: document.getElementById('comments').value.trim(),
+                comment: document.getElementById('comment').value.trim(),
+                op_email: myEmailInput.value.trim()
             };
 
-            if (editingIndex >= 0) {
-                // Actualizar existente
-                qsoList[editingIndex] = qsoData;
-                toast.textContent = "QSO Actualizado 📝";
-                cancelEdit(); // Esto resetea el formulario y el estado
-            } else {
-                // Crear nuevo
-                qsoList.push(qsoData);
-                toast.textContent = "QSO Guardado 📻";
-                form.reset();
-                document.getElementById('my-call').value = op;
-                document.getElementById('date').value = new Date().toISOString().split('T')[0];
-                lookupLink.href = "#";
-            }
-
+            qsoList.push(newQso);
             updateUI();
-            document.getElementById('call').focus();
-            showToast();
+            
+            dxCallInput.value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('freq').value = '';
+            document.getElementById('comment').value = '';
+            autoFocus();
+            setUTCNow();
         };
 
         function deleteQSO(i) {
-            if(confirm('¿Borrar este registro permanentemente?')) { 
-                if(editingIndex === i) cancelEdit(); // Cancelar edición si borramos lo que editamos
-                qsoList.splice(i, 1); 
-                updateUI(); 
+            if(confirm('¿Eliminar registro seleccionado?')) {
+                qsoList.splice(i, 1);
+                updateUI();
             }
         }
 
         function clearLog() {
-            if (confirm('¿ESTÁ SEGURO? Se borrará todo el log.')) { 
-                qsoList = []; 
-                cancelEdit();
-                updateUI(); 
+            if (confirm(`¿Vaciar completamente el libro de ${currentOperator}?`)) {
+                qsoList = [];
+                updateUI();
             }
         }
 
-        function showToast() {
-            toast.classList.remove('translate-y-32');
-            setTimeout(() => toast.classList.add('translate-y-32'), 2500);
-        }
-
         function exportADIF() {
-            if (qsoList.length === 0) return;
-            let adif = "ADIF Export - Neon Radio\n<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonRadioLog\n<EOH>\n\n";
+            if (qsoList.length === 0) return alert("El libro está vacío.");
+            if (!currentOperator) return alert("Por favor, introduce tu indicativo antes de exportar.");
+            
+            let adif = `ADIF Export para QRZ/LoTW\n<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonLog_CL7ADV\n<EOH>\n\n`;
+            
             qsoList.forEach(q => {
-                const d = q.date.replace(/-/g, '');
-                // Sanitizar comentarios para ADIF (reemplazar saltos de línea)
-                const comments = q.comments ? q.comments.replace(/(\r\n|\n|\r)/gm, " ") : "";
-                const name = q.name || "";
+                const cleanDate = q.date.replace(/-/g, '');
+                const cleanTime = q.time.replace(/:/g, '');
                 
-                adif += `<STATION_CALLSIGN:${q.myCall.length}>${q.myCall} <CALL:${q.call.length}>${q.call} <QSO_DATE:${d.length}>${d} <TIME_ON:4>${q.time} <BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} <RST_SENT:${q.rst_sent.length}>${q.rst_sent} <RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
+                let line = `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator} `;
+                line += `<CALL:${q.call.length}>${q.call} `;
+                line += `<QSO_DATE:8>${cleanDate} `;
+                line += `<TIME_ON:4>${cleanTime} `;
+                line += `<BAND:${q.band.length}>${q.band} `;
+                line += `<MODE:${q.mode.length}>${q.mode} `;
+                line += `<RST_SENT:${q.rst_sent.length}>${q.rst_sent} `;
+                line += `<RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
                 
-                if(name) adif += `<NAME:${name.length}>${name} `;
-                if(comments) adif += `<COMMENT:${comments.length}>${comments} `;
+                if (q.freq) line += `<FREQ:${q.freq.length}>${q.freq} `;
+                if (q.comment) line += `<COMMENT:${q.comment.length}>${q.comment} `;
+                if (q.email) line += `<EMAIL:${q.email.length}>${q.email} `;
+                if (q.op_email) line += `<MY_EMAIL:${q.op_email.length}>${q.op_email} `;
                 
-                adif += `<EOR>\n`;
+                line += `<EOR>\n`;
+                adif += line;
             });
+
             const blob = new Blob([adif], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `LOG_CUBA_${new Date().getTime()}.adi`;
+            const timestamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
+            a.download = `LOG_${currentOperator}_${timestamp}.adif`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
-
-        updateUI();
     </script>
 </body>
 </html>
