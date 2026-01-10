@@ -81,7 +81,7 @@
             background: rgba(2, 6, 23, 0.9);
         }
 
-        /* Nuevos estilos para edición */
+        /* Estilos para edición */
         .edit-mode {
             background: rgba(234, 179, 8, 0.15) !important;
             border-left: 4px solid #facc15 !important;
@@ -165,229 +165,380 @@
             visibility: visible;
             opacity: 1;
         }
+        
+        /* Animación para la portada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsividad adicional para la portada */
+        @media (max-width: 640px) {
+            #cover-page .glass-panel {
+                padding: 1.5rem !important;
+                margin: 0 1rem;
+            }
+            
+            #cover-page h1 {
+                font-size: 2rem !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen pb-10">
 
-    <!-- BARRA SUPERIOR UTC -->
-    <div class="utc-clock-container w-full py-2 px-4 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md">
-        <div class="flex items-center gap-2">
-            <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Radio Link Status:</span>
-            <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span class="text-[10px] font-bold text-green-400">ACTIVE</span>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="text-right">
-                <span class="text-[10px] font-black text-slate-400 uppercase block leading-none">Hora UTC</span>
-                <span id="real-time-utc" class="neon-text-yellow text-xl md:text-2xl font-black tracking-tighter">00:00:00 UTC</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="main-content" class="p-4 md:p-8 max-w-7xl mx-auto">
-        <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
-            <div>
-                <h1 class="text-4xl md:text-5xl main-title mb-2">Neon Log Station <span class="text-sm text-cyan-400 align-top">v4.3</span></h1>
-                <p class="text-cyan-400 text-xs tracking-[0.3em] uppercase font-bold">Camagüey - Santa Cruz del Sur • Digital V4.3</p>
-            </div>
+    <!-- PORTADA DE INICIO -->
+    <div id="cover-page" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-gray-950 overflow-hidden transition-opacity duration-1000">
+        <div class="relative w-full max-w-4xl px-6 py-12 md:py-20">
+            <!-- Elementos decorativos -->
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-60 h-60 bg-rose-500/10 rounded-full blur-3xl"></div>
             
-            <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                <div class="glass-panel p-4 rounded-xl neon-border-cyan flex-1">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Operador</label>
-                            <input type="text" id="my-call" placeholder="TU CALL" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
+            <!-- Contenido principal -->
+            <div class="glass-panel p-8 md:p-12 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-900/20 relative">
+                <!-- Encabezado -->
+                <div class="text-center mb-10">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-r from-cyan-500 to-rose-500 flex items-center justify-center animate-pulse">
+                            <svg class="w-10 h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+                            </svg>
                         </div>
-                        <div>
-                            <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Mi Email Log</label>
-                            <input type="email" id="my-email" placeholder="email@example.com" class="w-full p-2 rounded bg-dark border-none text-xs">
+                    </div>
+                    
+                    <h1 class="text-3xl md:text-5xl font-bold mb-4">
+                        <span class="bg-gradient-to-r from-cyan-400 via-white to-rose-400 bg-clip-text text-transparent">
+                            Neon Log Master
+                        </span>
+                    </h1>
+                    <div class="text-cyan-300 font-mono text-sm md:text-base mb-2">V4.3 • Digital Station Log</div>
+                    <div class="h-1 w-24 bg-gradient-to-r from-cyan-500 to-rose-500 mx-auto my-4 rounded-full"></div>
+                </div>
+
+                <!-- Mensaje de bienvenida -->
+                <div class="text-center mb-10 px-4">
+                    <p class="text-slate-300 text-lg md:text-xl mb-6 leading-relaxed">
+                        Sistema digital de registro QSO<br>
+                        <span class="text-cyan-300 font-bold">Desarrollado por CL7ADV Cuba</span>
+                    </p>
+                    
+                    <div class="inline-block bg-slate-800/50 border-l-4 border-cyan-500 p-4 rounded-r-lg mb-8">
+                        <p class="text-slate-400 text-sm md:text-base italic">
+                            "73 desde Camagüey, Cuba.<br>
+                            ¡Buenas señales y DX en todas las bandas!"
+                        </p>
+                    </div>
+                    
+                    <!-- Indicadores de sistema -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-md mx-auto mb-10">
+                        <div class="text-center p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">
+                            <div class="text-cyan-400 text-sm font-bold">ADIF Ready</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">
+                            <div class="text-rose-400 text-sm font-bold">Multi-Modo</div>
+                        </div>
+                        <div class="text-center p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">
+                            <div class="text-yellow-400 text-sm font-bold">Local Storage</div>
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col items-center justify-center bg-rose-600 px-6 py-4 rounded-xl shadow-lg border-2 border-rose-400 min-w-[120px]">
-                    <span id="qso-count" class="text-2xl font-black italic">0 QSOs</span>
-                    <span id="edit-status" class="text-[10px] font-bold uppercase mt-1 hidden"></span>
+
+                <!-- Botón de entrada -->
+                <div class="text-center">
+                    <button id="enter-app" class="group relative px-10 py-4 bg-gradient-to-r from-cyan-600 to-rose-600 rounded-xl font-bold text-lg uppercase tracking-widest transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/30 active:scale-95">
+                        <span class="relative z-10 text-white">Acceder al Sistema</span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md"></div>
+                    </button>
+                    
+                    <p class="text-slate-500 text-xs mt-6">
+                        Compatible con PC, Tablet y Móvil • v4.3
+                    </p>
                 </div>
             </div>
-        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- COLUMNA REGISTRO -->
-            <section class="lg:col-span-4 glass-panel p-6 rounded-2xl neon-border-pink">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-black flex items-center gap-3 text-rose-400 uppercase">
-                        <span class="w-2 h-6 bg-rose-500 rounded-full"></span> 
-                        <span id="form-title">Log In</span>
-                    </h2>
-                    <div id="edit-controls" class="hidden flex gap-2">
-                        <button id="cancel-edit" class="btn-cancel-edit px-3 py-1 rounded text-[10px] font-bold uppercase">Cancelar</button>
-                        <button id="save-edit" class="btn-save-edit px-3 py-1 rounded text-[10px] font-bold uppercase">Guardar</button>
+            <!-- Footer portada -->
+            <div class="text-center mt-10">
+                <div class="text-slate-600 text-sm font-mono">
+                    <div class="flex justify-center items-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span>Sistema Operativo: Online</span>
                     </div>
+                    <p>© 2025-2026 • CL7ADV Cuba • Todos los derechos reservados</p>
                 </div>
-                
-                <form id="qso-form" class="space-y-4">
-                    <div class="grid grid-cols-1 gap-4">
-                        <div class="relative">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Corresponsal</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="call" required placeholder="CALLSIGN" class="flex-grow p-4 rounded-lg font-black text-2xl text-yellow-400 uppercase">
-                                <button type="button" onclick="checkQRZ()" title="Verificar en QRZ.com" class="bg-orange-600 hover:bg-orange-500 p-3 rounded-lg flex items-center justify-center transition-all active:scale-90">
-                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NUEVO CAMPO: EMAIL DEL CORRESPONSAL -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email del Destinatario</label>
-                        <input type="email" id="dx-email" placeholder="correo@corresponsal.com" class="w-full p-3 rounded-lg text-sm">
-                    </div>
-
-                    <!-- NUEVO CAMPO: NOMBRE DEL CORRESPONSAL -->
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre (opcional)</label>
-                        <input type="text" id="dx-name" placeholder="Nombre del corresponsal" class="w-full p-3 rounded-lg text-sm">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha</label>
-                            <input type="date" id="date" required class="w-full p-3 rounded-lg text-xs">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Hora On</label>
-                                <button type="button" onclick="setUTCNow()" class="text-[9px] text-cyan-400 font-bold">SYNC</button>
-                            </div>
-                            <input type="text" id="time" required placeholder="HHMM" maxlength="4" class="w-full p-3 rounded-lg text-center font-bold tracking-widest">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-1">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Banda</label>
-                            <select id="band" class="w-full p-3 rounded-lg font-bold text-cyan-400">
-                                <option value="40m" selected>40m</option>
-                                <option value="20m">20m</option>
-                                <option value="80m">80m</option>
-                                <option value="15m">15m</option>
-                                <option value="10m">10m</option>
-                                <option value="2m">2m</option>
-                                <option value="70cm">70cm</option>
-                            </select>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Frecuencia (MHz)</label>
-                            <input type="text" id="freq" placeholder="7.150" class="w-full p-3 rounded-lg font-bold text-cyan-400">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modo</label>
-                            <select id="mode" class="w-full p-3 rounded-lg font-bold text-rose-400">
-                                <option value="SSB">SSB</option>
-                                <option value="CW">CW</option>
-                                <option value="FT8">FT8</option>
-                                <option value="FM">FM</option>
-                                <option value="DMR">DMR</option>
-                                <option value="DV">DV</option>
-                            </select>
-                        </div>
-                        <div class="relative">
-                            <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Sent</span>
-                            <input type="text" id="rst_sent" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
-                        </div>
-                        <div class="relative">
-                            <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Rcvd</span>
-                            <input type="text" id="rst_rcvd" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label>
-                        <textarea id="comment" rows="2" placeholder="Notas..." class="w-full p-3 rounded-lg text-xs italic"></textarea>
-                    </div>
-
-                    <button type="submit" id="submit-btn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest italic border-b-4 border-rose-800">
-                        Registrar QSO
-                    </button>
-                </form>
-                
-                <!-- NUEVA SECCIÓN: BÚSQUEDA RÁPIDA -->
-                <div class="mt-8 pt-6 border-t border-slate-800">
-                    <h3 class="text-[11px] font-black text-cyan-400 uppercase mb-3 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
-                        Búsqueda Rápida
-                    </h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="search-call" placeholder="Buscar por CALL..." class="flex-grow p-2 rounded-lg text-sm bg-slate-900 border border-slate-700">
-                        <button onclick="searchContact()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Buscar</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- COLUMNA LISTA -->
-            <section class="lg:col-span-8 flex flex-col">
-                <div class="glass-panel p-4 rounded-t-2xl border-b-0 flex flex-wrap gap-4 justify-between items-center bg-slate-900/80">
-                    <h2 class="text-lg font-black italic text-yellow-400 uppercase tracking-widest">LOG BOOK</h2>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="exportADIF()" class="btn-adif px-4 py-2 rounded-lg text-[10px]">Export .ADIF</button>
-                        <button onclick="openExternal('qrz')" class="bg-orange-700 hover:bg-orange-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">QRZ Log</button>
-                        <button onclick="openExternal('eqsl')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">eQSL</button>
-                        <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Clear</button>
-                        <button onclick="exportCSV()" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Export CSV</button>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-b-2xl overflow-hidden flex-grow overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[800px]">
-                        <thead>
-                            <tr class="bg-slate-950/80 text-cyan-400 text-[10px] uppercase font-black italic">
-                                <th class="p-4">Corresponsal</th>
-                                <th class="p-4">Info UTC</th>
-                                <th class="p-4">Frec/Modo</th>
-                                <th class="p-4">Reporte</th>
-                                <th class="p-4">Comentarios</th>
-                                <th class="p-4 text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="log-body" class="divide-y divide-slate-800/50"></tbody>
-                    </table>
-                    <div id="empty-msg" class="p-20 text-center text-slate-600 italic font-bold uppercase tracking-widest">No Signals Logged Yet...</div>
-                </div>
-                
-                <!-- NUEVO: ESTADÍSTICAS -->
-                <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
-                    <div class="glass-panel p-3 rounded-lg text-center">
-                        <div class="text-cyan-400 font-black">Último QSO</div>
-                        <div id="last-qso" class="text-slate-400">-</div>
-                    </div>
-                    <div class="glass-panel p-3 rounded-lg text-center">
-                        <div class="text-cyan-400 font-black">Modo Más Usado</div>
-                        <div id="top-mode" class="text-slate-400">-</div>
-                    </div>
-                    <div class="glass-panel p-3 rounded-lg text-center">
-                        <div class="text-cyan-400 font-black">Banda Más Usada</div>
-                        <div id="top-band" class="text-slate-400">-</div>
-                    </div>
-                </div>
-            </section>
+            </div>
         </div>
     </div>
 
-    <!-- FIRMA DE DERECHOS / FOOTER -->
-    <footer class="mt-12 py-8 w-full text-center">
-        <div class="flex flex-col items-center gap-2">
-            <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-4"></div>
-            <p class="text-[10px] text-slate-500 uppercase tracking-[0.4em] font-black">Developed & Designed by</p>
-            <p class="text-xl font-black italic text-cyan-400 tracking-wider">cl7adv cuba</p>
-            <p class="text-[9px] text-slate-600 mt-2">© 2025-2026 • v4.3 con edición avanzada</p>
+    <!-- CONTENIDO PRINCIPAL (oculto inicialmente) -->
+    <div id="main-content" style="display: none;">
+
+        <!-- BARRA SUPERIOR UTC -->
+        <div class="utc-clock-container w-full py-2 px-4 flex justify-between items-center sticky top-0 z-40 backdrop-blur-md">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Radio Link Status:</span>
+                <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-green-400">ACTIVE</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <span class="text-[10px] font-black text-slate-400 uppercase block leading-none">Hora UTC</span>
+                    <span id="real-time-utc" class="neon-text-yellow text-xl md:text-2xl font-black tracking-tighter">00:00:00 UTC</span>
+                </div>
+            </div>
         </div>
-    </footer>
+
+        <div class="p-4 md:p-8 max-w-7xl mx-auto">
+            <header class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
+                <div>
+                    <h1 class="text-4xl md:text-5xl main-title mb-2">Neon Log Station <span class="text-sm text-cyan-400 align-top">v4.3</span></h1>
+                    <p class="text-cyan-400 text-xs tracking-[0.3em] uppercase font-bold">Camagüey - Santa Cruz del Sur • Digital V4.3</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                    <div class="glass-panel p-4 rounded-xl neon-border-cyan flex-1">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Operador</label>
+                                <input type="text" id="my-call" placeholder="TU CALL" class="w-full p-2 rounded bg-dark border-none uppercase font-black text-lg">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] text-cyan-400 uppercase font-black mb-1">Mi Email Log</label>
+                                <input type="email" id="my-email" placeholder="email@example.com" class="w-full p-2 rounded bg-dark border-none text-xs">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center bg-rose-600 px-6 py-4 rounded-xl shadow-lg border-2 border-rose-400 min-w-[120px]">
+                        <span id="qso-count" class="text-2xl font-black italic">0 QSOs</span>
+                        <span id="edit-status" class="text-[10px] font-bold uppercase mt-1 hidden"></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- COLUMNA REGISTRO -->
+                <section class="lg:col-span-4 glass-panel p-6 rounded-2xl neon-border-pink">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-black flex items-center gap-3 text-rose-400 uppercase">
+                            <span class="w-2 h-6 bg-rose-500 rounded-full"></span> 
+                            <span id="form-title">Log In</span>
+                        </h2>
+                        <div id="edit-controls" class="hidden flex gap-2">
+                            <button id="cancel-edit" class="btn-cancel-edit px-3 py-1 rounded text-[10px] font-bold uppercase">Cancelar</button>
+                            <button id="save-edit" class="btn-save-edit px-3 py-1 rounded text-[10px] font-bold uppercase">Guardar</button>
+                        </div>
+                    </div>
+                    
+                    <form id="qso-form" class="space-y-4">
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="relative">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Corresponsal</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="call" required placeholder="CALLSIGN" class="flex-grow p-4 rounded-lg font-black text-2xl text-yellow-400 uppercase">
+                                    <button type="button" onclick="checkQRZ()" title="Verificar en QRZ.com" class="bg-orange-600 hover:bg-orange-500 p-3 rounded-lg flex items-center justify-center transition-all active:scale-90">
+                                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NUEVO CAMPO: EMAIL DEL CORRESPONSAL -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email del Destinatario</label>
+                            <input type="email" id="dx-email" placeholder="correo@corresponsal.com" class="w-full p-3 rounded-lg text-sm">
+                        </div>
+
+                        <!-- NUEVO CAMPO: NOMBRE DEL CORRESPONSAL -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre (opcional)</label>
+                            <input type="text" id="dx-name" placeholder="Nombre del corresponsal" class="w-full p-3 rounded-lg text-sm">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha</label>
+                                <input type="date" id="date" required class="w-full p-3 rounded-lg text-xs">
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Hora On</label>
+                                    <button type="button" onclick="setUTCNow()" class="text-[9px] text-cyan-400 font-bold">SYNC</button>
+                                </div>
+                                <input type="text" id="time" required placeholder="HHMM" maxlength="4" class="w-full p-3 rounded-lg text-center font-bold tracking-widest">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Banda</label>
+                                <select id="band" class="w-full p-3 rounded-lg font-bold text-cyan-400">
+                                    <option value="40m" selected>40m</option>
+                                    <option value="20m">20m</option>
+                                    <option value="80m">80m</option>
+                                    <option value="15m">15m</option>
+                                    <option value="10m">10m</option>
+                                    <option value="2m">2m</option>
+                                    <option value="70cm">70cm</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Frecuencia (MHz)</label>
+                                <input type="text" id="freq" placeholder="7.150" class="w-full p-3 rounded-lg font-bold text-cyan-400">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modo</label>
+                                <select id="mode" class="w-full p-3 rounded-lg font-bold text-rose-400">
+                                    <option value="SSB">SSB</option>
+                                    <option value="CW">CW</option>
+                                    <option value="FT8">FT8</option>
+                                    <option value="FM">FM</option>
+                                    <option value="DMR">DMR</option>
+                                    <option value="DV">DV</option>
+                                </select>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Sent</span>
+                                <input type="text" id="rst_sent" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-2 top-1 text-[8px] text-slate-500 uppercase font-bold">Rcvd</span>
+                                <input type="text" id="rst_rcvd" value="59" class="w-full p-3 pt-5 text-center font-bold text-yellow-500 rounded-lg">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Comentarios</label>
+                            <textarea id="comment" rows="2" placeholder="Notas..." class="w-full p-3 rounded-lg text-xs italic"></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest italic border-b-4 border-rose-800">
+                            Registrar QSO
+                        </button>
+                    </form>
+                    
+                    <!-- NUEVA SECCIÓN: BÚSQUEDA RÁPIDA -->
+                    <div class="mt-8 pt-6 border-t border-slate-800">
+                        <h3 class="text-[11px] font-black text-cyan-400 uppercase mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+                            Búsqueda Rápida
+                        </h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="search-call" placeholder="Buscar por CALL..." class="flex-grow p-2 rounded-lg text-sm bg-slate-900 border border-slate-700">
+                            <button onclick="searchContact()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Buscar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- COLUMNA LISTA -->
+                <section class="lg:col-span-8 flex flex-col">
+                    <div class="glass-panel p-4 rounded-t-2xl border-b-0 flex flex-wrap gap-4 justify-between items-center bg-slate-900/80">
+                        <h2 class="text-lg font-black italic text-yellow-400 uppercase tracking-widest">LOG BOOK</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="exportADIF()" class="btn-adif px-4 py-2 rounded-lg text-[10px]">Export .ADIF</button>
+                            <button onclick="openExternal('qrz')" class="bg-orange-700 hover:bg-orange-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">QRZ Log</button>
+                            <button onclick="openExternal('eqsl')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">eQSL</button>
+                            <button onclick="clearLog()" class="bg-slate-800 hover:bg-rose-900 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Clear</button>
+                            <button onclick="exportCSV()" class="bg-emerald-700 hover:bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors">Export CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-b-2xl overflow-hidden flex-grow overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr class="bg-slate-950/80 text-cyan-400 text-[10px] uppercase font-black italic">
+                                    <th class="p-4">Corresponsal</th>
+                                    <th class="p-4">Info UTC</th>
+                                    <th class="p-4">Frec/Modo</th>
+                                    <th class="p-4">Reporte</th>
+                                    <th class="p-4">Comentarios</th>
+                                    <th class="p-4 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-body" class="divide-y divide-slate-800/50"></tbody>
+                        </table>
+                        <div id="empty-msg" class="p-20 text-center text-slate-600 italic font-bold uppercase tracking-widest">No Signals Logged Yet...</div>
+                    </div>
+                    
+                    <!-- NUEVO: ESTADÍSTICAS -->
+                    <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
+                        <div class="glass-panel p-3 rounded-lg text-center">
+                            <div class="text-cyan-400 font-black">Último QSO</div>
+                            <div id="last-qso" class="text-slate-400">-</div>
+                        </div>
+                        <div class="glass-panel p-3 rounded-lg text-center">
+                            <div class="text-cyan-400 font-black">Modo Más Usado</div>
+                            <div id="top-mode" class="text-slate-400">-</div>
+                        </div>
+                        <div class="glass-panel p-3 rounded-lg text-center">
+                            <div class="text-cyan-400 font-black">Banda Más Usada</div>
+                            <div id="top-band" class="text-slate-400">-</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- FIRMA DE DERECHOS / FOOTER -->
+        <footer class="mt-12 py-8 w-full text-center">
+            <div class="flex flex-col items-center gap-2">
+                <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-4"></div>
+                <p class="text-[10px] text-slate-500 uppercase tracking-[0.4em] font-black">Developed & Designed by</p>
+                <p class="text-xl font-black italic text-cyan-400 tracking-wider">cl7adv cuba</p>
+                <p class="text-[9px] text-slate-600 mt-2">© 2025-2026 • v4.3 con edición avanzada</p>
+            </div>
+        </footer>
+    </div>
 
     <script>
+        // Script para manejar la portada
+        document.addEventListener('DOMContentLoaded', function() {
+            const coverPage = document.getElementById('cover-page');
+            const enterBtn = document.getElementById('enter-app');
+            const mainContent = document.getElementById('main-content');
+            const utcClock = document.querySelector('.utc-clock-container');
+            const footer = document.querySelector('footer');
+
+            // Mostrar portada inicialmente (asegurarse que el contenido principal está oculto)
+            mainContent.style.display = 'none';
+            utcClock.style.display = 'none';
+            footer.style.display = 'none';
+
+            // Botón para entrar
+            enterBtn.addEventListener('click', function() {
+                // Animación de desvanecimiento
+                coverPage.style.opacity = '0';
+                
+                setTimeout(() => {
+                    coverPage.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    utcClock.style.display = 'flex';
+                    footer.style.display = 'block';
+                    
+                    // Iniciar reloj UTC si no estaba corriendo
+                    updateClock();
+                    
+                    // Enfocar el campo de CALL
+                    document.getElementById('my-call').focus();
+                }, 800);
+            });
+
+            // También permitir cerrar con Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && coverPage.style.display !== 'none') {
+                    enterBtn.click();
+                }
+            });
+        });
+
+        // Variables principales de la aplicación
         let currentOperator = '';
         let qsoList = [];
         let editingIndex = -1; // -1 significa que no estamos editando
