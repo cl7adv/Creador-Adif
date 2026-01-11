@@ -897,37 +897,86 @@
             }
         }
 
-        function exportADIF() {
-            if (qsoList.length === 0) return showNotification("Libro vacío.", 'warning');
-            if (!currentOperator) return showNotification("Falta indicativo.", 'error');
-            
-            let adif = `ADIF Export\n<ADIF_VER:5>3.1.1\n<PROGRAMID:12>NeonLog_CL7ADV\n<EOH>\n\n`;
-            
-            qsoList.forEach(q => {
-                const cleanDate = q.date.replace(/-/g, '');
-                const cleanTime = q.time.replace(/:/g, '');
-                let line = `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator} <CALL:${q.call.length}>${q.call} <QSO_DATE:8>${cleanDate} <TIME_ON:4>${cleanTime} <BAND:${q.band.length}>${q.band} <MODE:${q.mode.length}>${q.mode} <RST_SENT:${q.rst_sent.length}>${q.rst_sent} <RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd} `;
-                if (q.email) line += `<EMAIL:${q.email.length}>${q.email} `;
-                if (q.dx_name) line += `<NAME:${q.dx_name.length}>${q.dx_name} `;
-                if (q.freq) line += `<FREQ:${q.freq.length}>${q.freq} `;
-                if (q.comment) line += `<COMMENT:${q.comment.length}>${q.comment} `;
-                line += `<EOR>\n`;
-                adif += line;
-            });
-
-            const blob = new Blob([adif], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `LOG_${currentOperator}_${new Date().toISOString().slice(0,10)}.adi`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('ADIF exportado correctamente', 'success');
+function exportADIF() {
+    if (qsoList.length === 0) return showNotification("Libro vacío.", 'warning');
+    if (!currentOperator) return showNotification("Falta indicativo.", 'error');
+    
+    // Obtener email del operador (del input actual)
+    const operatorEmail = myEmailInput.value.trim();
+    
+    let adif = `ADIF Export - Neon Log Master v4.3\n`;
+    adif += `<ADIF_VER:5>3.1.1\n`;
+    adif += `<CREATED_TIMESTAMP:15>${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}\n`;
+    adif += `<PROGRAMID:15>NeonLogMaster\n`;
+    adif += `<PROGRAMVERSION:3>4.3\n`;
+    
+    // Información de la estación
+    adif += `<STATION_CALLSIGN:${currentOperator.length}>${currentOperator}\n`;
+    if (operatorEmail) {
+        adif += `<STATION_EMAIL:${operatorEmail.length}>${operatorEmail}\n`;
+    }
+    
+    adif += `<EOH>\n\n`;
+    
+    qsoList.forEach(q => {
+        const cleanDate = q.date.replace(/-/g, '');
+        const cleanTime = q.time.length === 4 ? q.time : q.time.padStart(4, '0');
+        
+        let line = `<CALL:${q.call.length}>${q.call}\n`;
+        line += `<QSO_DATE:8>${cleanDate}\n`;
+        line += `<TIME_ON:4>${cleanTime}\n`;
+        line += `<BAND:${q.band.length}>${q.band}\n`;
+        
+        // Manejar frecuencia específica si existe
+        if (q.freq && q.freq.trim() !== '') {
+            line += `<FREQ:${q.freq.length}>${q.freq}\n`;
         }
+        
+        line += `<MODE:${q.mode.length}>${q.mode}\n`;
+        line += `<RST_SENT:${q.rst_sent.length}>${q.rst_sent}\n`;
+        line += `<RST_RCVD:${q.rst_rcvd.length}>${q.rst_rcvd}\n`;
+        
+        // Información del operador en cada QSO
+        line += `<OPERATOR:${currentOperator.length}>${currentOperator}\n`;
+        
+        // Email del operador en cada QSO
+        if (operatorEmail) {
+            line += `<MY_EMAIL:${operatorEmail.length}>${operatorEmail}\n`;
+        }
+        
+        // Información del corresponsal
+        if (q.dx_name && q.dx_name.trim() !== '') {
+            line += `<NAME:${q.dx_name.length}>${q.dx_name}\n`;
+        }
+        
+        if (q.email && q.email.trim() !== '') {
+            line += `<EMAIL:${q.email.length}>${q.email}\n`;
+        }
+        
+        if (q.comment && q.comment.trim() !== '') {
+            line += `<COMMENT:${q.comment.length}>${q.comment}\n`;
+        }
+        
+        // Campos adicionales para compatibilidad
+        line += `<QSO_RANDOM:1>Y\n`;
+        line += `<APP_NEONLOG_VER:3>4.3\n`;
+        
+        line += `<EOR>\n`;
+        adif += line;
+    });
 
+    const blob = new Blob([adif], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `LOG_${currentOperator}_${new Date().toISOString().slice(0,10)}.adi`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('ADIF exportado con información completa del operador', 'success');
+}
         function exportCSV() {
             if (qsoList.length === 0) return showNotification("Libro vacío.", 'warning');
             
