@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Log Station v4.3.5 - Alfred CL7ADV</title>
     <style>
         :root {
@@ -13,17 +13,17 @@
             --neon-yellow: #ffea00;
             --text-main: #e6f1ff;
             --sunrise-gradient: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #0a192f 100%);
-            --mobile-breakpoint: 768px;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body, html {
             height: 100%;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
@@ -40,12 +40,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 10000;
             transition: opacity 0.8s ease-out;
-            overflow: hidden;
         }
 
-        /* Fondo del amanecer cubano */
         .sunrise-bg {
             position: absolute;
             top: 0;
@@ -74,35 +72,14 @@
             height: 120px;
             background: radial-gradient(circle, #ffea00 0%, #ff7e5f 100%);
             border-radius: 50%;
-            box-shadow: 
-                0 0 60px #ff7e5f,
-                0 0 120px rgba(255, 126, 95, 0.5),
-                inset 0 0 30px #fff;
+            box-shadow: 0 0 60px #ff7e5f, 0 0 120px rgba(255, 126, 95, 0.5);
             animation: sunrise-anim 3s forwards ease-out;
             z-index: 1;
         }
 
         @keyframes sunrise-anim {
-            0% { 
-                bottom: -150px; 
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% { 
-                bottom: 20%; 
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Línea del horizonte */
-        .horizon {
-            position: absolute;
-            bottom: 20%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 234, 0, 0.5), transparent);
-            box-shadow: 0 0 10px rgba(255, 234, 0, 0.3);
+            0% { bottom: -150px; opacity: 0; transform: scale(0.8); }
+            100% { bottom: 20%; opacity: 1; transform: scale(1); }
         }
 
         .splash-content {
@@ -110,18 +87,15 @@
             z-index: 2;
             text-align: center;
             padding: 20px;
-            width: 100%;
             max-width: 500px;
         }
 
         .splash-title {
-            font-size: 2.5rem;
+            font-size: clamp(2rem, 5vw, 3rem);
             color: var(--neon-cyan);
             font-style: italic;
             font-weight: 900;
-            text-shadow: 
-                0 0 20px var(--neon-cyan),
-                0 0 40px rgba(0, 229, 255, 0.5);
+            text-shadow: 0 0 20px var(--neon-cyan);
             margin-bottom: 10px;
             animation: title-glow 2s ease-in-out infinite alternate;
         }
@@ -132,16 +106,14 @@
         }
 
         .splash-welcome {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2vw, 1.2rem);
             color: var(--text-main);
             letter-spacing: 2px;
             margin-bottom: 30px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .loader {
-            width: 100%;
-            max-width: 300px;
+            width: min(100%, 300px);
             height: 4px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
@@ -156,7 +128,6 @@
             width: 0%; height: 100%;
             background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
             animation: load 2.5s forwards;
-            box-shadow: 0 0 10px var(--neon-pink);
         }
 
         @keyframes load { 
@@ -164,131 +135,178 @@
             100% { width: 100%; } 
         }
 
-        /* CONTENIDO PRINCIPAL RESPONSIVE */
+        /* ============= DISEÑO PRINCIPAL ============= */
         #main-content {
             display: none;
-            padding: 15px;
             opacity: 0;
             transition: opacity 0.5s ease-in;
             min-height: 100vh;
+            padding: 15px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
+        /* TOP BAR - COMPACTO PARA PC */
         .top-bar {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
+            width: 100%;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 992px) {
             .top-bar {
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: flex-start;
+                align-items: center;
+                margin-bottom: 25px;
+                gap: 20px;
             }
         }
 
         .station-title {
             font-style: italic;
             font-weight: 900;
-            font-size: 1.8rem;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             color: var(--neon-cyan);
             text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
             line-height: 1.2;
         }
 
-        @media (min-width: 768px) {
-            .station-title {
-                font-size: 2.5rem;
-            }
+        .station-subtitle {
+            color: var(--neon-cyan);
+            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+            letter-spacing: 2px;
         }
 
+        /* UTC CLOCK - COMPACTO */
         .utc-container {
-            text-align: center;
             background: rgba(0, 229, 255, 0.05);
             padding: 10px 15px;
             border-radius: 10px;
             border: 1px solid rgba(0, 229, 255, 0.2);
+            text-align: center;
             width: 100%;
             max-width: 400px;
             align-self: center;
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 992px) {
             .utc-container {
                 text-align: right;
-                align-self: flex-end;
+                align-self: center;
+                min-width: 300px;
+                max-width: 350px;
             }
         }
 
         .utc-clock {
-            font-size: 1.8rem;
+            font-size: clamp(1.5rem, 3vw, 2rem);
             color: var(--neon-yellow);
             font-weight: bold;
             font-family: 'Courier New', monospace;
             letter-spacing: 1px;
         }
 
-        @media (min-width: 768px) {
-            .utc-clock {
-                font-size: 2.2rem;
-            }
-        }
-
-        /* DASHBOARD RESPONSIVE */
+        /* DASHBOARD - DISEÑO OPTIMIZADO */
         .dashboard {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
-        @media (min-width: 768px) {
+        /* PC: Grid de 3 columnas compactas */
+        @media (min-width: 1200px) {
             .dashboard {
                 display: grid;
-                grid-template-columns: 350px 1fr 250px;
+                grid-template-columns: 320px 1fr 260px;
                 gap: 20px;
+                align-items: start;
+            }
+        }
+
+        /* Pantallas muy grandes */
+        @media (min-width: 1400px) {
+            .dashboard {
+                grid-template-columns: 340px 1fr 280px;
+                gap: 25px;
             }
         }
 
         .panel {
             background: var(--panel-bg);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 18px;
             border: 1px solid rgba(0, 229, 255, 0.1);
             width: 100%;
         }
 
         .reg-qso { 
-            border-left: 5px solid var(--neon-pink); 
+            border-left: 4px solid var(--neon-pink); 
+        }
+
+        @media (max-width: 1199px) {
+            .reg-qso {
+                border-left: none;
+                border-top: 4px solid var(--neon-pink);
+            }
         }
 
         .op-panel { 
-            border-top: 5px solid var(--neon-cyan); 
+            border-top: 4px solid var(--neon-cyan); 
         }
 
-        /* Mejoras para inputs en móvil */
+        /* FORMULARIO - COMPACTO PARA PC */
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .form-group > div {
+            flex: 1;
+            min-width: 120px;
+        }
+
         .input-field {
             background: #0d1b2a;
             border: 1px solid #1e3a5f;
             color: white;
-            padding: 12px 10px;
-            border-radius: 8px;
+            padding: 10px 12px;
+            border-radius: 6px;
             width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            font-size: 16px; /* Previene zoom en iOS */
+            font-size: 14px;
             -webkit-appearance: none;
             appearance: none;
-            min-height: 44px; /* Tamaño táctil mínimo */
+            min-height: 42px;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .input-field {
+                font-size: 13px;
+                padding: 8px 10px;
+                min-height: 38px;
+            }
         }
 
         select.input-field {
             background: #0d1b2a url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 10px center;
-            background-size: 20px;
-            padding-right: 40px;
+            background-size: 16px;
+            padding-right: 35px;
         }
 
-        /* Botones optimizados para táctil */
+        /* BOTONES - TAMAÑOS OPTIMIZADOS */
         .btn-group { 
             display: flex; 
             gap: 8px; 
@@ -297,17 +315,17 @@
         }
         
         .btn-action {
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 12px;
             text-transform: uppercase;
             transition: all 0.2s;
-            min-height: 44px; /* Tamaño mínimo para dedos */
+            min-height: 38px;
             flex: 1;
-            min-width: 60px;
+            min-width: 50px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -317,17 +335,23 @@
         @media (min-width: 768px) {
             .btn-action {
                 padding: 8px 12px;
-                min-height: auto;
+                min-height: 36px;
+                font-size: 11px;
             }
         }
 
-        .btn-action:active {
-            transform: scale(0.98);
+        @media (min-width: 1200px) {
+            .btn-action {
+                padding: 6px 10px;
+                min-height: 34px;
+                font-size: 10px;
+            }
         }
 
         .btn-action:hover { 
             filter: brightness(1.2); 
             transform: translateY(-1px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-qrz { background: #ff9800; color: white; }
@@ -336,47 +360,49 @@
         .btn-del { background: #f44336; color: white; }
         .btn-edit { background: #2196F3; color: white; }
 
-        /* Tabla responsive */
+        /* TABLA - COMPACTA PARA PC */
         .table-container {
             width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
             margin-bottom: 15px;
         }
 
         table { 
             width: 100%; 
-            border-collapse: collapse; 
-            font-size: 0.85rem; 
-            min-width: 600px; /* Ancho mínimo para mantener legibilidad */
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px; 
+            min-width: 650px;
+        }
+
+        @media (min-width: 1200px) {
+            table {
+                min-width: 100%;
+                font-size: 12px;
+            }
         }
 
         th { 
             color: var(--neon-yellow); 
             text-align: left; 
-            padding: 12px 10px; 
+            padding: 10px 8px; 
             border-bottom: 2px solid #1e3a5f; 
             white-space: nowrap;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+            background: var(--panel-bg);
         }
 
         td { 
-            padding: 12px 10px; 
+            padding: 10px 8px; 
             border-bottom: 1px solid #1e3a5f; 
-            vertical-align: top;
+            vertical-align: middle;
         }
 
-        /* Optimizar columnas para móvil */
-        @media (max-width: 767px) {
-            table {
-                font-size: 0.8rem;
-            }
-            
+        @media (min-width: 1200px) {
             th, td {
                 padding: 8px 6px;
-            }
-            
-            .hide-on-mobile {
-                display: none;
             }
         }
 
@@ -384,27 +410,50 @@
         .checkbox-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 15px;
-            font-size: 0.9rem;
+            font-size: 13px;
             color: var(--neon-yellow);
         }
 
         .checkbox-container input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             accent-color: var(--neon-cyan);
+        }
+
+        /* Panel de estadísticas */
+        .stats-box {
+            text-align: center;
+            background: linear-gradient(to bottom, #ff007f33, transparent);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .stats-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--neon-yellow);
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: var(--neon-pink);
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
 
         /* Firma */
         .signature {
             margin-top: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--neon-cyan);
             text-align: center;
             font-style: italic;
             border-top: 1px solid #1e3a5f;
-            padding-top: 15px;
+            padding-top: 12px;
         }
 
         /* Modo edición */
@@ -419,65 +468,67 @@
             50% { box-shadow: 0 0 25px var(--neon-yellow); }
         }
 
-        /* Menu hamburguesa para móvil */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 100;
-            background: var(--panel-bg);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        @media (max-width: 767px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            .dashboard {
-                display: none;
-            }
-            
-            .dashboard.active {
-                display: flex;
-            }
-        }
-
-        /* Footer móvil */
+        /* FOOTER MÓVIL - Solo para móviles */
         .mobile-footer {
             display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--panel-bg);
-            border-top: 1px solid var(--neon-cyan);
-            padding: 10px;
-            z-index: 90;
         }
 
-        @media (max-width: 767px) {
+        @media (max-width: 991px) {
             .mobile-footer {
                 display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: var(--panel-bg);
+                border-top: 2px solid var(--neon-cyan);
+                padding: 10px 15px;
+                z-index: 100;
                 justify-content: space-around;
+                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
             }
             
             .mobile-footer button {
                 flex: 1;
                 margin: 0 5px;
+                min-height: 48px;
+                font-size: 0.9rem;
+            }
+
+            #main-content {
+                padding-bottom: 80px;
             }
         }
 
-        /* Mejoras de scroll */
+        /* Optimización para móvil pequeño */
+        @media (max-width: 480px) {
+            #main-content {
+                padding: 10px;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .utc-container {
+                padding: 8px 12px;
+            }
+            
+            .utc-clock {
+                font-size: 1.3rem;
+            }
+            
+            .station-title {
+                font-size: 1.5rem;
+            }
+            
+            .input-field {
+                font-size: 16px;
+                min-height: 46px;
+            }
+        }
+
+        /* Scrollbar personalizado */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -485,11 +536,53 @@
 
         ::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb {
             background: var(--neon-cyan);
             border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ccff;
+        }
+
+        /* Mejoras de layout para tabletas */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .dashboard {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .reg-qso {
+                grid-column: 1;
+            }
+            
+            .panel:nth-child(2) {
+                grid-column: 2;
+                grid-row: 1;
+            }
+            
+            .op-panel {
+                grid-column: span 2;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .op-panel h4 {
+                grid-column: span 2;
+            }
+            
+            .stats-box {
+                grid-column: 1;
+            }
+            
+            .signature {
+                grid-column: 2;
+            }
         }
     </style>
 </head>
@@ -498,25 +591,21 @@
     <div id="splash-screen">
         <div class="sunrise-bg"></div>
         <div class="sun"></div>
-        <div class="horizon"></div>
         <div class="splash-content">
             <div class="splash-title">NEON LOG STATION</div>
             <div class="splash-welcome">AMANECER EN CUBA - BIENVENIDOS COLEGAS RADIOPERADORES</div>
             <div class="loader"></div>
-            <div style="margin-top: 20px; font-size: 0.9rem; color: #e6f1ff; text-shadow: 0 0 5px #000;">
+            <div style="margin-top: 20px; font-size: 0.9rem; color: #e6f1ff;">
                 By Alfred CL7ADV - Camagüey, Cuba
             </div>
         </div>
     </div>
 
-    <!-- Botón menú móvil -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
-
     <div id="main-content">
         <div class="top-bar">
             <div>
-                <div class="station-title">NEON LOG STATION <span style="font-size: 0.9rem;">v4.3.5</span></div>
-                <div style="color: var(--neon-cyan); font-size: 0.8rem; letter-spacing: 2px;">
+                <div class="station-title">NEON LOG STATION <span style="font-size: 0.8rem;">v4.3.5</span></div>
+                <div class="station-subtitle">
                     CAMAGÜEY - SANTA CRUZ DEL SUR
                 </div>
             </div>
@@ -526,54 +615,54 @@
             </div>
         </div>
 
-        <div class="dashboard" id="dashboard">
+        <div class="dashboard">
             <!-- Registrar QSO -->
             <div class="panel reg-qso" id="formPanel">
-                <h3 id="formTitle" style="color: var(--neon-pink); margin-top: 0;">
-                    <span style="font-size: 1.2rem;">📻</span> REGISTRAR QSO
+                <h3 id="formTitle" style="color: var(--neon-pink); margin: 0 0 15px 0; font-size: 1.2rem;">
+                    📻 REGISTRAR QSO
                 </h3>
                 
                 <input type="hidden" id="editId">
 
-                <label style="font-size: 0.8rem; color: var(--neon-cyan);">INDICATIVO (CALLSIGN)</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">INDICATIVO (CALLSIGN)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                     <input type="text" id="qsoCall" class="input-field" 
-                           style="font-size: 1.2rem; color: var(--neon-cyan); margin-bottom: 0;" 
+                           style="font-size: 1.1rem; color: var(--neon-cyan);" 
                            placeholder="CALLSIGN" autocomplete="off">
-                    <button class="btn-action btn-qrz" onclick="checkQRZ('qsoCall')" style="min-width: 60px;">
+                    <button class="btn-action btn-qrz" onclick="checkQRZ('qsoCall')" style="min-width: 55px;">
                         QRZ
                     </button>
                 </div>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-                    <div style="flex: 1; min-width: 140px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">FECHA UTC</label>
+                <div class="form-group">
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">FECHA UTC</label>
                         <input type="text" id="qsoDate" class="input-field" placeholder="2024-01-20">
                     </div>
-                    <div style="flex: 1; min-width: 140px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">HORA UTC</label>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">HORA UTC</label>
                         <input type="text" id="qsoTime" class="input-field" placeholder="14:30">
                     </div>
                 </div>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-                    <div style="flex: 1; min-width: 140px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">NOMBRE</label>
+                <div class="form-group">
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">NOMBRE</label>
                         <input type="text" id="qsoName" class="input-field" placeholder="Nombre">
                     </div>
-                    <div style="flex: 1; min-width: 140px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">EMAIL</label>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">EMAIL</label>
                         <input type="email" id="qsoEmail" class="input-field" placeholder="email@correo.com">
                     </div>
                 </div>
 
-                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">REPORTE (RST)</label>
+                <div class="form-group">
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">REPORTE (RST)</label>
                         <input type="text" id="qsoRst" class="input-field" value="59">
                     </div>
-                    <div style="flex: 1; min-width: 120px;">
-                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">BANDA</label>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">BANDA</label>
                         <select id="qsoBand" class="input-field">
                             <option value="160m">160m</option>
                             <option value="80m">80m</option>
@@ -592,8 +681,8 @@
                     </div>
                 </div>
 
-                <label style="font-size: 0.8rem; color: var(--neon-cyan);">MODO</label>
-                <select id="qsoMode" class="input-field">
+                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">MODO</label>
+                <select id="qsoMode" class="input-field" style="margin-bottom: 12px;">
                     <option value="SSB" selected>SSB</option>
                     <option value="CW">CW</option>
                     <option value="FT8">FT8</option>
@@ -610,18 +699,18 @@
                     <label for="exportQRZ">EXPORTAR A QRZ</label>
                 </div>
 
-                <label style="font-size: 0.8rem; color: var(--neon-cyan);">COMENTARIO</label>
-                <input type="text" id="qsoNotes" class="input-field" placeholder="Gracias 73...">
+                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">COMENTARIO</label>
+                <input type="text" id="qsoNotes" class="input-field" placeholder="Gracias 73..." style="margin-bottom: 15px;">
                 
-                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <div style="display: flex; gap: 8px;">
                     <button id="btnSubmit" class="btn-action btn-adif" 
-                            style="flex: 3; padding: 12px; font-size: 0.9rem;"
+                            style="flex: 3; padding: 10px; font-size: 0.85rem;"
                             onclick="processQSO()">
                         <span id="btnSubmitIcon">⚡</span> 
                         <span id="btnSubmitText">Grabar Contacto</span>
                     </button>
                     <button id="btnCancelEdit" class="btn-action btn-del" 
-                            style="display: none; flex: 1; padding: 12px;"
+                            style="display: none; flex: 1; padding: 10px;"
                             onclick="cancelEdit()">
                         X
                     </button>
@@ -631,24 +720,24 @@
             <!-- Log Book -->
             <div class="panel">
                 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
-                    <h3 style="color: var(--neon-yellow); margin: 0;">
-                        <span style="font-size: 1.2rem;">📋</span> LOG BOOK
+                    <h3 style="color: var(--neon-yellow); margin: 0; font-size: 1.2rem;">
+                        📋 LOG BOOK
                     </h3>
                     <input type="text" id="searchLog" placeholder="Buscar..." 
                            class="input-field" 
-                           style="width: 180px; margin-bottom: 0; min-height: 40px;"
+                           style="width: 150px; margin-bottom: 0; font-size: 0.9rem;"
                            oninput="saveAndRender()">
                 </div>
                 
                 <div class="btn-group">
                     <button class="btn-action btn-adif" onclick="downloadADIF()">
-                        <span class="hide-on-mobile">Exportar </span>ADIF
+                        Exportar ADIF
                     </button>
                     <button class="btn-action btn-csv" onclick="downloadCSV()">
                         CSV
                     </button>
                     <button class="btn-action btn-del" onclick="clearAll()">
-                        Borrar
+                        Borrar Todo
                     </button>
                 </div>
 
@@ -658,9 +747,9 @@
                             <tr>
                                 <th>CORRESPONSAL</th>
                                 <th>FECHA / HORA</th>
-                                <th class="hide-on-mobile">BANDA / MODO</th>
+                                <th>BANDA / MODO</th>
                                 <th>QRZ</th>
-                                <th style="text-align: right;">ACC.</th>
+                                <th style="text-align: right;">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="logBody"></tbody>
@@ -668,35 +757,33 @@
                 </div>
                 
                 <div style="text-align: center; color: var(--neon-cyan); font-size: 0.8rem; margin-top: 10px;">
-                    Total: <span id="visibleCount">0</span> / <span id="totalCount">0</span> contactos
+                    Mostrando: <span id="visibleCount">0</span> de <span id="totalCount">0</span> contactos
                 </div>
             </div>
 
             <!-- Panel Operador -->
             <div class="panel op-panel">
-                <h4 style="color: var(--neon-cyan); margin-top: 0;">
-                    <span style="font-size: 1.2rem;">👤</span> OPERADOR
+                <h4 style="color: var(--neon-cyan); margin: 0 0 15px 0; font-size: 1.1rem;">
+                    👤 OPERADOR
                 </h4>
                 
-                <label style="font-size: 0.7rem; color: #888;">MI CALLSIGN</label>
+                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI CALLSIGN</label>
                 <input type="text" id="opCall" class="input-field" 
-                       placeholder="CL7ADV" onchange="saveOperator()">
+                       placeholder="CL7ADV" onchange="saveOperator()" style="margin-bottom: 12px;">
                 
-                <label style="font-size: 0.7rem; color: #888;">MI NOMBRE</label>
+                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI NOMBRE</label>
                 <input type="text" id="opName" class="input-field" 
-                       placeholder="Alfred" onchange="saveOperator()">
+                       placeholder="Alfred" onchange="saveOperator()" style="margin-bottom: 12px;">
 
-                <label style="font-size: 0.7rem; color: #888;">MI CORREO (ADIF)</label>
+                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI CORREO (ADIF)</label>
                 <input type="email" id="opEmail" class="input-field" 
-                       placeholder="mi@email.com" onchange="saveOperator()">
+                       placeholder="mi@email.com" onchange="saveOperator()" style="margin-bottom: 20px;">
                 
-                <hr style="border: 0; border-top: 1px solid #1e3a5f; margin: 20px 0;">
+                <hr style="border: 0; border-top: 1px solid #1e3a5f; margin: 15px 0;">
                 
-                <div style="text-align: center; background: linear-gradient(to bottom, #ff007f33, transparent); padding: 15px; border-radius: 10px;">
-                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--neon-yellow);" id="totalQSOs">0</div>
-                    <div style="color: var(--neon-pink); font-weight: bold; font-size: 0.9rem;">
-                        QSOs TOTALES
-                    </div>
+                <div class="stats-box">
+                    <div class="stats-number" id="totalQSOs">0</div>
+                    <div class="stats-label">QSOs TOTALES</div>
                 </div>
 
                 <div class="signature">
@@ -709,12 +796,12 @@
         </div>
         
         <!-- Footer para móviles -->
-        <div class="mobile-footer" id="mobileFooter">
-            <button class="btn-action btn-adif" onclick="scrollToSection('formPanel')">
-                📻 Nuevo
+        <div class="mobile-footer">
+            <button class="btn-action btn-adif" onclick="document.getElementById('formPanel').scrollIntoView({behavior: 'smooth'})">
+                📻 Nuevo QSO
             </button>
-            <button class="btn-action btn-csv" onclick="scrollToSection('logBody')">
-                📋 Log
+            <button class="btn-action btn-csv" onclick="document.getElementById('logBody').scrollIntoView({behavior: 'smooth'})">
+                📋 Ver Log
             </button>
             <button class="btn-action" style="background: #9c27b0;" onclick="downloadADIF()">
                 💾 Exportar
@@ -727,15 +814,14 @@
         let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
         let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
         let isEditing = false;
-        let isMobileMenuOpen = false;
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             loadOperator();
             updateClock();
             saveAndRender();
-            setupMobileDetection();
-            setupTouchEvents();
+            // Auto-ajustar para PC
+            adjustForPC();
         });
 
         // Splash screen
@@ -747,10 +833,31 @@
                 setTimeout(() => {
                     splash.style.display = 'none';
                     main.style.display = 'block';
-                    setTimeout(() => main.style.opacity = '1', 50);
+                    setTimeout(() => {
+                        main.style.opacity = '1';
+                        // Ajustar después de mostrar contenido
+                        adjustForPC();
+                    }, 50);
                 }, 800);
-            }, 3000);
+            }, 2500); // Reducido a 2.5 segundos
         });
+
+        // Ajustes específicos para PC
+        function adjustForPC() {
+            if (window.innerWidth >= 1200) {
+                // Ajustar tamaños de fuente en PC
+                document.querySelectorAll('.input-field').forEach(el => {
+                    el.style.fontSize = '13px';
+                    el.style.padding = '8px 10px';
+                });
+                
+                // Ajustar botones
+                document.querySelectorAll('.btn-action').forEach(btn => {
+                    btn.style.fontSize = '11px';
+                    btn.style.padding = '7px 10px';
+                });
+            }
+        }
 
         // Reloj UTC
         function updateClock() {
@@ -777,51 +884,6 @@
             }
         }
         setInterval(updateClock, 1000);
-
-        // Detección de móvil
-        function setupMobileDetection() {
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                document.getElementById('dashboard').classList.remove('active');
-            }
-        }
-
-        // Eventos táctiles
-        function setupTouchEvents() {
-            // Prevenir zoom en inputs
-            document.querySelectorAll('input, select').forEach(el => {
-                el.addEventListener('touchstart', (e) => {
-                    e.stopPropagation();
-                }, { passive: true });
-            });
-        }
-
-        // Menú móvil
-        function toggleMobileMenu() {
-            const dashboard = document.getElementById('dashboard');
-            const btn = document.getElementById('mobileMenuBtn');
-            
-            isMobileMenuOpen = !isMobileMenuOpen;
-            dashboard.classList.toggle('active', isMobileMenuOpen);
-            btn.textContent = isMobileMenuOpen ? '✕' : '☰';
-            
-            if (isMobileMenuOpen) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        // Scroll a sección en móvil
-        function scrollToSection(sectionId) {
-            const element = document.getElementById(sectionId);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if (window.innerWidth <= 768) {
-                    toggleMobileMenu();
-                }
-            }
-        }
 
         // Operador
         function saveOperator() {
@@ -891,8 +953,9 @@
             
             // Feedback visual
             const btn = document.getElementById('btnSubmit');
+            const originalBg = btn.style.background;
             btn.style.background = '#4CAF50';
-            setTimeout(() => btn.style.background = '', 500);
+            setTimeout(() => btn.style.background = originalBg, 500);
         }
 
         // Editar QSO
@@ -915,7 +978,7 @@
 
             // Estética de edición
             document.getElementById('formPanel').classList.add('editing-mode');
-            document.getElementById('formTitle').innerHTML = '<span style="font-size: 1.2rem;">✏️</span> EDITANDO CONTACTO';
+            document.getElementById('formTitle').innerHTML = '✏️ EDITANDO CONTACTO';
             document.getElementById('formTitle').style.color = "var(--neon-yellow)";
             document.getElementById('btnSubmitIcon').textContent = '💾';
             document.getElementById('btnSubmitText').textContent = 'Actualizar';
@@ -923,11 +986,6 @@
             document.getElementById('btnCancelEdit').style.display = "flex";
             
             document.getElementById('qsoCall').focus();
-            
-            // Scroll a formulario en móvil
-            if (window.innerWidth <= 768) {
-                scrollToSection('formPanel');
-            }
         }
 
         function updateQSO() {
@@ -961,7 +1019,7 @@
         function cancelEdit() {
             isEditing = false;
             document.getElementById('formPanel').classList.remove('editing-mode');
-            document.getElementById('formTitle').innerHTML = '<span style="font-size: 1.2rem;">📻</span> REGISTRAR QSO';
+            document.getElementById('formTitle').innerHTML = '📻 REGISTRAR QSO';
             document.getElementById('formTitle').style.color = "var(--neon-pink)";
             document.getElementById('btnSubmitIcon').textContent = '⚡';
             document.getElementById('btnSubmitText').textContent = 'Grabar Contacto';
@@ -999,32 +1057,32 @@
             body.innerHTML = filtered.map(q => `
                 <tr>
                     <td>
-                        <b style="color:var(--neon-yellow); font-size: 0.9rem;">${q.call}</b><br>
-                        <small style="color: #aaa;">${q.name || ''}</small>
+                        <b style="color:var(--neon-yellow); font-size: 0.85rem;">${q.call}</b><br>
+                        <small style="color: #aaa; font-size: 0.75rem;">${q.name || ''}</small>
                     </td>
-                    <td style="font-family: monospace; font-size: 0.85rem;">
+                    <td style="font-family: monospace; font-size: 0.8rem;">
                         ${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}<br>
                         <span style="color:var(--neon-cyan)">${q.time.slice(0,2)}:${q.time.slice(2,4)}z</span>
                     </td>
-                    <td class="hide-on-mobile">
-                        <span style="color: var(--neon-yellow);">${q.band}</span><br>
-                        <small>${q.mode}</small>
+                    <td>
+                        <span style="color: var(--neon-yellow); font-size: 0.85rem;">${q.band}</span><br>
+                        <small style="font-size: 0.75rem;">${q.mode}</small>
                     </td>
                     <td>
                         <span style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#666'}; 
-                              font-weight: bold; font-size: 0.9rem;">
+                              font-weight: bold; font-size: 0.85rem;">
                             ${q.qrz === 'Y' ? '✓' : '✗'}
                         </span>
                     </td>
                     <td style="text-align: right; white-space: nowrap;">
                         <button onclick="editQSO(${q.id})" class="btn-action btn-edit" 
-                                style="padding: 6px 10px; font-size: 0.8rem; margin-right: 5px;" 
+                                style="padding: 5px 8px; font-size: 0.75rem; margin-right: 5px;" 
                                 title="Editar">
                             ✎
                         </button>
                         <button onclick="deleteQSO(${q.id})" 
                                 style="background:none; border:none; color:var(--neon-pink); 
-                                       cursor:pointer; font-size: 1.2rem; padding: 0 5px;" 
+                                       cursor:pointer; font-size: 1.1rem; padding: 0 5px;" 
                                 title="Eliminar">
                             ×
                         </button>
@@ -1116,13 +1174,8 @@
             URL.revokeObjectURL(url);
         }
 
-        // Responsive al redimensionar
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768 && isMobileMenuOpen) {
-                toggleMobileMenu();
-            }
-            updateClock();
-        });
+        // Redimensionamiento
+        window.addEventListener('resize', adjustForPC);
 
         // Prevenir envío de formulario con Enter
         document.addEventListener('keydown', function(e) {
