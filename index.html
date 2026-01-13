@@ -73,11 +73,7 @@
             background: radial-gradient(circle, #ffea00 0%, #ff7e5f 100%);
             border-radius: 50%;
             box-shadow: 0 0 60px #ff7e5f, 0 0 120px rgba(255, 126, 95, 0.5);
-           <label for="rst">RST:</label>
-<input type="text" id="rst">
-<label for="freq">Frecuencia (MHz):</label>
-<input type="text" id="freq" placeholder="Ej: 14.074">
- animation: sunrise-anim 3s forwards ease-out;
+            animation: sunrise-anim 3s forwards ease-out;
             z-index: 1;
         }
 
@@ -363,6 +359,7 @@
         .btn-csv { background: #4caf50; color: white; }
         .btn-del { background: #f44336; color: white; }
         .btn-edit { background: #2196F3; color: white; }
+        .btn-freq { background: #9c27b0; color: white; }
 
         /* TABLA - COMPACTA PARA PC */
         .table-container {
@@ -685,18 +682,32 @@
                     </div>
                 </div>
 
-                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">MODO</label>
-                <select id="qsoMode" class="input-field" style="margin-bottom: 12px;">
-                    <option value="SSB" selected>SSB</option>
-                    <option value="CW">CW</option>
-                    <option value="FT8">FT8</option>
-                    <option value="FT4">FT4</option>
-                    <option value="FM">FM</option>
-                    <option value="AM">AM</option>
-                    <option value="VARA">VARA</option>
-                    <option value="Digital Voice">Digital Voice</option>
-                    <option value="dmr">DMR</option>
-                </select>
+                <!-- NUEVO CAMPO DE FRECUENCIA CON BOTÓN -->
+                <div class="form-group">
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">FRECUENCIA (MHz)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="qsoFreq" class="input-field" placeholder="ej. 7.125 MHz">
+                            <button class="btn-action btn-freq" onclick="calculateFreqFromBand()" style="min-width: 55px;" title="Calcular frecuencia de banda">
+                                Freq
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">MODO</label>
+                        <select id="qsoMode" class="input-field">
+                            <option value="SSB" selected>SSB</option>
+                            <option value="CW">CW</option>
+                            <option value="FT8">FT8</option>
+                            <option value="FT4">FT4</option>
+                            <option value="FM">FM</option>
+                            <option value="AM">AM</option>
+                            <option value="VARA">VARA</option>
+                            <option value="Digital Voice">Digital Voice</option>
+                            <option value="dmr">DMR</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <div class="checkbox-container">
                     <input type="checkbox" id="exportQRZ" checked>
@@ -751,7 +762,8 @@
                             <tr>
                                 <th>CORRESPONSAL</th>
                                 <th>FECHA / HORA</th>
-                                <th>BANDA / MODO</th>
+                                <th>BANDA / FREC.</th>
+                                <th>MODO</th>
                                 <th>QRZ</th>
                                 <th style="text-align: right;">ACCIONES</th>
                             </tr>
@@ -819,6 +831,23 @@
         let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
         let isEditing = false;
 
+        // Mapa de frecuencias centrales por banda (en MHz)
+        const bandFrequencies = {
+            '160m': '1.850',
+            '80m': '3.750',
+            '60m': '5.330',
+            '40m': '7.125',
+            '30m': '10.125',
+            '20m': '14.200',
+            '17m': '18.100',
+            '15m': '21.200',
+            '12m': '24.940',
+            '10m': '28.500',
+            '6m': '50.125',
+            '2m': '144.200',
+            '70cm': '433.500'
+        };
+
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
             loadOperator();
@@ -860,6 +889,27 @@
                     btn.style.fontSize = '11px';
                     btn.style.padding = '7px 10px';
                 });
+            }
+        }
+
+        // Función para calcular frecuencia basada en la banda seleccionada
+        function calculateFreqFromBand() {
+            const bandSelect = document.getElementById('qsoBand');
+            const selectedBand = bandSelect.value;
+            const freqInput = document.getElementById('qsoFreq');
+            
+            if (bandFrequencies[selectedBand]) {
+                freqInput.value = bandFrequencies[selectedBand];
+                
+                // Efecto visual de confirmación
+                freqInput.style.borderColor = 'var(--neon-cyan)';
+                freqInput.style.boxShadow = '0 0 10px rgba(0, 229, 255, 0.5)';
+                setTimeout(() => {
+                    freqInput.style.borderColor = '#1e3a5f';
+                    freqInput.style.boxShadow = 'none';
+                }, 1000);
+            } else {
+                freqInput.value = '';
             }
         }
 
@@ -945,6 +995,7 @@
                 date: rawDate,
                 time: rawTime,
                 band: document.getElementById('qsoBand').value,
+                freq: document.getElementById('qsoFreq').value.trim(),
                 mode: document.getElementById('qsoMode').value,
                 notes: document.getElementById('qsoNotes').value,
                 qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
@@ -976,6 +1027,7 @@
             document.getElementById('qsoDate').value = `${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}`;
             document.getElementById('qsoTime').value = `${q.time.slice(0,2)}:${q.time.slice(2,4)}`;
             document.getElementById('qsoBand').value = q.band;
+            document.getElementById('qsoFreq').value = q.freq || '';
             document.getElementById('qsoMode').value = q.mode;
             document.getElementById('qsoNotes').value = q.notes;
             document.getElementById('exportQRZ').checked = q.qrz === 'Y';
@@ -1009,6 +1061,7 @@
                     date: rawDate,
                     time: rawTime,
                     band: document.getElementById('qsoBand').value,
+                    freq: document.getElementById('qsoFreq').value.trim(),
                     mode: document.getElementById('qsoMode').value,
                     notes: document.getElementById('qsoNotes').value,
                     qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
@@ -1037,6 +1090,7 @@
             document.getElementById('qsoCall').value = "";
             document.getElementById('qsoName').value = "";
             document.getElementById('qsoEmail').value = "";
+            document.getElementById('qsoFreq').value = "";
             document.getElementById('qsoNotes').value = "";
             document.getElementById('qsoDate').value = "";
             document.getElementById('qsoTime').value = "";
@@ -1055,7 +1109,8 @@
             const filtered = qsos.filter(q => 
                 q.call.includes(term) || 
                 (q.name && q.name.toUpperCase().includes(term)) ||
-                (q.notes && q.notes.toUpperCase().includes(term))
+                (q.notes && q.notes.toUpperCase().includes(term)) ||
+                (q.freq && q.freq.includes(term))
             );
 
             body.innerHTML = filtered.map(q => `
@@ -1070,7 +1125,12 @@
                     </td>
                     <td>
                         <span style="color: var(--neon-yellow); font-size: 0.85rem;">${q.band}</span><br>
-                        <small style="font-size: 0.75rem;">${q.mode}</small>
+                        <small style="font-size: 0.75rem; color: ${q.freq ? 'var(--neon-cyan)' : '#666'}">
+                            ${q.freq ? q.freq + ' MHz' : 'Sin freq.'}
+                        </small>
+                    </td>
+                    <td style="font-size: 0.75rem;">
+                        ${q.mode}
                     </td>
                     <td>
                         <span style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#666'}; 
@@ -1138,6 +1198,7 @@
                 adif += `<MODE:${q.mode.length}>${q.mode}\n`;
                 adif += `<RST_SENT:${q.rst.length}>${q.rst}\n`;
                 
+                if(q.freq) adif += `<FREQ:${q.freq.length}>${q.freq}\n`;
                 if(q.name) adif += `<NAME:${q.name.length}>${q.name}\n`;
                 if(q.email) adif += `<EMAIL:${q.email.length}>${q.email}\n`;
                 if(q.notes) adif += `<COMMENT:${q.notes.length}>${q.notes}\n`;
@@ -1159,9 +1220,9 @@
                 return;
             }
 
-            let csv = "Call,Date,Time,Band,Mode,RST,Name,Email,Notes,QRZ\n";
+            let csv = "Call,Date,Time,Band,Freq (MHz),Mode,RST,Name,Email,Notes,QRZ\n";
             qsos.forEach(q => {
-                csv += `"${q.call}","${q.date}","${q.time}","${q.band}","${q.mode}","${q.rst}","${q.name || ''}","${q.email || ''}","${q.notes || ''}","${q.qrz}"\n`;
+                csv += `"${q.call}","${q.date}","${q.time}","${q.band}","${q.freq || ''}","${q.mode}","${q.rst}","${q.name || ''}","${q.email || ''}","${q.notes || ''}","${q.qrz}"\n`;
             });
             downloadFile(csv, `NEON_LOG_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
         }
