@@ -183,6 +183,7 @@
         .btn-adif { background: var(--neon-cyan); color: #0a192f; }
         .btn-csv { background: #4caf50; color: white; }
         .btn-del { background: #f44336; color: white; }
+        .btn-edit { background: #2196F3; color: white; margin-right: 5px; }
 
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th { color: var(--neon-yellow); text-align: left; padding: 10px; border-bottom: 2px solid #1e3a5f; }
@@ -205,6 +206,11 @@
             font-style: italic;
             border-top: 1px solid #1e3a5f;
             padding-top: 15px;
+        }
+
+        .editing-mode {
+            border: 2px solid var(--neon-yellow) !important;
+            box-shadow: 0 0 15px var(--neon-yellow);
         }
     </style>
 </head>
@@ -234,9 +240,11 @@
 
         <div class="dashboard">
             <!-- Registrar QSO -->
-            <div class="panel reg-qso">
-                <h3 style="color: var(--neon-pink)">| REGISTRAR QSO</h3>
+            <div class="panel reg-qso" id="formPanel">
+                <h3 id="formTitle" style="color: var(--neon-pink)">| REGISTRAR QSO</h3>
                 
+                <input type="hidden" id="editId">
+
                 <label style="font-size: 0.7rem; color: var(--neon-cyan);">INDICATIVO (CALLSIGN)</label>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="qsoCall" class="input-field" style="font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 0;" placeholder="CALLSIGN">
@@ -301,7 +309,10 @@
                 <label style="font-size: 0.7rem; color: var(--neon-cyan);">COMENTARIO</label>
                 <input type="text" id="qsoNotes" class="input-field" placeholder="Gracias 73...">
                 
-                <button class="btn-action btn-adif" style="width: 100%; padding: 15px; margin-top: 10px; font-size: 1rem;" onclick="addQSO()">Grabar Contacto ⚡</button>
+                <div style="display: flex; gap: 5px;">
+                    <button id="btnSubmit" class="btn-action btn-adif" style="flex: 3; padding: 15px; margin-top: 10px; font-size: 1rem;" onclick="processQSO()">Grabar Contacto ⚡</button>
+                    <button id="btnCancelEdit" class="btn-action btn-del" style="display: none; flex: 1; padding: 15px; margin-top: 10px; font-size: 1rem;" onclick="cancelEdit()">X</button>
+                </div>
             </div>
 
             <!-- Log Book -->
@@ -325,7 +336,7 @@
                                 <th>FECHA / HORA</th>
                                 <th>BANDA / MODO</th>
                                 <th>QRZ</th>
-                                <th>ACC.</th>
+                                <th style="text-align: right;">ACC.</th>
                             </tr>
                         </thead>
                         <tbody id="logBody"></tbody>
@@ -343,7 +354,7 @@
                 <input type="text" id="opName" class="input-field" placeholder="Mi Nombre" onchange="saveOperator()">
 
                 <label style="font-size: 0.6rem; color: #888;">MI CORREO (ADIF)</label>
-                <input type="email" id="opEmail" class="input-field" placeholder="mi@email.com" onchange="changeOperator()">
+                <input type="email" id="opEmail" class="input-field" placeholder="mi@email.com" onchange="saveOperator()">
                 
                 <hr style="border: 0; border-top: 1px solid #1e3a5f; margin: 20px 0;">
                 
@@ -369,13 +380,15 @@
                     main.style.display = 'block';
                     setTimeout(() => main.style.opacity = '1', 50);
                 }, 800);
-            }, 3000); // 3 segundos para que se aprecie el amanecer
+            }, 3000);
         });
 
         let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
         let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
+        let isEditing = false;
 
         function updateClock() {
+            if (isEditing) return; // No actualizar campos si estamos editando
             const now = new Date();
             const year = now.getUTCFullYear();
             const month = String(now.getUTCMonth() + 1).padStart(2, '0');
@@ -417,6 +430,14 @@
             if(call) window.open(`https://www.qrz.com/db/${call}`, '_blank');
         }
 
+        function processQSO() {
+            if (isEditing) {
+                updateQSO();
+            } else {
+                addQSO();
+            }
+        }
+
         function addQSO() {
             const call = document.getElementById('qsoCall').value.toUpperCase().trim();
             if(!call) return;
@@ -440,13 +461,84 @@
 
             qsos.unshift(newQso);
             saveAndRender();
+            clearForm();
+        }
+
+        function editQSO(id) {
+            const q = qsos.find(item => item.id === id);
+            if (!q) return;
+
+            isEditing = true;
+            document.getElementById('editId').value = q.id;
+            document.getElementById('qsoCall').value = q.call;
+            document.getElementById('qsoName').value = q.name;
+            document.getElementById('qsoEmail').value = q.email;
+            document.getElementById('qsoRst').value = q.rst;
+            document.getElementById('qsoDate').value = `${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}`;
+            document.getElementById('qsoTime').value = `${q.time.slice(0,2)}:${q.time.slice(2,4)}`;
+            document.getElementById('qsoBand').value = q.band;
+            document.getElementById('qsoMode').value = q.mode;
+            document.getElementById('qsoNotes').value = q.notes;
+            document.getElementById('exportQRZ').checked = q.qrz === 'Y';
+
+            // Estética de edición
+            document.getElementById('formPanel').classList.add('editing-mode');
+            document.getElementById('formTitle').innerText = "| EDITANDO CONTACTO";
+            document.getElementById('formTitle').style.color = "var(--neon-yellow)";
+            document.getElementById('btnSubmit').innerText = "Actualizar Contacto 💾";
+            document.getElementById('btnSubmit').className = "btn-action btn-csv";
+            document.getElementById('btnCancelEdit').style.display = "block";
             
+            document.getElementById('qsoCall').focus();
+        }
+
+        function updateQSO() {
+            const id = parseInt(document.getElementById('editId').value);
+            const index = qsos.findIndex(q => q.id === id);
+            
+            if (index !== -1) {
+                const rawDate = document.getElementById('qsoDate').value.replace(/-/g, '');
+                const rawTime = document.getElementById('qsoTime').value.replace(/:/g, '');
+
+                qsos[index] = {
+                    ...qsos[index],
+                    call: document.getElementById('qsoCall').value.toUpperCase().trim(),
+                    name: document.getElementById('qsoName').value.trim(),
+                    email: document.getElementById('qsoEmail').value.trim(),
+                    rst: document.getElementById('qsoRst').value.trim(),
+                    date: rawDate,
+                    time: rawTime,
+                    band: document.getElementById('qsoBand').value,
+                    mode: document.getElementById('qsoMode').value,
+                    notes: document.getElementById('qsoNotes').value,
+                    qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N'
+                };
+
+                saveAndRender();
+                cancelEdit();
+            }
+        }
+
+        function cancelEdit() {
+            isEditing = false;
+            document.getElementById('formPanel').classList.remove('editing-mode');
+            document.getElementById('formTitle').innerText = "| REGISTRAR QSO";
+            document.getElementById('formTitle').style.color = "var(--neon-pink)";
+            document.getElementById('btnSubmit').innerText = "Grabar Contacto ⚡";
+            document.getElementById('btnSubmit').className = "btn-action btn-adif";
+            document.getElementById('btnCancelEdit').style.display = "none";
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById('editId').value = "";
             document.getElementById('qsoCall').value = "";
             document.getElementById('qsoName').value = "";
             document.getElementById('qsoEmail').value = "";
             document.getElementById('qsoNotes').value = "";
             document.getElementById('qsoDate').value = "";
             document.getElementById('qsoTime').value = "";
+            updateClock();
         }
 
         function saveAndRender() {
@@ -461,7 +553,10 @@
                     <td style="font-family: monospace;">${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}<br><span style="color:var(--neon-cyan)">${q.time}z</span></td>
                     <td>${q.band}<br><small>${q.mode}</small></td>
                     <td style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#444'}">${q.qrz === 'Y' ? 'SI' : 'NO'}</td>
-                    <td><button onclick="deleteQSO(${q.id})" style="background:none; border:none; color:var(--neon-pink); cursor:pointer;">×</button></td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button onclick="editQSO(${q.id})" class="btn-action btn-edit" title="Editar">✎</button>
+                        <button onclick="deleteQSO(${q.id})" style="background:none; border:none; color:var(--neon-pink); cursor:pointer; font-size: 1.2rem;" title="Eliminar">×</button>
+                    </td>
                 </tr>
             `).join('');
 
@@ -470,6 +565,7 @@
 
         function deleteQSO(id) {
             if(confirm("¿Eliminar registro?")) {
+                if (isEditing && document.getElementById('editId').value == id) cancelEdit();
                 qsos = qsos.filter(q => q.id !== id);
                 saveAndRender();
             }
@@ -478,6 +574,7 @@
         function clearAll() {
             if(confirm("¿Borrar todo el historial?")) {
                 qsos = [];
+                cancelEdit();
                 saveAndRender();
             }
         }
