@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Neon Log Station v4.3.5 - Alfred CL7ADV</title>
     <style>
         :root {
@@ -13,6 +13,11 @@
             --neon-yellow: #ffea00;
             --text-main: #e6f1ff;
             --sunrise-gradient: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #0a192f 100%);
+            --mobile-breakpoint: 768px;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body, html {
@@ -22,14 +27,15 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* PANTALLA DE BIENVENIDA (Sunrise Effect) */
+        /* PANTALLA DE BIENVENIDA CON AMANECER EN CUBA */
         #splash-screen {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: var(--bg-dark);
+            background: linear-gradient(180deg, #0a192f 0%, #0d1b2a 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -39,37 +45,90 @@
             overflow: hidden;
         }
 
-        /* El sol del amanecer */
+        /* Fondo del amanecer cubano */
+        .sunrise-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, 
+                rgba(255, 126, 95, 0.1) 0%, 
+                rgba(254, 180, 123, 0.2) 20%,
+                rgba(255, 234, 0, 0.1) 40%,
+                rgba(10, 25, 47, 0.9) 70%,
+                var(--bg-dark) 100%);
+            animation: sky-animation 4s ease-out forwards;
+        }
+
+        @keyframes sky-animation {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* El sol del amanecer cubano */
         .sun {
             position: absolute;
-            bottom: -100px;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, #ffea00, #ff7e5f);
+            bottom: -150px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #ffea00 0%, #ff7e5f 100%);
             border-radius: 50%;
-            box-shadow: 0 0 60px #ff7e5f;
-            animation: sunrise-anim 2.5s forwards ease-out;
+            box-shadow: 
+                0 0 60px #ff7e5f,
+                0 0 120px rgba(255, 126, 95, 0.5),
+                inset 0 0 30px #fff;
+            animation: sunrise-anim 3s forwards ease-out;
             z-index: 1;
         }
 
         @keyframes sunrise-anim {
-            0% { bottom: -150px; opacity: 0; }
-            100% { bottom: 20%; opacity: 1; }
+            0% { 
+                bottom: -150px; 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% { 
+                bottom: 20%; 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Línea del horizonte */
+        .horizon {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 234, 0, 0.5), transparent);
+            box-shadow: 0 0 10px rgba(255, 234, 0, 0.3);
         }
 
         .splash-content {
             position: relative;
             z-index: 2;
             text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
         }
 
         .splash-title {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: var(--neon-cyan);
             font-style: italic;
             font-weight: 900;
-            text-shadow: 0 0 20px var(--neon-cyan);
+            text-shadow: 
+                0 0 20px var(--neon-cyan),
+                0 0 40px rgba(0, 229, 255, 0.5);
             margin-bottom: 10px;
+            animation: title-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes title-glow {
+            0% { text-shadow: 0 0 20px var(--neon-cyan); }
+            100% { text-shadow: 0 0 30px var(--neon-cyan), 0 0 50px rgba(0, 229, 255, 0.7); }
         }
 
         .splash-welcome {
@@ -77,70 +136,118 @@
             color: var(--text-main);
             letter-spacing: 2px;
             margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .loader {
-            width: 200px; height: 4px;
+            width: 100%;
+            max-width: 300px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             position: relative;
             overflow: hidden;
-            margin: 0 auto;
+            margin: 0 auto 20px;
         }
 
         .loader::after {
             content: '';
             position: absolute;
             width: 0%; height: 100%;
-            background: var(--neon-pink);
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
             animation: load 2.5s forwards;
             box-shadow: 0 0 10px var(--neon-pink);
         }
 
-        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+        @keyframes load { 
+            0% { width: 0%; } 
+            100% { width: 100%; } 
+        }
 
+        /* CONTENIDO PRINCIPAL RESPONSIVE */
         #main-content {
             display: none;
-            padding: 20px;
+            padding: 15px;
             opacity: 0;
             transition: opacity 0.5s ease-in;
+            min-height: 100vh;
         }
 
         .top-bar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .top-bar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
         }
 
         .station-title {
             font-style: italic;
             font-weight: 900;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: var(--neon-cyan);
             text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+            line-height: 1.2;
+        }
+
+        @media (min-width: 768px) {
+            .station-title {
+                font-size: 2.5rem;
+            }
         }
 
         .utc-container {
-            text-align: right;
+            text-align: center;
             background: rgba(0, 229, 255, 0.05);
             padding: 10px 15px;
             border-radius: 10px;
             border: 1px solid rgba(0, 229, 255, 0.2);
+            width: 100%;
+            max-width: 400px;
+            align-self: center;
+        }
+
+        @media (min-width: 768px) {
+            .utc-container {
+                text-align: right;
+                align-self: flex-end;
+            }
         }
 
         .utc-clock {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             color: var(--neon-yellow);
             font-weight: bold;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
         }
 
-        /* DASHBOARD LAYOUT */
+        @media (min-width: 768px) {
+            .utc-clock {
+                font-size: 2.2rem;
+            }
+        }
+
+        /* DASHBOARD RESPONSIVE */
         .dashboard {
-            display: grid;
-            grid-template-columns: 350px 1fr 250px;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                display: grid;
+                grid-template-columns: 350px 1fr 250px;
+                gap: 20px;
+            }
         }
 
         .panel {
@@ -148,56 +255,148 @@
             border-radius: 15px;
             padding: 20px;
             border: 1px solid rgba(0, 229, 255, 0.1);
+            width: 100%;
         }
 
-        .reg-qso { border-left: 5px solid var(--neon-pink); }
-        .op-panel { border-top: 5px solid var(--neon-cyan); }
-        
+        .reg-qso { 
+            border-left: 5px solid var(--neon-pink); 
+        }
+
+        .op-panel { 
+            border-top: 5px solid var(--neon-cyan); 
+        }
+
+        /* Mejoras para inputs en móvil */
         .input-field {
             background: #0d1b2a;
             border: 1px solid #1e3a5f;
             color: white;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px 10px;
+            border-radius: 8px;
             width: 100%;
             box-sizing: border-box;
             margin-bottom: 10px;
-            font-size: 0.9rem;
+            font-size: 16px; /* Previene zoom en iOS */
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 44px; /* Tamaño táctil mínimo */
         }
 
-        .btn-group { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        select.input-field {
+            background: #0d1b2a url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 10px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+
+        /* Botones optimizados para táctil */
+        .btn-group { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 15px; 
+            flex-wrap: wrap; 
+        }
         
         .btn-action {
-            padding: 8px 12px;
-            border-radius: 5px;
+            padding: 12px 15px;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             transition: all 0.2s;
+            min-height: 44px; /* Tamaño mínimo para dedos */
+            flex: 1;
+            min-width: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
         }
 
-        .btn-action:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        @media (min-width: 768px) {
+            .btn-action {
+                padding: 8px 12px;
+                min-height: auto;
+            }
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .btn-action:hover { 
+            filter: brightness(1.2); 
+            transform: translateY(-1px); 
+        }
+
         .btn-qrz { background: #ff9800; color: white; }
         .btn-adif { background: var(--neon-cyan); color: #0a192f; }
         .btn-csv { background: #4caf50; color: white; }
         .btn-del { background: #f44336; color: white; }
-        .btn-edit { background: #2196F3; color: white; margin-right: 5px; }
+        .btn-edit { background: #2196F3; color: white; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { color: var(--neon-yellow); text-align: left; padding: 10px; border-bottom: 2px solid #1e3a5f; }
-        td { padding: 12px 10px; border-bottom: 1px solid #1e3a5f; }
+        /* Tabla responsive */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 15px;
+        }
 
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.85rem; 
+            min-width: 600px; /* Ancho mínimo para mantener legibilidad */
+        }
+
+        th { 
+            color: var(--neon-yellow); 
+            text-align: left; 
+            padding: 12px 10px; 
+            border-bottom: 2px solid #1e3a5f; 
+            white-space: nowrap;
+        }
+
+        td { 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #1e3a5f; 
+            vertical-align: top;
+        }
+
+        /* Optimizar columnas para móvil */
+        @media (max-width: 767px) {
+            table {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .hide-on-mobile {
+                display: none;
+            }
+        }
+
+        /* Checkboxes */
         .checkbox-container {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.8rem;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
             color: var(--neon-yellow);
         }
 
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--neon-cyan);
+        }
+
+        /* Firma */
         .signature {
             margin-top: 20px;
             font-size: 0.8rem;
@@ -208,29 +407,118 @@
             padding-top: 15px;
         }
 
+        /* Modo edición */
         .editing-mode {
             border: 2px solid var(--neon-yellow) !important;
             box-shadow: 0 0 15px var(--neon-yellow);
+            animation: pulse-edit 2s infinite;
+        }
+
+        @keyframes pulse-edit {
+            0%, 100% { box-shadow: 0 0 15px var(--neon-yellow); }
+            50% { box-shadow: 0 0 25px var(--neon-yellow); }
+        }
+
+        /* Menu hamburguesa para móvil */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 767px) {
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .dashboard {
+                display: none;
+            }
+            
+            .dashboard.active {
+                display: flex;
+            }
+        }
+
+        /* Footer móvil */
+        .mobile-footer {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--neon-cyan);
+            padding: 10px;
+            z-index: 90;
+        }
+
+        @media (max-width: 767px) {
+            .mobile-footer {
+                display: flex;
+                justify-content: space-around;
+            }
+            
+            .mobile-footer button {
+                flex: 1;
+                margin: 0 5px;
+            }
+        }
+
+        /* Mejoras de scroll */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-cyan);
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
+        <div class="sunrise-bg"></div>
         <div class="sun"></div>
+        <div class="horizon"></div>
         <div class="splash-content">
             <div class="splash-title">NEON LOG STATION</div>
-            <div class="splash-welcome">BIENVENIDOS COLEGAS RADIOPERADORES</div>
+            <div class="splash-welcome">AMANECER EN CUBA - BIENVENIDOS COLEGAS RADIOPERADORES</div>
             <div class="loader"></div>
-            <div style="margin-top: 20px; font-size: 0.8rem; color: #e6f1ff; text-shadow: 0 0 5px #000;">By Alfred CL7ADV</div>
+            <div style="margin-top: 20px; font-size: 0.9rem; color: #e6f1ff; text-shadow: 0 0 5px #000;">
+                By Alfred CL7ADV - Camagüey, Cuba
+            </div>
         </div>
     </div>
+
+    <!-- Botón menú móvil -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
     <div id="main-content">
         <div class="top-bar">
             <div>
-                <div class="station-title">NEON LOG STATION <span style="font-size: 1rem;">v4.3.5</span></div>
-                <div style="color: var(--neon-cyan); font-size: 0.8rem; letter-spacing: 3px;">CAMAGÜEY - SANTA CRUZ DEL SUR</div>
+                <div class="station-title">NEON LOG STATION <span style="font-size: 0.9rem;">v4.3.5</span></div>
+                <div style="color: var(--neon-cyan); font-size: 0.8rem; letter-spacing: 2px;">
+                    CAMAGÜEY - SANTA CRUZ DEL SUR
+                </div>
             </div>
             <div class="utc-container">
                 <span class="utc-date" id="date-utc">YYYY-MM-DD</span>
@@ -238,67 +526,83 @@
             </div>
         </div>
 
-        <div class="dashboard">
+        <div class="dashboard" id="dashboard">
             <!-- Registrar QSO -->
             <div class="panel reg-qso" id="formPanel">
-                <h3 id="formTitle" style="color: var(--neon-pink)">| REGISTRAR QSO</h3>
+                <h3 id="formTitle" style="color: var(--neon-pink); margin-top: 0;">
+                    <span style="font-size: 1.2rem;">📻</span> REGISTRAR QSO
+                </h3>
                 
                 <input type="hidden" id="editId">
 
-                <label style="font-size: 0.7rem; color: var(--neon-cyan);">INDICATIVO (CALLSIGN)</label>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <input type="text" id="qsoCall" class="input-field" style="font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 0;" placeholder="CALLSIGN">
-                    <button class="btn-action btn-qrz" onclick="checkQRZ('qsoCall')">QRZ</button>
+                <label style="font-size: 0.8rem; color: var(--neon-cyan);">INDICATIVO (CALLSIGN)</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <input type="text" id="qsoCall" class="input-field" 
+                           style="font-size: 1.2rem; color: var(--neon-cyan); margin-bottom: 0;" 
+                           placeholder="CALLSIGN" autocomplete="off">
+                    <button class="btn-action btn-qrz" onclick="checkQRZ('qsoCall')" style="min-width: 60px;">
+                        QRZ
+                    </button>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">FECHA UTC (YYYY-MM-DD)</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">FECHA UTC</label>
                         <input type="text" id="qsoDate" class="input-field" placeholder="2024-01-20">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">HORA UTC (HH:MM)</label>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">HORA UTC</label>
                         <input type="text" id="qsoTime" class="input-field" placeholder="14:30">
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">NOMBRE</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">NOMBRE</label>
                         <input type="text" id="qsoName" class="input-field" placeholder="Nombre">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">EMAIL CORRESPONSAL</label>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">EMAIL</label>
                         <input type="email" id="qsoEmail" class="input-field" placeholder="email@correo.com">
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">REPORTE (RST)</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">REPORTE (RST)</label>
                         <input type="text" id="qsoRst" class="input-field" value="59">
                     </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.7rem; color: var(--neon-cyan);">BANDA</label>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label style="font-size: 0.8rem; color: var(--neon-cyan);">BANDA</label>
                         <select id="qsoBand" class="input-field">
-                            <option value="160m">160m</option><option value="80m">80m</option>
-                            <option value="60m">60m</option><option value="40m" selected>40m</option>
-                            <option value="30m">30m</option><option value="20m">20m</option>
-                            <option value="17m">17m</option><option value="15m">15m</option>
-                            <option value="12m">12m</option><option value="10m">10m</option>
-                            <option value="6m">6m</option><option value="2m">2m</option>
+                            <option value="160m">160m</option>
+                            <option value="80m">80m</option>
+                            <option value="60m">60m</option>
+                            <option value="40m" selected>40m</option>
+                            <option value="30m">30m</option>
+                            <option value="20m">20m</option>
+                            <option value="17m">17m</option>
+                            <option value="15m">15m</option>
+                            <option value="12m">12m</option>
+                            <option value="10m">10m</option>
+                            <option value="6m">6m</option>
+                            <option value="2m">2m</option>
                             <option value="70cm">70cm</option>
                         </select>
                     </div>
                 </div>
 
-                <label style="font-size: 0.7rem; color: var(--neon-cyan);">MODO</label>
+                <label style="font-size: 0.8rem; color: var(--neon-cyan);">MODO</label>
                 <select id="qsoMode" class="input-field">
-                    <option value="SSB" selected>SSB</option><option value="CW">CW</option>
-                    <option value="FT8">FT8</option><option value="FT4">FT4</option>
-                    <option value="FM">FM</option><option value="AM">AM</option>
-                    <option value="VARA">VARA</option><option value="Digital Voice">Digital Voice</option>
-                    <option value="dmr">dmr</option>
+                    <option value="SSB" selected>SSB</option>
+                    <option value="CW">CW</option>
+                    <option value="FT8">FT8</option>
+                    <option value="FT4">FT4</option>
+                    <option value="FM">FM</option>
+                    <option value="AM">AM</option>
+                    <option value="VARA">VARA</option>
+                    <option value="Digital Voice">Digital Voice</option>
+                    <option value="dmr">DMR</option>
                 </select>
                 
                 <div class="checkbox-container">
@@ -306,35 +610,55 @@
                     <label for="exportQRZ">EXPORTAR A QRZ</label>
                 </div>
 
-                <label style="font-size: 0.7rem; color: var(--neon-cyan);">COMENTARIO</label>
+                <label style="font-size: 0.8rem; color: var(--neon-cyan);">COMENTARIO</label>
                 <input type="text" id="qsoNotes" class="input-field" placeholder="Gracias 73...">
                 
-                <div style="display: flex; gap: 5px;">
-                    <button id="btnSubmit" class="btn-action btn-adif" style="flex: 3; padding: 15px; margin-top: 10px; font-size: 1rem;" onclick="processQSO()">Grabar Contacto ⚡</button>
-                    <button id="btnCancelEdit" class="btn-action btn-del" style="display: none; flex: 1; padding: 15px; margin-top: 10px; font-size: 1rem;" onclick="cancelEdit()">X</button>
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <button id="btnSubmit" class="btn-action btn-adif" 
+                            style="flex: 3; padding: 12px; font-size: 0.9rem;"
+                            onclick="processQSO()">
+                        <span id="btnSubmitIcon">⚡</span> 
+                        <span id="btnSubmitText">Grabar Contacto</span>
+                    </button>
+                    <button id="btnCancelEdit" class="btn-action btn-del" 
+                            style="display: none; flex: 1; padding: 12px;"
+                            onclick="cancelEdit()">
+                        X
+                    </button>
                 </div>
             </div>
 
             <!-- Log Book -->
             <div class="panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="color: var(--neon-yellow); margin: 0;">LOG BOOK</h3>
-                    <input type="text" id="searchLog" placeholder="Buscar..." class="input-field" style="width: 180px; margin-bottom: 0;" oninput="saveAndRender()">
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
+                    <h3 style="color: var(--neon-yellow); margin: 0;">
+                        <span style="font-size: 1.2rem;">📋</span> LOG BOOK
+                    </h3>
+                    <input type="text" id="searchLog" placeholder="Buscar..." 
+                           class="input-field" 
+                           style="width: 180px; margin-bottom: 0; min-height: 40px;"
+                           oninput="saveAndRender()">
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn-action btn-adif" onclick="downloadADIF()">Exportar ADIF</button>
-                    <button class="btn-action btn-csv" onclick="downloadCSV()">CSV</button>
-                    <button class="btn-action btn-del" onclick="clearAll()">Borrar Todo</button>
+                    <button class="btn-action btn-adif" onclick="downloadADIF()">
+                        <span class="hide-on-mobile">Exportar </span>ADIF
+                    </button>
+                    <button class="btn-action btn-csv" onclick="downloadCSV()">
+                        CSV
+                    </button>
+                    <button class="btn-action btn-del" onclick="clearAll()">
+                        Borrar
+                    </button>
                 </div>
 
-                <div style="max-height: 520px; overflow-y: auto;">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>CORRESPONSAL</th>
                                 <th>FECHA / HORA</th>
-                                <th>BANDA / MODO</th>
+                                <th class="hide-on-mobile">BANDA / MODO</th>
                                 <th>QRZ</th>
                                 <th style="text-align: right;">ACC.</th>
                             </tr>
@@ -342,34 +666,79 @@
                         <tbody id="logBody"></tbody>
                     </table>
                 </div>
+                
+                <div style="text-align: center; color: var(--neon-cyan); font-size: 0.8rem; margin-top: 10px;">
+                    Total: <span id="visibleCount">0</span> / <span id="totalCount">0</span> contactos
+                </div>
             </div>
 
             <!-- Panel Operador -->
             <div class="panel op-panel">
-                <h4 style="color: var(--neon-cyan); margin-top: 0;">OPERADOR</h4>
-                <label style="font-size: 0.6rem; color: #888;">MI CALLSIGN</label>
-                <input type="text" id="opCall" class="input-field" placeholder="MI CALL" onchange="saveOperator()">
+                <h4 style="color: var(--neon-cyan); margin-top: 0;">
+                    <span style="font-size: 1.2rem;">👤</span> OPERADOR
+                </h4>
                 
-                <label style="font-size: 0.6rem; color: #888;">MI NOMBRE</label>
-                <input type="text" id="opName" class="input-field" placeholder="Mi Nombre" onchange="saveOperator()">
+                <label style="font-size: 0.7rem; color: #888;">MI CALLSIGN</label>
+                <input type="text" id="opCall" class="input-field" 
+                       placeholder="CL7ADV" onchange="saveOperator()">
+                
+                <label style="font-size: 0.7rem; color: #888;">MI NOMBRE</label>
+                <input type="text" id="opName" class="input-field" 
+                       placeholder="Alfred" onchange="saveOperator()">
 
-                <label style="font-size: 0.6rem; color: #888;">MI CORREO (ADIF)</label>
-                <input type="email" id="opEmail" class="input-field" placeholder="mi@email.com" onchange="saveOperator()">
+                <label style="font-size: 0.7rem; color: #888;">MI CORREO (ADIF)</label>
+                <input type="email" id="opEmail" class="input-field" 
+                       placeholder="mi@email.com" onchange="saveOperator()">
                 
                 <hr style="border: 0; border-top: 1px solid #1e3a5f; margin: 20px 0;">
                 
-                <div style="text-align: center; background: linear-gradient(to bottom, #ff007f33, transparent); padding: 10px; border-radius: 10px;">
-                    <div style="font-size: 2.5rem; font-weight: bold;" id="totalCount">0</div>
-                    <div style="color: var(--neon-pink); font-weight: bold; font-size: 0.8rem;">QSOs TOTALES</div>
+                <div style="text-align: center; background: linear-gradient(to bottom, #ff007f33, transparent); padding: 15px; border-radius: 10px;">
+                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--neon-yellow);" id="totalQSOs">0</div>
+                    <div style="color: var(--neon-pink); font-weight: bold; font-size: 0.9rem;">
+                        QSOs TOTALES
+                    </div>
                 </div>
 
-                <div class="signature">Firma: Alfred CL7ADV</div>
+                <div class="signature">
+                    Firma: Alfred CL7ADV<br>
+                    <span style="font-size: 0.7rem; color: #888;">
+                        Camagüey, Cuba - v4.3.5
+                    </span>
+                </div>
             </div>
+        </div>
+        
+        <!-- Footer para móviles -->
+        <div class="mobile-footer" id="mobileFooter">
+            <button class="btn-action btn-adif" onclick="scrollToSection('formPanel')">
+                📻 Nuevo
+            </button>
+            <button class="btn-action btn-csv" onclick="scrollToSection('logBody')">
+                📋 Log
+            </button>
+            <button class="btn-action" style="background: #9c27b0;" onclick="downloadADIF()">
+                💾 Exportar
+            </button>
         </div>
     </div>
 
     <script>
-        // Splash logic
+        // Variables globales
+        let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
+        let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
+        let isEditing = false;
+        let isMobileMenuOpen = false;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOperator();
+            updateClock();
+            saveAndRender();
+            setupMobileDetection();
+            setupTouchEvents();
+        });
+
+        // Splash screen
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
@@ -383,12 +752,10 @@
             }, 3000);
         });
 
-        let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
-        let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
-        let isEditing = false;
-
+        // Reloj UTC
         function updateClock() {
-            if (isEditing) return; // No actualizar campos si estamos editando
+            if (isEditing) return;
+            
             const now = new Date();
             const year = now.getUTCFullYear();
             const month = String(now.getUTCMonth() + 1).padStart(2, '0');
@@ -403,13 +770,60 @@
             document.getElementById('date-utc').innerText = dateStr;
             document.getElementById('clock').innerText = clockStr;
 
-            if (!document.getElementById('qsoCall').value && !document.getElementById('qsoDate').value) {
+            // Auto-completar fecha y hora si no hay edición
+            if (!isEditing && !document.getElementById('qsoCall').value) {
                 document.getElementById('qsoDate').value = dateStr;
                 document.getElementById('qsoTime').value = h + ":" + m;
             }
         }
         setInterval(updateClock, 1000);
 
+        // Detección de móvil
+        function setupMobileDetection() {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                document.getElementById('dashboard').classList.remove('active');
+            }
+        }
+
+        // Eventos táctiles
+        function setupTouchEvents() {
+            // Prevenir zoom en inputs
+            document.querySelectorAll('input, select').forEach(el => {
+                el.addEventListener('touchstart', (e) => {
+                    e.stopPropagation();
+                }, { passive: true });
+            });
+        }
+
+        // Menú móvil
+        function toggleMobileMenu() {
+            const dashboard = document.getElementById('dashboard');
+            const btn = document.getElementById('mobileMenuBtn');
+            
+            isMobileMenuOpen = !isMobileMenuOpen;
+            dashboard.classList.toggle('active', isMobileMenuOpen);
+            btn.textContent = isMobileMenuOpen ? '✕' : '☰';
+            
+            if (isMobileMenuOpen) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Scroll a sección en móvil
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (window.innerWidth <= 768) {
+                    toggleMobileMenu();
+                }
+            }
+        }
+
+        // Operador
         function saveOperator() {
             operator = {
                 call: document.getElementById('opCall').value.toUpperCase().trim(),
@@ -420,16 +834,23 @@
         }
 
         function loadOperator() {
-            document.getElementById('opCall').value = operator.call || '';
-            document.getElementById('opName').value = operator.name || '';
+            if (!operator.call) operator.call = 'CL7ADV';
+            if (!operator.name) operator.name = 'Alfred';
+            
+            document.getElementById('opCall').value = operator.call;
+            document.getElementById('opName').value = operator.name;
             document.getElementById('opEmail').value = operator.email || '';
         }
 
+        // QRZ
         function checkQRZ(id) {
             const call = document.getElementById(id).value.toUpperCase().trim();
-            if(call) window.open(`https://www.qrz.com/db/${call}`, '_blank');
+            if(call) {
+                window.open(`https://www.qrz.com/db/${call}`, '_blank');
+            }
         }
 
+        // Procesar QSO
         function processQSO() {
             if (isEditing) {
                 updateQSO();
@@ -440,7 +861,11 @@
 
         function addQSO() {
             const call = document.getElementById('qsoCall').value.toUpperCase().trim();
-            if(!call) return;
+            if(!call) {
+                alert('Por favor ingrese un indicativo');
+                document.getElementById('qsoCall').focus();
+                return;
+            }
 
             const rawDate = document.getElementById('qsoDate').value.replace(/-/g, '');
             const rawTime = document.getElementById('qsoTime').value.replace(/:/g, '');
@@ -456,14 +881,21 @@
                 band: document.getElementById('qsoBand').value,
                 mode: document.getElementById('qsoMode').value,
                 notes: document.getElementById('qsoNotes').value,
-                qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N'
+                qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
+                timestamp: new Date().toISOString()
             };
 
             qsos.unshift(newQso);
             saveAndRender();
             clearForm();
+            
+            // Feedback visual
+            const btn = document.getElementById('btnSubmit');
+            btn.style.background = '#4CAF50';
+            setTimeout(() => btn.style.background = '', 500);
         }
 
+        // Editar QSO
         function editQSO(id) {
             const q = qsos.find(item => item.id === id);
             if (!q) return;
@@ -483,13 +915,19 @@
 
             // Estética de edición
             document.getElementById('formPanel').classList.add('editing-mode');
-            document.getElementById('formTitle').innerText = "| EDITANDO CONTACTO";
+            document.getElementById('formTitle').innerHTML = '<span style="font-size: 1.2rem;">✏️</span> EDITANDO CONTACTO';
             document.getElementById('formTitle').style.color = "var(--neon-yellow)";
-            document.getElementById('btnSubmit').innerText = "Actualizar Contacto 💾";
+            document.getElementById('btnSubmitIcon').textContent = '💾';
+            document.getElementById('btnSubmitText').textContent = 'Actualizar';
             document.getElementById('btnSubmit').className = "btn-action btn-csv";
-            document.getElementById('btnCancelEdit').style.display = "block";
+            document.getElementById('btnCancelEdit').style.display = "flex";
             
             document.getElementById('qsoCall').focus();
+            
+            // Scroll a formulario en móvil
+            if (window.innerWidth <= 768) {
+                scrollToSection('formPanel');
+            }
         }
 
         function updateQSO() {
@@ -511,7 +949,8 @@
                     band: document.getElementById('qsoBand').value,
                     mode: document.getElementById('qsoMode').value,
                     notes: document.getElementById('qsoNotes').value,
-                    qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N'
+                    qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
+                    timestamp: new Date().toISOString()
                 };
 
                 saveAndRender();
@@ -522,9 +961,10 @@
         function cancelEdit() {
             isEditing = false;
             document.getElementById('formPanel').classList.remove('editing-mode');
-            document.getElementById('formTitle').innerText = "| REGISTRAR QSO";
+            document.getElementById('formTitle').innerHTML = '<span style="font-size: 1.2rem;">📻</span> REGISTRAR QSO';
             document.getElementById('formTitle').style.color = "var(--neon-pink)";
-            document.getElementById('btnSubmit').innerText = "Grabar Contacto ⚡";
+            document.getElementById('btnSubmitIcon').textContent = '⚡';
+            document.getElementById('btnSubmitText').textContent = 'Grabar Contacto';
             document.getElementById('btnSubmit').className = "btn-action btn-adif";
             document.getElementById('btnCancelEdit').style.display = "none";
             clearForm();
@@ -538,93 +978,159 @@
             document.getElementById('qsoNotes').value = "";
             document.getElementById('qsoDate').value = "";
             document.getElementById('qsoTime').value = "";
+            document.getElementById('qsoRst').value = "59";
+            document.getElementById('qsoBand').value = "40m";
+            document.getElementById('qsoMode').value = "SSB";
+            document.getElementById('exportQRZ').checked = true;
             updateClock();
         }
 
+        // Renderizar tabla
         function saveAndRender() {
             localStorage.setItem('qsos', JSON.stringify(qsos));
             const term = document.getElementById('searchLog').value.toUpperCase();
             const body = document.getElementById('logBody');
-            const filtered = qsos.filter(q => q.call.includes(term) || q.name.toUpperCase().includes(term));
+            const filtered = qsos.filter(q => 
+                q.call.includes(term) || 
+                (q.name && q.name.toUpperCase().includes(term)) ||
+                (q.notes && q.notes.toUpperCase().includes(term))
+            );
 
             body.innerHTML = filtered.map(q => `
                 <tr>
-                    <td><b style="color:var(--neon-yellow)">${q.call}</b><br><small>${q.name || ''}</small></td>
-                    <td style="font-family: monospace;">${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}<br><span style="color:var(--neon-cyan)">${q.time}z</span></td>
-                    <td>${q.band}<br><small>${q.mode}</small></td>
-                    <td style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#444'}">${q.qrz === 'Y' ? 'SI' : 'NO'}</td>
+                    <td>
+                        <b style="color:var(--neon-yellow); font-size: 0.9rem;">${q.call}</b><br>
+                        <small style="color: #aaa;">${q.name || ''}</small>
+                    </td>
+                    <td style="font-family: monospace; font-size: 0.85rem;">
+                        ${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}<br>
+                        <span style="color:var(--neon-cyan)">${q.time.slice(0,2)}:${q.time.slice(2,4)}z</span>
+                    </td>
+                    <td class="hide-on-mobile">
+                        <span style="color: var(--neon-yellow);">${q.band}</span><br>
+                        <small>${q.mode}</small>
+                    </td>
+                    <td>
+                        <span style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#666'}; 
+                              font-weight: bold; font-size: 0.9rem;">
+                            ${q.qrz === 'Y' ? '✓' : '✗'}
+                        </span>
+                    </td>
                     <td style="text-align: right; white-space: nowrap;">
-                        <button onclick="editQSO(${q.id})" class="btn-action btn-edit" title="Editar">✎</button>
-                        <button onclick="deleteQSO(${q.id})" style="background:none; border:none; color:var(--neon-pink); cursor:pointer; font-size: 1.2rem;" title="Eliminar">×</button>
+                        <button onclick="editQSO(${q.id})" class="btn-action btn-edit" 
+                                style="padding: 6px 10px; font-size: 0.8rem; margin-right: 5px;" 
+                                title="Editar">
+                            ✎
+                        </button>
+                        <button onclick="deleteQSO(${q.id})" 
+                                style="background:none; border:none; color:var(--neon-pink); 
+                                       cursor:pointer; font-size: 1.2rem; padding: 0 5px;" 
+                                title="Eliminar">
+                            ×
+                        </button>
                     </td>
                 </tr>
             `).join('');
 
+            document.getElementById('totalQSOs').innerText = qsos.length;
             document.getElementById('totalCount').innerText = qsos.length;
+            document.getElementById('visibleCount').innerText = filtered.length;
         }
 
         function deleteQSO(id) {
-            if(confirm("¿Eliminar registro?")) {
-                if (isEditing && document.getElementById('editId').value == id) cancelEdit();
+            if(confirm("¿Eliminar este contacto del log?")) {
+                if (isEditing && document.getElementById('editId').value == id) {
+                    cancelEdit();
+                }
                 qsos = qsos.filter(q => q.id !== id);
                 saveAndRender();
             }
         }
 
         function clearAll() {
-            if(confirm("¿Borrar todo el historial?")) {
+            if(confirm("¿Borrar TODOS los contactos del log?\n\nEsta acción no se puede deshacer.")) {
                 qsos = [];
                 cancelEdit();
                 saveAndRender();
             }
         }
 
+        // Exportar
         function downloadADIF() {
-            let adif = "ADIF Export from NEON LOG STATION\n";
-            adif += `<PROGRAMID:8>NEON_LOG\n<PROGRAMVERSION:5>4.3.5\n<EOH>\n`;
+            if (qsos.length === 0) {
+                alert('No hay contactos para exportar');
+                return;
+            }
+
+            let adif = "ADIF Export from NEON LOG STATION v4.3.5\n";
+            adif += "<ADIF_VER:5>3.1.0\n";
+            adif += `<PROGRAMID:8>NEON_LOG\n<PROGRAMVERSION:5>4.3.5\n`;
+            adif += `<CREATED_TIMESTAMP:15>${new Date().toISOString().replace(/[-:]/g, '').slice(0,15)}\n`;
+            adif += "<EOH>\n";
             
-            qsos.forEach(q => {
-                adif += `<CALL:${q.call.length}>${q.call}`;
-                adif += `<QSO_DATE:8>${q.date}`;
-                adif += `<TIME_ON:${q.time.length}>${q.time}`;
-                adif += `<BAND:${q.band.length}>${q.band}`;
-                adif += `<MODE:${q.mode.length}>${q.mode}`;
-                adif += `<RST_SENT:${q.rst.length}>${q.rst}`;
+            qsos.forEach((q, idx) => {
+                adif += `<CALL:${q.call.length}>${q.call}\n`;
+                adif += `<QSO_DATE:8>${q.date}\n`;
+                adif += `<TIME_ON:${q.time.length}>${q.time}\n`;
+                adif += `<BAND:${q.band.length}>${q.band}\n`;
+                adif += `<MODE:${q.mode.length}>${q.mode}\n`;
+                adif += `<RST_SENT:${q.rst.length}>${q.rst}\n`;
                 
-                if(q.name) adif += `<NAME:${q.name.length}>${q.name}`;
-                if(q.email) adif += `<EMAIL:${q.email.length}>${q.email}`;
-                if(q.notes) adif += `<COMMENT:${q.notes.length}>${q.notes}`;
+                if(q.name) adif += `<NAME:${q.name.length}>${q.name}\n`;
+                if(q.email) adif += `<EMAIL:${q.email.length}>${q.email}\n`;
+                if(q.notes) adif += `<COMMENT:${q.notes.length}>${q.notes}\n`;
                 
-                if(operator.call) adif += `<STATION_CALLSIGN:${operator.call.length}>${operator.call}`;
-                if(operator.call) adif += `<OPERATOR:${operator.call.length}>${operator.call}`;
-                if(operator.name) adif += `<MY_NAME:${operator.name.length}>${operator.name}`;
-                if(operator.email) adif += `<MY_EMAIL:${operator.email.length}>${operator.email}`;
+                if(operator.call) adif += `<STATION_CALLSIGN:${operator.call.length}>${operator.call}\n`;
+                if(operator.call) adif += `<OPERATOR:${operator.call.length}>${operator.call}\n`;
+                if(operator.name) adif += `<MY_NAME:${operator.name.length}>${operator.name}\n`;
+                if(operator.email) adif += `<MY_EMAIL:${operator.email.length}>${operator.email}\n`;
                 
                 adif += `<EOR>\n`;
             });
 
-            downloadFile(adif, 'Log_NeonStation_v4.3.5.adi');
+            downloadFile(adif, `NEON_LOG_${new Date().toISOString().slice(0,10)}.adi`, 'text/plain');
         }
 
         function downloadCSV() {
-            let csv = "Call,Date,Time,Band,Mode,RST,Name,Email,Notes\n";
+            if (qsos.length === 0) {
+                alert('No hay contactos para exportar');
+                return;
+            }
+
+            let csv = "Call,Date,Time,Band,Mode,RST,Name,Email,Notes,QRZ\n";
             qsos.forEach(q => {
-                csv += `${q.call},${q.date},${q.time},${q.band},${q.mode},${q.rst},"${q.name}","${q.email}","${q.notes}"\n`;
+                csv += `"${q.call}","${q.date}","${q.time}","${q.band}","${q.mode}","${q.rst}","${q.name || ''}","${q.email || ''}","${q.notes || ''}","${q.qrz}"\n`;
             });
-            downloadFile(csv, 'Log_NeonStation_v4.3.5.csv');
+            downloadFile(csv, `NEON_LOG_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
         }
 
-        function downloadFile(content, fileName) {
-            const blob = new Blob([content], {type: 'text/plain'});
+        function downloadFile(content, fileName, mimeType = 'text/plain') {
+            const blob = new Blob(["\uFEFF" + content], {type: mimeType});
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
+            a.href = url;
             a.download = fileName;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        loadOperator();
-        updateClock();
-        saveAndRender();
+        // Responsive al redimensionar
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && isMobileMenuOpen) {
+                toggleMobileMenu();
+            }
+            updateClock();
+        });
+
+        // Prevenir envío de formulario con Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                e.preventDefault();
+                processQSO();
+            }
+        });
     </script>
 </body>
 </html>
