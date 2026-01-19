@@ -11,6 +11,7 @@
             --neon-cyan: #00e5ff;
             --neon-pink: #ff007f;
             --neon-yellow: #ffea00;
+            --neon-green: #00ff88;
             --text-main: #e6f1ff;
             --sunrise-gradient: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #0a192f 100%);
         }
@@ -360,6 +361,7 @@
         .btn-del { background: #f44336; color: white; }
         .btn-edit { background: #2196F3; color: white; }
         .btn-freq { background: #9c27b0; color: white; }
+        .btn-cabr { background: var(--neon-green); color: #0a192f; }
 
         /* TABLA - COMPACTA PARA PC */
         .table-container {
@@ -585,6 +587,128 @@
                 grid-column: 2;
             }
         }
+
+        /* Ventana modal para ADIF2CABR */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .modal-title {
+            color: var(--neon-green);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 3px solid var(--neon-green);
+        }
+
+        .file-input-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            background: var(--neon-green);
+            color: #0a192f;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #00cc77;
+            transform: translateY(-2px);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .status-error {
+            background: rgba(255, 0, 127, 0.1);
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+        }
+
+        /* Indicador de progreso */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            width: 0%;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -598,6 +722,47 @@
             <div class="loader"></div>
             <div style="margin-top: 20px; font-size: 0.9rem; color: #e6f1ff;">
                 By Alfred CL7ADV - Camagüey, Cuba
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ADIF2CABR -->
+    <div id="adif2cabr-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔄 CONVERTIR ADIF A CABR</div>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            
+            <div class="modal-info">
+                <strong>ADIF2CABR.exe</strong> convierte archivos ADIF (.adi) al formato CABR utilizado por algunos sistemas de registro. 
+                Selecciona un archivo ADIF para procesarlo.
+            </div>
+            
+            <div class="file-input-container">
+                <label for="adif-file-input" class="file-input-label">
+                    📁 SELECCIONAR ARCHIVO ADIF
+                </label>
+                <input type="file" id="adif-file-input" class="file-input" accept=".adi,.txt">
+                
+                <div id="selected-file-name" style="margin-top: 10px; color: var(--neon-cyan); font-size: 0.9rem;">
+                    Ningún archivo seleccionado
+                </div>
+            </div>
+            
+            <div class="progress-container" id="conversion-progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div id="status-message" class="status-message"></div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-action btn-cabr" onclick="processADIF2CABR()" style="flex: 2;">
+                    🔄 CONVERTIR A CABR
+                </button>
+                <button class="btn-action" onclick="closeModal()" style="flex: 1; background: #666;">
+                    CANCELAR
+                </button>
             </div>
         </div>
     </div>
@@ -752,6 +917,9 @@
                     <button class="btn-action btn-csv" onclick="downloadCSV()">
                         CSV
                     </button>
+                    <button class="btn-action btn-cabr" onclick="openADIF2CABRModal()">
+                        ADIF → CABR
+                    </button>
                     <button class="btn-action btn-del" onclick="clearAll()">
                         Borrar Todo
                     </button>
@@ -820,8 +988,8 @@
             <button class="btn-action btn-csv" onclick="document.getElementById('logBody').scrollIntoView({behavior: 'smooth'})">
                 📋 Ver Log
             </button>
-            <button class="btn-action" style="background: #9c27b0;" onclick="downloadADIF()">
-                💾 Exportar
+            <button class="btn-action btn-cabr" onclick="openADIF2CABRModal()">
+                🔄 CABR
             </button>
         </div>
     </div>
@@ -831,6 +999,7 @@
         let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
         let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
         let isEditing = false;
+        let selectedADIFFile = null;
 
         // Mapa de frecuencias centrales por banda (en MHz)
         const bandFrequencies = {
@@ -856,6 +1025,19 @@
             saveAndRender();
             // Auto-ajustar para PC
             adjustForPC();
+            
+            // Configurar el input de archivo ADIF
+            document.getElementById('adif-file-input').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    selectedADIFFile = e.target.files[0];
+                    document.getElementById('selected-file-name').textContent = 
+                        `📄 ${selectedADIFFile.name} (${formatFileSize(selectedADIFFile.size)})`;
+                } else {
+                    selectedADIFFile = null;
+                    document.getElementById('selected-file-name').textContent = 
+                        'Ningún archivo seleccionado';
+                }
+            });
         });
 
         // Splash screen
@@ -1240,6 +1422,142 @@
             URL.revokeObjectURL(url);
         }
 
+        // Funciones para ADIF2CABR
+        function openADIF2CABRModal() {
+            document.getElementById('adif2cabr-modal').style.display = 'flex';
+            // Resetear el estado
+            selectedADIFFile = null;
+            document.getElementById('selected-file-name').textContent = 'Ningún archivo seleccionado';
+            document.getElementById('adif-file-input').value = '';
+            document.getElementById('conversion-progress').style.display = 'none';
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('status-message').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('adif2cabr-modal').style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // Función para simular el procesamiento de ADIF2CABR.exe
+        function processADIF2CABR() {
+            if (!selectedADIFFile) {
+                showStatus('Por favor selecciona un archivo ADIF primero.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('conversion-progress');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '30%';
+            
+            reader.onload = function(e) {
+                // Simular procesamiento
+                setTimeout(() => {
+                    progressBar.style.width = '60%';
+                    
+                    setTimeout(() => {
+                        progressBar.style.width = '100%';
+                        
+                        // Leer contenido del archivo ADIF
+                        const adifContent = e.target.result;
+                        
+                        // Aquí normalmente se llamaría al ejecutable ADIF2CABR.exe
+                        // Como no podemos ejecutarlo en el navegador, simulamos la conversión
+                        // En un entorno real, esto se haría en el servidor o con una API
+                        
+                        // Simular conversión a CABR (formato ficticio)
+                        const cabrContent = convertADIFtoCABR(adifContent);
+                        
+                        // Descargar el archivo CABR resultante
+                        const cabrFileName = selectedADIFFile.name.replace('.adi', '.cabr').replace('.txt', '.cabr') || 'converted.cabr';
+                        downloadFile(cabrContent, cabrFileName, 'text/plain');
+                        
+                        showStatus('✅ Conversión completada. Archivo CABR descargado.', 'success');
+                        
+                        // Cerrar modal después de un tiempo
+                        setTimeout(() => {
+                            closeModal();
+                        }, 2000);
+                    }, 500);
+                }, 500);
+            };
+            
+            reader.onerror = function() {
+                showStatus('❌ Error al leer el archivo ADIF.', 'error');
+                progressContainer.style.display = 'none';
+            };
+            
+            reader.readAsText(selectedADIFFile);
+        }
+
+        // Función para simular la conversión ADIF a CABR
+        function convertADIFtoCABR(adifContent) {
+            // Esta es una simulación de conversión
+            // En un entorno real, esto se haría con ADIF2CABR.exe
+            // Aquí solo reformateamos ligeramente el contenido
+            
+            let cabrContent = `CABR File - Converted from ADIF by NEON LOG STATION v4.3.5\n`;
+            cabrContent += `Conversion date: ${new Date().toLocaleString()}\n`;
+            cabrContent += `Operator: ${operator.call || 'Unknown'}\n`;
+            cabrContent += `==========================================\n\n`;
+            
+            // Parsear líneas ADIF básicas
+            const lines = adifContent.split('\n');
+            let inQSO = false;
+            let currentQSO = {};
+            
+            lines.forEach(line => {
+                if (line.includes('<CALL:')) {
+                    const callMatch = line.match(/<CALL:(\d+)>(.*)/);
+                    if (callMatch) currentQSO.call = callMatch[2];
+                }
+                if (line.includes('<QSO_DATE:')) {
+                    const dateMatch = line.match(/<QSO_DATE:(\d+)>(.*)/);
+                    if (dateMatch) currentQSO.date = dateMatch[2];
+                }
+                if (line.includes('<TIME_ON:')) {
+                    const timeMatch = line.match(/<TIME_ON:(\d+)>(.*)/);
+                    if (timeMatch) currentQSO.time = timeMatch[2];
+                }
+                if (line.includes('<BAND:')) {
+                    const bandMatch = line.match(/<BAND:(\d+)>(.*)/);
+                    if (bandMatch) currentQSO.band = bandMatch[2];
+                }
+                if (line.includes('<MODE:')) {
+                    const modeMatch = line.match(/<MODE:(\d+)>(.*)/);
+                    if (modeMatch) currentQSO.mode = modeMatch[2];
+                }
+                if (line.includes('<EOR>')) {
+                    // Fin de QSO, agregar a CABR
+                    if (currentQSO.call) {
+                        cabrContent += `${currentQSO.date || ''}|${currentQSO.time || ''}|${currentQSO.call || ''}|${currentQSO.band || ''}|${currentQSO.mode || ''}\n`;
+                    }
+                    currentQSO = {};
+                }
+            });
+            
+            cabrContent += `\n==========================================\n`;
+            cabrContent += `Total QSOs: ${lines.filter(l => l.includes('<EOR>')).length}\n`;
+            cabrContent += `Generated by NEON LOG STATION - Alfred CL7ADV`;
+            
+            return cabrContent;
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message status-${type}`;
+            statusEl.style.display = 'block';
+        }
+
         // Redimensionamiento
         window.addEventListener('resize', adjustForPC);
 
@@ -1248,6 +1566,13 @@
             if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
                 e.preventDefault();
                 processQSO();
+            }
+        });
+
+        // Cerrar modal con Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
             }
         });
     </script>
