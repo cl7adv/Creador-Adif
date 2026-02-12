@@ -3,1578 +3,620 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Log Station v4.3.5 - Alfred CL7ADV</title>
+    <title>Neon Log Station v5.3.5 - Alfred CL7ADV</title>
     <style>
         :root {
-            --bg-dark: #0a192f;
-            --panel-bg: #112240;
+            --bg-dark: #050a14;
+            --panel-bg: #0d1b2a;
             --neon-cyan: #00e5ff;
             --neon-pink: #ff007f;
             --neon-yellow: #ffea00;
             --neon-green: #00ff88;
             --text-main: #e6f1ff;
-            --sunrise-gradient: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #0a192f 100%);
+            --card-bg: rgba(20, 33, 61, 0.9);
+            --sunrise: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #050a14 100%);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body, html {
             height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
 
-        /* PANTALLA DE BIENVENIDA CON SALUDOS */
-        #splash-screen {
+        /* MARCA DE AGUA DEL CREADOR */
+        .watermark {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(180deg, #0a192f 0%, #0d1b2a 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.8s ease-out;
-        }
-
-        .sunrise-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(0deg, 
-                rgba(255, 126, 95, 0.1) 0%, 
-                rgba(254, 180, 123, 0.2) 20%,
-                rgba(255, 234, 0, 0.1) 40%,
-                rgba(10, 25, 47, 0.9) 70%,
-                var(--bg-dark) 100%);
-            animation: sky-animation 4s ease-out forwards;
-        }
-
-        @keyframes sky-animation {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* El sol del amanecer cubano */
-        .sun {
-            position: absolute;
-            bottom: -150px;
-            width: 120px;
-            height: 120px;
-            background: radial-gradient(circle, #ffea00 0%, #ff7e5f 100%);
-            border-radius: 50%;
-            box-shadow: 0 0 60px #ff7e5f, 0 0 120px rgba(255, 126, 95, 0.5);
-            animation: sunrise-anim 3s forwards ease-out;
-            z-index: 1;
-        }
-
-        @keyframes sunrise-anim {
-            0% { bottom: -150px; opacity: 0; transform: scale(0.8); }
-            100% { bottom: 20%; opacity: 1; transform: scale(1); }
-        }
-
-        .splash-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            padding: 20px;
-            max-width: 500px;
-        }
-
-        .splash-title {
-            font-size: clamp(2rem, 5vw, 3rem);
-            color: var(--neon-cyan);
-            font-style: italic;
-            font-weight: 900;
-            text-shadow: 0 0 20px var(--neon-cyan);
-            margin-bottom: 10px;
-            animation: title-glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes title-glow {
-            0% { text-shadow: 0 0 20px var(--neon-cyan); }
-            100% { text-shadow: 0 0 30px var(--neon-cyan), 0 0 50px rgba(0, 229, 255, 0.7); }
-        }
-
-        .splash-welcome {
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            color: var(--text-main);
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-        }
-
-        .loader {
-            width: min(100%, 300px);
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            position: relative;
-            overflow: hidden;
-            margin: 0 auto 20px;
-        }
-
-        .loader::after {
-            content: '';
-            position: absolute;
-            width: 0%; height: 100%;
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
-            animation: load 2.5s forwards;
-        }
-
-        @keyframes load { 
-            0% { width: 0%; } 
-            100% { width: 100%; } 
-        }
-
-        /* ============= DISEÑO PRINCIPAL ============= */
-        #main-content {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
-            min-height: 100vh;
-            padding: 15px;
-            max-width: 1600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* TOP BAR - COMPACTO PARA PC */
-        .top-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        @media (min-width: 992px) {
-            .top-bar {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 25px;
-                gap: 20px;
-            }
-        }
-
-        .station-title {
-            font-style: italic;
-            font-weight: 900;
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-            line-height: 1.2;
-        }
-
-        .station-subtitle {
-            color: var(--neon-cyan);
-            font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-            letter-spacing: 2px;
-        }
-
-        /* UTC CLOCK - COMPACTO */
-        .utc-container {
-            background: rgba(0, 229, 255, 0.05);
-            padding: 10px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            align-self: center;
-        }
-
-        @media (min-width: 992px) {
-            .utc-container {
-                text-align: right;
-                align-self: center;
-                min-width: 300px;
-                max-width: 350px;
-            }
-        }
-
-        .utc-clock {
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            color: var(--neon-yellow);
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-        }
-
-        /* DASHBOARD - DISEÑO OPTIMIZADO */
-        .dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        /* PC: Grid de 3 columnas compactas */
-        @media (min-width: 1200px) {
-            .dashboard {
-                display: grid;
-                grid-template-columns: 320px 1fr 260px;
-                gap: 20px;
-                align-items: start;
-            }
-        }
-
-        /* Pantallas muy grandes */
-        @media (min-width: 1400px) {
-            .dashboard {
-                grid-template-columns: 340px 1fr 280px;
-                gap: 25px;
-            }
-        }
-
-        .panel {
-            background: var(--panel-bg);
-            border-radius: 12px;
-            padding: 18px;
-            border: 1px solid rgba(0, 229, 255, 0.1);
-            width: 100%;
-        }
-
-        .reg-qso { 
-            border-left: 4px solid var(--neon-pink); 
-        }
-
-        @media (max-width: 1199px) {
-            .reg-qso {
-                border-left: none;
-                border-top: 4px solid var(--neon-pink);
-            }
-        }
-
-        .op-panel { 
-            border-top: 4px solid var(--neon-cyan); 
-        }
-
-        /* FORMULARIO - COMPACTO PARA PC */
-        .form-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .form-group > div {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .input-field {
-            background: #0d1b2a;
-            border: 1px solid #1e3a5f;
-            color: white;
-            padding: 10px 12px;
-            border-radius: 6px;
-            width: 100%;
-            font-size: 14px;
-            -webkit-appearance: none;
-            appearance: none;
-            min-height: 42px;
-            transition: all 0.3s;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
-        }
-
-        @media (min-width: 768px) {
-            .input-field {
-                font-size: 13px;
-                padding: 8px 10px;
-                min-height: 38px;
-            }
-        }
-
-        select.input-field {
-            background: #0d1b2a url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 10px center;
-            background-size: 16px;
-            padding-right: 35px;
-        }
-
-        /* BOTONES - TAMAÑOS OPTIMIZADOS */
-        .btn-group { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 15px; 
-            flex-wrap: wrap; 
-        }
-        
-        .btn-action {
-            padding: 10px 14px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
+            bottom: 15px;
+            right: 15px;
+            font-size: 0.75rem;
+            color: rgba(0, 229, 255, 0.5);
+            z-index: 3000;
+            pointer-events: none;
             text-transform: uppercase;
-            transition: all 0.2s;
-            min-height: 38px;
-            flex: 1;
-            min-width: 50px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        @media (min-width: 768px) {
-            .btn-action {
-                padding: 8px 12px;
-                min-height: 36px;
-                font-size: 11px;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .btn-action {
-                padding: 6px 10px;
-                min-height: 34px;
-                font-size: 10px;
-            }
-        }
-
-        .btn-action:hover { 
-            filter: brightness(1.2); 
-            transform: translateY(-1px); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .btn-qrz { background: #ff9800; color: white; }
-        .btn-adif { background: var(--neon-cyan); color: #0a192f; }
-        .btn-csv { background: #4caf50; color: white; }
-        .btn-del { background: #f44336; color: white; }
-        .btn-edit { background: #2196F3; color: white; }
-        .btn-freq { background: #9c27b0; color: white; }
-        .btn-cabr { background: var(--neon-green); color: #0a192f; }
-
-        /* TABLA - COMPACTA PARA PC */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin-bottom: 15px;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 13px; 
-            min-width: 650px;
-        }
-
-        @media (min-width: 1200px) {
-            table {
-                min-width: 100%;
-                font-size: 12px;
-            }
-        }
-
-        th { 
-            color: var(--neon-yellow); 
-            text-align: left; 
-            padding: 10px 8px; 
-            border-bottom: 2px solid #1e3a5f; 
-            white-space: nowrap;
-            font-size: 12px;
-            position: sticky;
-            top: 0;
-            background: var(--panel-bg);
-        }
-
-        td { 
-            padding: 10px 8px; 
-            border-bottom: 1px solid #1e3a5f; 
-            vertical-align: middle;
-        }
-
-        @media (min-width: 1200px) {
-            th, td {
-                padding: 8px 6px;
-            }
-        }
-
-        /* Checkboxes */
-        .checkbox-container {
+        /* PANTALLA DE INTRODUCCIÓN */
+        #intro-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--sunrise);
             display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: var(--neon-yellow);
+            z-index: 2000;
+            transition: opacity 1.5s ease, visibility 1.5s;
         }
 
-        .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--neon-cyan);
+        .sun {
+            width: 100px; height: 100px;
+            background: #fffbe6;
+            border-radius: 50%;
+            box-shadow: 0 0 50px #ffea00, 0 0 100px #ff7e5f;
+            margin-bottom: 20px;
+            animation: pulse 3s infinite alternate;
         }
 
-        /* Panel de estadísticas */
-        .stats-box {
+        @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
+
+        .intro-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
             text-align: center;
-            background: linear-gradient(to bottom, #ff007f33, transparent);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
         }
 
-        .stats-number {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: var(--neon-yellow);
-            line-height: 1;
+        /* CONTENIDO PRINCIPAL */
+        #main-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 2s ease;
         }
 
-        .stats-label {
-            color: var(--neon-pink);
-            font-weight: bold;
-            font-size: 0.85rem;
+        header {
+            background: rgba(13, 27, 42, 0.95);
+            padding: 10px 15px;
+            text-align: center;
+            border-bottom: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .time-display {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-green);
+            font-size: 0.9rem;
             margin-top: 5px;
         }
 
-        /* Firma */
-        .signature {
-            margin-top: 20px;
-            font-size: 0.75rem;
-            color: var(--neon-cyan);
-            text-align: center;
-            font-style: italic;
-            border-top: 1px solid #1e3a5f;
-            padding-top: 12px;
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; flex-grow: 1; }
+
+        /* MENU CASILLAS */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
-        /* Modo edición */
-        .editing-mode {
-            border: 2px solid var(--neon-yellow) !important;
-            box-shadow: 0 0 15px var(--neon-yellow);
-            animation: pulse-edit 2s infinite;
-        }
-
-        @keyframes pulse-edit {
-            0%, 100% { box-shadow: 0 0 15px var(--neon-yellow); }
-            50% { box-shadow: 0 0 25px var(--neon-yellow); }
-        }
-
-        /* FOOTER MÓVIL - Solo para móviles */
-        .mobile-footer {
-            display: none;
-        }
-
-        @media (max-width: 991px) {
-            .mobile-footer {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background: var(--panel-bg);
-                border-top: 2px solid var(--neon-cyan);
-                padding: 10px 15px;
-                z-index: 100;
-                justify-content: space-around;
-                box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-            }
-            
-            .mobile-footer button {
-                flex: 1;
-                margin: 0 5px;
-                min-height: 48px;
-                font-size: 0.9rem;
-            }
-
-            #main-content {
-                padding-bottom: 80px;
-            }
-        }
-
-        /* Optimización para móvil pequeño */
-        @media (max-width: 480px) {
-            #main-content {
-                padding: 10px;
-            }
-            
-            .panel {
-                padding: 15px;
-            }
-            
-            .utc-container {
-                padding: 8px 12px;
-            }
-            
-            .utc-clock {
-                font-size: 1.3rem;
-            }
-            
-            .station-title {
-                font-size: 1.5rem;
-            }
-            
-            .input-field {
-                font-size: 16px;
-                min-height: 46px;
-            }
-        }
-
-        /* Scrollbar personalizado */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00ccff;
-        }
-
-        /* Mejoras de layout para tabletas */
-        @media (min-width: 768px) and (max-width: 1199px) {
-            .dashboard {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            
-            .reg-qso {
-                grid-column: 1;
-            }
-            
-            .panel:nth-child(2) {
-                grid-column: 2;
-                grid-row: 1;
-            }
-            
-            .op-panel {
-                grid-column: span 2;
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            
-            .op-panel h4 {
-                grid-column: span 2;
-            }
-            
-            .stats-box {
-                grid-column: 1;
-            }
-            
-            .signature {
-                grid-column: 2;
-            }
-        }
-
-        /* Ventana modal para ADIF2CABR */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
+        .menu-item {
             background: var(--panel-bg);
-            padding: 25px;
+            border: 1px solid #333;
             border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            border: 2px solid var(--neon-green);
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
-            padding-bottom: 10px;
-        }
-
-        .modal-title {
-            color: var(--neon-green);
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--neon-pink);
-            font-size: 1.5rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .modal-info {
-            background: rgba(0, 0, 0, 0.2);
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            border-left: 3px solid var(--neon-green);
-        }
-
-        .file-input-container {
-            margin: 20px 0;
             text-align: center;
-        }
-
-        .file-input-label {
-            display: inline-block;
-            background: var(--neon-green);
-            color: #0a192f;
-            padding: 12px 25px;
-            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100px; opacity: 0.7;
+        }
+
+        .menu-item:hover { transform: scale(1.02); opacity: 1; border-color: var(--neon-cyan); }
+        
+        .menu-item.active-item {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 10px rgba(0, 229, 255, 0.2);
+            background: #1b263b; opacity: 1; transform: translateY(-2px);
+        }
+
+        .menu-item .number { position: absolute; top: 5px; left: 8px; font-size: 0.75rem; color: var(--neon-pink); font-weight: bold; }
+        .menu-item i { font-size: 1.6rem; margin-bottom: 6px; color: var(--neon-yellow); }
+
+        /* PANELES */
+        .log-entry-panel {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            border-top: 3px solid var(--neon-pink);
+            margin-bottom: 20px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .active-panel { display: block; animation: slideUp 0.4s ease; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        
+        label { font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        input, select {
+            background: rgba(27, 38, 59, 0.8);
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+
+        .btn {
+            padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .btn-pink { background: var(--neon-pink); color: #fff; }
+        .btn-green { background: var(--neon-green); color: #000; }
+        .btn-cyan { background: var(--neon-cyan); color: #000; }
+
+        /* ESTILO PARA EL BUSCADOR QRZ */
+        .qrz-input-wrapper {
+            display: flex;
+            gap: 5px;
+        }
+        .qrz-input-wrapper input { flex-grow: 1; }
+        .btn-qrz {
+            background: #ffea00;
+            color: #000;
+            padding: 0 15px;
+            border: none;
+            border-radius: 8px;
             font-weight: bold;
-            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 10px rgba(255, 234, 0, 0.4);
         }
+        .btn-qrz:hover { background: #fff; box-shadow: 0 0 20px #ffea00; }
 
-        .file-input-label:hover {
-            background: #00cc77;
-            transform: translateY(-2px);
-        }
+        .table-container { width: 100%; overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 0.85rem; }
+        th { background: var(--panel-bg); color: var(--neon-yellow); text-align: left; padding: 12px; border-bottom: 2px solid var(--neon-cyan); }
+        td { padding: 10px; border-bottom: 1px solid #222; }
+        tr:hover { background: rgba(0,229,255,0.05); }
 
-        .file-input {
-            display: none;
-        }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; transition: 0.2s; }
+        .action-btn:hover { transform: scale(1.3); }
 
-        .status-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            display: none;
-        }
-
-        .status-success {
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--neon-green);
-            border: 1px solid var(--neon-green);
-        }
-
-        .status-error {
-            background: rgba(255, 0, 127, 0.1);
-            color: var(--neon-pink);
-            border: 1px solid var(--neon-pink);
-        }
-
-        /* Indicador de progreso */
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
-            width: 0%;
-            transition: width 0.3s;
+        @media (max-width: 600px) {
+            .grid-menu { grid-template-columns: repeat(2, 1fr); }
+            .form-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen">
-        <div class="sunrise-bg"></div>
-        <div class="sun"></div>
-        <div class="splash-content">
-            <div class="splash-title">NEON LOG STATION</div>
-            <div class="splash-welcome">HOLA SALUDOS, - BIENVENIDOS COLEGAS RADIOPERADORES</div>
-            <div class="loader"></div>
-            <div style="margin-top: 20px; font-size: 0.9rem; color: #e6f1ff;">
-                By Alfred CL7ADV - Camagüey, Cuba
+<!-- FIRMA DE AGUA -->
+<div class="watermark">CL7ADV-CUBA Creador</div>
+
+<!-- PANTALLA INTRO -->
+<div id="intro-screen">
+    <div class="sun"></div>
+    <div class="intro-text">
+        Amanecer en el Caribe<br>
+        <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--neon-cyan);">Cargando Estación de Alfred CL7ADV...</span>
+    </div>
+</div>
+
+<div id="main-content">
+    <header>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.3.5</h1>
+        <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
+        <div id="clock" class="time-display">00:00:00 UTC</div>
+    </header>
+
+    <div class="container">
+        <!-- CASILLAS MENU -->
+        <div class="grid-menu">
+            <div id="btn-op" class="menu-item" onclick="togglePanel('panel-op', 'btn-op')">
+                <span class="number">00</span><i>👤</i><span>Operador</span>
+            </div>
+            <div id="btn-log" class="menu-item active-item" onclick="togglePanel('panel-log', 'btn-log')">
+                <span class="number">01</span><i>📝</i><span>Nuevo QSO</span>
+            </div>
+            <div id="btn-table" class="menu-item" onclick="togglePanel('panel-table', 'btn-table')">
+                <span class="number">02</span><i>📋</i><span>Libro</span>
+            </div>
+            <div id="btn-export" class="menu-item" onclick="exportADIF()">
+                <span class="number">03</span><i>💾</i><span>Exportar</span>
+            </div>
+            <div id="btn-clear" class="menu-item" onclick="clearLogs()">
+                <span class="number">04</span><i>🗑️</i><span>Limpiar</span>
+            </div>
+        </div>
+
+        <!-- PANEL OPERADOR -->
+        <div id="panel-op" class="log-entry-panel">
+            <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">Ajustes de Estación (Mía)</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Tu Indicativo</label><input type="text" id="op_call" placeholder="CL7ADV" oninput="saveOperatorData()"></div>
+                <div class="form-group"><label>Tu Nombre</label><input type="text" id="op_name" placeholder="Alfred" oninput="saveOperatorData()"></div>
+                <div class="form-group"><label>Tu Grilla</label><input type="text" id="op_grid" placeholder="FL01aa" oninput="saveOperatorData()"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Tu Correo Electrónico (Opcional)</label>
+                    <input type="email" id="op_email" placeholder="tu_correo@ejemplo.com" oninput="saveOperatorData()">
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL NUEVO/EDITAR QSO -->
+        <div id="panel-log" class="log-entry-panel active-panel">
+            <h3 id="panel-title" style="color: var(--neon-pink); margin-bottom: 15px;">Registro de Contacto</h3>
+            <input type="hidden" id="edit_id">
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Callsign Corresponsal</label>
+                    <div class="qrz-input-wrapper">
+                        <input type="text" id="call" placeholder="Indicativo" onkeyup="this.value = this.value.toUpperCase()">
+                        <button type="button" class="btn-qrz" title="Ver en QRZ.com" onclick="checkQRZ()">⚡</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Frecuencia (MHz)</label>
+                    <input type="text" id="freq" placeholder="7.150">
+                </div>
+                <div class="form-group">
+                    <label>Banda</label>
+                    <select id="band">
+                        <option value="40M">40M</option><option value="20M">20M</option>
+                        <option value="15M">15M</option><option value="10M">10M</option>
+                        <option value="6M">6M</option><option value="2M">2M</option>
+                        <option value="70CM">70CM</option><option value="23CM">23CM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Modo</label>
+                    <input list="modes" id="mode" placeholder="Modo...">
+                    <datalist id="modes">
+                        <option value="SSB"><option value="FM"><option value="CW"><option value="FT8">
+                        <option value="FT4"><option value="Digital Voice"><option value="DMR">
+                        <option value="RTTY"><option value="JS8">
+                    </datalist>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Fecha UTC (AAAA/MM/DD)</label>
+                    <input type="text" id="manual_date" placeholder="Auto si vacío">
+                </div>
+                <div class="form-group">
+                    <label>Hora UTC (HH:MM:SS)</label>
+                    <input type="text" id="manual_time" placeholder="Auto si vacío">
+                </div>
+                <div class="form-group"><label>RST Sent</label><input type="text" id="rst_s" value="59"></div>
+                <div class="form-group"><label>RST Rcvd</label><input type="text" id="rst_r" value="59"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Correo del Corresponsal (Opcional)</label>
+                    <input type="email" id="email" placeholder="correo_contacto@ejemplo.com">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Comentarios / Nombre</label>
+                    <input type="text" id="comment" placeholder="Ej: Juan de Camagüey...">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex: 2;">💾 Guardar Registro</button>
+                <button id="cancel-edit" class="btn btn-cyan" onclick="resetForm()" style="flex: 1; display: none;">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- PANEL TABLA LIBRO -->
+        <div id="panel-table" class="log-entry-panel">
+            <h3 style="color: var(--neon-cyan); margin-bottom: 10px;">Libro de Guardia</h3>
+            <input type="text" id="search" class="search-box" placeholder="🔎 Filtrar por indicativo..." oninput="renderTable()" style="width:100%; padding:10px; background:#000; border:1px solid var(--neon-cyan); color:var(--neon-green); margin-bottom:15px; border-radius:5px;">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Fecha/Hora UTC</th><th>Callsign</th><th>Freq</th><th>Banda</th><th>Modo</th><th>RST</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal para ADIF2CABR -->
-    <div id="adif2cabr-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">🔄 CONVERTIR ADIF A CABR</div>
-                <button class="close-modal" onclick="closeModal()">×</button>
-            </div>
-            
-            <div class="modal-info">
-                <strong>ADIF2CABR.exe</strong> convierte archivos ADIF (.adi) al formato CABR utilizado por algunos sistemas de registro. 
-                Selecciona un archivo ADIF para procesarlo.
-            </div>
-            
-            <div class="file-input-container">
-                <label for="adif-file-input" class="file-input-label">
-                    📁 SELECCIONAR ARCHIVO ADIF
-                </label>
-                <input type="file" id="adif-file-input" class="file-input" accept=".adi,.txt">
-                
-                <div id="selected-file-name" style="margin-top: 10px; color: var(--neon-cyan); font-size: 0.9rem;">
-                    Ningún archivo seleccionado
-                </div>
-            </div>
-            
-            <div class="progress-container" id="conversion-progress">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            
-            <div id="status-message" class="status-message"></div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-action btn-cabr" onclick="processADIF2CABR()" style="flex: 2;">
-                    🔄 CONVERTIR A CABR
-                </button>
-                <button class="btn-action" onclick="closeModal()" style="flex: 1; background: #666;">
-                    CANCELAR
-                </button>
-            </div>
-        </div>
-    </div>
+<script>
+    const STORAGE_KEY = 'cl7adv_logs_v5_3_5';
+    const OP_KEY = 'cl7adv_operator_v5_3_5';
 
-    <div id="main-content">
-        <div class="top-bar">
-            <div>
-                <div class="station-title">NEON LOG STATION <span style="font-size: 0.8rem;">v4.3.5</span></div>
-                <div class="station-subtitle">
-                    CAMAGÜEY - SANTA CRUZ DEL SUR
-                </div>
-            </div>
-            <div class="utc-container">
-                <span class="utc-date" id="date-utc">YYYY-MM-DD</span>
-                <div class="utc-clock" id="clock">00:00:00 UTC</div>
-            </div>
-        </div>
+    let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
-        <div class="dashboard">
-            <!-- Registrar QSO -->
-            <div class="panel reg-qso" id="formPanel">
-                <h3 id="formTitle" style="color: var(--neon-pink); margin: 0 0 15px 0; font-size: 1.2rem;">
-                    📻 REGISTRAR QSO
-                </h3>
-                
-                <input type="hidden" id="editId">
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const intro = document.getElementById('intro-screen');
+            const main = document.getElementById('main-content');
+            intro.style.opacity = '0';
+            setTimeout(() => {
+                intro.style.visibility = 'hidden';
+                main.style.opacity = '1';
+                document.body.style.overflow = 'auto';
+            }, 1000);
+        }, 1000); 
+    });
 
-                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">INDICATIVO (CALLSIGN)</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                    <input type="text" id="qsoCall" class="input-field" 
-                           style="font-size: 1.1rem; color: var(--neon-cyan);" 
-                           placeholder="CALLSIGN" autocomplete="off">
-                    <button class="btn-action btn-qrz" onclick="checkQRZ('qsoCall')" style="min-width: 55px;">
-                        QRZ
-                    </button>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">FECHA UTC</label>
-                        <input type="text" id="qsoDate" class="input-field" placeholder="2024-01-20">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">HORA UTC</label>
-                        <input type="text" id="qsoTime" class="input-field" placeholder="14:30">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">NOMBRE</label>
-                        <input type="text" id="qsoName" class="input-field" placeholder="Nombre">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">EMAIL</label>
-                        <input type="email" id="qsoEmail" class="input-field" placeholder="email@correo.com">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">REPORTE (RST)</label>
-                        <input type="text" id="qsoRst" class="input-field" value="59">
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">BANDA</label>
-                        <select id="qsoBand" class="input-field">
-                            <option value="160m">160m</option>
-                            <option value="80m">80m</option>
-                            <option value="60m">60m</option>
-                            <option value="40m" selected>40m</option>
-                            <option value="30m">30m</option>
-                            <option value="20m">20m</option>
-                            <option value="17m">17m</option>
-                            <option value="15m">15m</option>
-                            <option value="12m">12m</option>
-                            <option value="10m">10m</option>
-                            <option value="6m">6m</option>
-                            <option value="2m">2m</option>
-                            <option value="70cm">70cm</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- NUEVO CAMPO DE FRECUENCIA CON BOTÓN -->
-                <div class="form-group">
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">FRECUENCIA (MHz)</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="qsoFreq" class="input-field" placeholder="ej. 7.125 MHz">
-                            <button class="btn-action btn-freq" onclick="calculateFreqFromBand()" style="min-width: 55px;" title="Calcular frecuencia de banda">
-                                Freq
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">MODO</label>
-                        <select id="qsoMode" class="input-field">
-                            <option value="SSB" selected>SSB</option>
-                            <option value="CW">CW</option>
-                            <option value="FT8">FT8</option>
-                            <option value="FT4">FT4</option>
-                            <option value="FM">FM</option>
-                            <option value="AM">AM</option>
-                            <option value="VARA">VARA</option>
-                            <option value="Digital Voice">Digital Voice</option>
-                            <option value="SSTV">SSTV</option>
-                            <option value="dmr">DMR</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="checkbox-container">
-                    <input type="checkbox" id="exportQRZ" checked>
-                    <label for="exportQRZ">EXPORTAR A QRZ</label>
-                </div>
-
-                <label style="font-size: 0.75rem; color: var(--neon-cyan); margin-bottom: 5px; display: block;">COMENTARIO</label>
-                <input type="text" id="qsoNotes" class="input-field" placeholder="Gracias 73..." style="margin-bottom: 15px;">
-                
-                <div style="display: flex; gap: 8px;">
-                    <button id="btnSubmit" class="btn-action btn-adif" 
-                            style="flex: 3; padding: 10px; font-size: 0.85rem;"
-                            onclick="processQSO()">
-                        <span id="btnSubmitIcon">⚡</span> 
-                        <span id="btnSubmitText">Grabar Contacto</span>
-                    </button>
-                    <button id="btnCancelEdit" class="btn-action btn-del" 
-                            style="display: none; flex: 1; padding: 10px;"
-                            onclick="cancelEdit()">
-                        X
-                    </button>
-                </div>
-            </div>
-
-            <!-- Log Book -->
-            <div class="panel">
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px;">
-                    <h3 style="color: var(--neon-yellow); margin: 0; font-size: 1.2rem;">
-                        📋 LOG BOOK
-                    </h3>
-                    <input type="text" id="searchLog" placeholder="Buscar..." 
-                           class="input-field" 
-                           style="width: 150px; margin-bottom: 0; font-size: 0.9rem;"
-                           oninput="saveAndRender()">
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn-action btn-adif" onclick="downloadADIF()">
-                        Exportar ADIF
-                    </button>
-                    <button class="btn-action btn-csv" onclick="downloadCSV()">
-                        CSV
-                    </button>
-                    <button class="btn-action btn-cabr" onclick="openADIF2CABRModal()">
-                        ADIF → CABR
-                    </button>
-                    <button class="btn-action btn-del" onclick="clearAll()">
-                        Borrar Todo
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CORRESPONSAL</th>
-                                <th>FECHA / HORA</th>
-                                <th>BANDA / FREC.</th>
-                                <th>MODO</th>
-                                <th>QRZ</th>
-                                <th style="text-align: right;">ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logBody"></tbody>
-                    </table>
-                </div>
-                
-                <div style="text-align: center; color: var(--neon-cyan); font-size: 0.8rem; margin-top: 10px;">
-                    Mostrando: <span id="visibleCount">0</span> de <span id="totalCount">0</span> contactos
-                </div>
-            </div>
-
-            <!-- Panel Operador -->
-            <div class="panel op-panel">
-                <h4 style="color: var(--neon-cyan); margin: 0 0 15px 0; font-size: 1.1rem;">
-                    👤 OPERADOR
-                </h4>
-                
-                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI CALLSIGN</label>
-                <input type="text" id="opCall" class="input-field" 
-                       placeholder="CL7ADV" onchange="saveOperator()" style="margin-bottom: 12px;">
-                
-                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI NOMBRE</label>
-                <input type="text" id="opName" class="input-field" 
-                       placeholder="Alfred" onchange="saveOperator()" style="margin-bottom: 12px;">
-
-                <label style="font-size: 0.7rem; color: #888; margin-bottom: 3px; display: block;">MI CORREO (ADIF)</label>
-                <input type="email" id="opEmail" class="input-field" 
-                       placeholder="mi@email.com" onchange="saveOperator()" style="margin-bottom: 20px;">
-                
-                <hr style="border: 0; border-top: 1px solid #1e3a5f; margin: 15px 0;">
-                
-                <div class="stats-box">
-                    <div class="stats-number" id="totalQSOs">0</div>
-                    <div class="stats-label">QSOs TOTALES</div>
-                </div>
-
-                <div class="signature">
-                    Firma: Alfred CL7ADV<br>
-                    <span style="font-size: 0.7rem; color: #888;">
-                        Camagüey, Cuba - v4.3.5
-                    </span>
-                </div>
-            </div>
-        </div>
+    function getUTCInfo() {
+        const now = new Date();
+        const y = now.getUTCFullYear();
+        const m = (now.getUTCMonth() + 1).toString().padStart(2, '0');
+        const d = now.getUTCDate().toString().padStart(2, '0');
+        const hh = now.getUTCHours().toString().padStart(2, '0');
+        const mm = now.getUTCMinutes().toString().padStart(2, '0');
+        const ss = now.getUTCSeconds().toString().padStart(2, '0');
         
-        <!-- Footer para móviles -->
-        <div class="mobile-footer">
-            <button class="btn-action btn-adif" onclick="document.getElementById('formPanel').scrollIntoView({behavior: 'smooth'})">
-                📻 Nuevo QSO
-            </button>
-            <button class="btn-action btn-csv" onclick="document.getElementById('logBody').scrollIntoView({behavior: 'smooth'})">
-                📋 Ver Log
-            </button>
-            <button class="btn-action btn-cabr" onclick="openADIF2CABRModal()">
-                🔄 CABR
-            </button>
-        </div>
-    </div>
+        return {
+            dateRaw: `${y}${m}${d}`,
+            timeRaw: `${hh}${mm}${ss}`,
+            dateFormatted: `${y}/${m}/${d}`,
+            timeFormatted: `${hh}:${mm}:${ss}`,
+            display: `${hh}:${mm}:${ss}`
+        };
+    }
 
-    <script>
-        // Variables globales
-        let qsos = JSON.parse(localStorage.getItem('qsos')) || [];
-        let operator = JSON.parse(localStorage.getItem('operator')) || { call: '', name: '', email: '' };
-        let isEditing = false;
-        let selectedADIFFile = null;
+    function updateClock() {
+        document.getElementById('clock').textContent = getUTCInfo().display + " UTC";
+    }
+    setInterval(updateClock, 1000);
 
-        // Mapa de frecuencias centrales por banda (en MHz)
-        const bandFrequencies = {
-            '160m': '1.850',
-            '80m': '3.750',
-            '60m': '5.330',
-            '40m': '7.125',
-            '30m': '10.125',
-            '20m': '14.200',
-            '17m': '18.100',
-            '15m': '21.200',
-            '12m': '24.940',
-            '10m': '28.500',
-            '6m': '50.125',
-            '2m': '144.200',
-            '70cm': '433.500'
+    function togglePanel(panelId, buttonId) {
+        document.querySelectorAll('.log-entry-panel').forEach(p => p.classList.remove('active-panel'));
+        document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active-item'));
+        
+        const targetPanel = document.getElementById(panelId);
+        if (targetPanel) targetPanel.classList.add('active-panel');
+        
+        const targetBtn = document.getElementById(buttonId);
+        if (targetBtn) targetBtn.classList.add('active-item');
+
+        if(panelId === 'panel-table') renderTable();
+    }
+
+    function saveOperatorData() {
+        opData.call = document.getElementById('op_call').value.toUpperCase();
+        opData.name = document.getElementById('op_name').value;
+        opData.grid = document.getElementById('op_grid').value.toUpperCase();
+        opData.email = document.getElementById('op_email').value;
+        localStorage.setItem(OP_KEY, JSON.stringify(opData));
+        document.getElementById('header-op').textContent = opData.call || "---";
+    }
+
+    // FUNCION PARA VERIFICAR EN QRZ.COM
+    function checkQRZ() {
+        const call = document.getElementById('call').value.trim().toUpperCase();
+        if (!call) {
+            alert("Por favor, introduce un indicativo primero.");
+            return;
+        }
+        window.open(`https://www.qrz.com/db/${call}`, '_blank');
+    }
+
+    function saveQSO() {
+        const call = document.getElementById('call').value.trim().toUpperCase();
+        if(!call) return alert("Por favor, ingrese el indicativo (Callsign).");
+
+        const utc = getUTCInfo();
+        const editId = document.getElementById('edit_id').value;
+        
+        let rawInputDate = document.getElementById('manual_date').value.trim();
+        let rawInputTime = document.getElementById('manual_time').value.trim();
+
+        let finalDate = rawInputDate === "" ? utc.dateRaw : rawInputDate.replace(/\D/g, '').substring(0, 8);
+        let finalTime = rawInputTime === "" ? utc.timeRaw : rawInputTime.replace(/\D/g, '').substring(0, 6);
+
+        const qso = {
+            id: editId ? parseInt(editId) : Date.now(),
+            call: call,
+            freq: document.getElementById('freq').value.trim(),
+            band: document.getElementById('band').value,
+            mode: document.getElementById('mode').value.toUpperCase() || "SSB",
+            rst_s: document.getElementById('rst_s').value.trim() || "59",
+            rst_r: document.getElementById('rst_r').value.trim() || "59",
+            date: finalDate,
+            time: finalTime,
+            email: document.getElementById('email').value.trim(),
+            comment: document.getElementById('comment').value.trim()
         };
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', function() {
-            loadOperator();
-            updateClock();
-            saveAndRender();
-            // Auto-ajustar para PC
-            adjustForPC();
+        if (editId) {
+            const index = qsoList.findIndex(q => q.id === qso.id);
+            if (index !== -1) qsoList[index] = qso;
+        } else {
+            qsoList.unshift(qso);
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
+        resetForm();
+        updateCount();
+        if(editId) togglePanel('panel-table', 'btn-table');
+        else alert("¡Registro guardado correctamente!");
+    }
+
+    function resetForm() {
+        document.getElementById('edit_id').value = "";
+        document.getElementById('call').value = "";
+        document.getElementById('comment').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('manual_date').value = "";
+        document.getElementById('manual_time').value = "";
+        document.getElementById('freq').value = "";
+        document.getElementById('rst_s').value = "59";
+        document.getElementById('rst_r').value = "59";
+        
+        document.getElementById('panel-title').textContent = "Registro de Contacto";
+        document.getElementById('panel-title').style.color = "var(--neon-pink)";
+        document.getElementById('save-btn').textContent = "💾 Guardar Registro";
+        document.getElementById('cancel-edit').style.display = "none";
+    }
+
+    function editQSO(id) {
+        const q = qsoList.find(item => item.id === id);
+        if (!q) return;
+
+        const vDate = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
+        const vTime = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
+
+        document.getElementById('edit_id').value = q.id;
+        document.getElementById('call').value = q.call;
+        document.getElementById('freq').value = q.freq;
+        document.getElementById('band').value = q.band;
+        document.getElementById('mode').value = q.mode;
+        document.getElementById('rst_s').value = q.rst_s;
+        document.getElementById('rst_r').value = q.rst_r;
+        document.getElementById('manual_date').value = vDate;
+        document.getElementById('manual_time').value = vTime;
+        document.getElementById('email').value = q.email || "";
+        document.getElementById('comment').value = q.comment;
+
+        document.getElementById('panel-title').textContent = "Editando Registro";
+        document.getElementById('panel-title').style.color = "var(--neon-cyan)";
+        document.getElementById('save-btn').textContent = "✅ Actualizar Registro";
+        document.getElementById('cancel-edit').style.display = "block";
+
+        togglePanel('panel-log', 'btn-log');
+    }
+
+    function renderTable() {
+        const filterStr = document.getElementById('search').value.toUpperCase();
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = "";
+        
+        const filtered = qsoList.filter(q => q.call.includes(filterStr));
+
+        filtered.forEach(q => {
+            const displayDate = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
+            const displayTime = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-family:monospace">${displayDate} | ${displayTime}</td>
+                <td style="color:var(--neon-yellow); font-weight:bold">${q.call}</td>
+                <td style="color:var(--neon-green)">${q.freq || '---'}</td>
+                <td>${q.band}</td>
+                <td>${q.mode}</td>
+                <td>${q.rst_s}/${q.rst_r}</td>
+                <td>
+                    <button title="Editar" class="action-btn" onclick="editQSO(${q.id})">✏️</button>
+                    <button title="QRZ" class="action-btn" onclick="window.open('https://www.qrz.com/db/${q.call}', '_blank')">🌐</button>
+                    <button title="Borrar" class="action-btn delete-trigger" style="color:red">❌</button>
+                </td>
+            `;
             
-            // Configurar el input de archivo ADIF
-            document.getElementById('adif-file-input').addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    selectedADIFFile = e.target.files[0];
-                    document.getElementById('selected-file-name').textContent = 
-                        `📄 ${selectedADIFFile.name} (${formatFileSize(selectedADIFFile.size)})`;
-                } else {
-                    selectedADIFFile = null;
-                    document.getElementById('selected-file-name').textContent = 
-                        'Ningún archivo seleccionado';
-                }
-            });
-        });
-
-        // Splash screen
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                const main = document.getElementById('main-content');
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    main.style.display = 'block';
-                    setTimeout(() => {
-                        main.style.opacity = '1';
-                        // Ajustar después de mostrar contenido
-                        adjustForPC();
-                    }, 50);
-                }, 800);
-            }, 2500); // Reducido a 2.5 segundos
-        });
-
-        // Ajustes específicos para PC
-        function adjustForPC() {
-            if (window.innerWidth >= 1200) {
-                // Ajustar tamaños de fuente en PC
-                document.querySelectorAll('.input-field').forEach(el => {
-                    el.style.fontSize = '13px';
-                    el.style.padding = '8px 10px';
-                });
-                
-                // Ajustar botones
-                document.querySelectorAll('.btn-action').forEach(btn => {
-                    btn.style.fontSize = '11px';
-                    btn.style.padding = '7px 10px';
-                });
-            }
-        }
-
-        // Función para calcular frecuencia basada en la banda seleccionada
-        function calculateFreqFromBand() {
-            const bandSelect = document.getElementById('qsoBand');
-            const selectedBand = bandSelect.value;
-            const freqInput = document.getElementById('qsoFreq');
-            
-            if (bandFrequencies[selectedBand]) {
-                freqInput.value = bandFrequencies[selectedBand];
-                
-                // Efecto visual de confirmación
-                freqInput.style.borderColor = 'var(--neon-cyan)';
-                freqInput.style.boxShadow = '0 0 10px rgba(0, 229, 255, 0.5)';
-                setTimeout(() => {
-                    freqInput.style.borderColor = '#1e3a5f';
-                    freqInput.style.boxShadow = 'none';
-                }, 1000);
-            } else {
-                freqInput.value = '';
-            }
-        }
-
-        // Reloj UTC
-        function updateClock() {
-            if (isEditing) return;
-            
-            const now = new Date();
-            const year = now.getUTCFullYear();
-            const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(now.getUTCDate()).padStart(2, '0');
-            const h = String(now.getUTCHours()).padStart(2, '0');
-            const m = String(now.getUTCMinutes()).padStart(2, '0');
-            const s = String(now.getUTCSeconds()).padStart(2, '0');
-
-            const dateStr = `${year}-${month}-${day}`;
-            const clockStr = `${h}:${m}:${s} UTC`;
-            
-            document.getElementById('date-utc').innerText = dateStr;
-            document.getElementById('clock').innerText = clockStr;
-
-            // Auto-completar fecha y hora si no hay edición
-            if (!isEditing && !document.getElementById('qsoCall').value) {
-                document.getElementById('qsoDate').value = dateStr;
-                document.getElementById('qsoTime').value = h + ":" + m;
-            }
-        }
-        setInterval(updateClock, 1000);
-
-        // Operador
-        function saveOperator() {
-            operator = {
-                call: document.getElementById('opCall').value.toUpperCase().trim(),
-                name: document.getElementById('opName').value.trim(),
-                email: document.getElementById('opEmail').value.trim()
-            };
-            localStorage.setItem('operator', JSON.stringify(operator));
-        }
-
-        function loadOperator() {
-            if (!operator.call) operator.call = 'CL7ADV';
-            if (!operator.name) operator.name = 'Alfred';
-            
-            document.getElementById('opCall').value = operator.call;
-            document.getElementById('opName').value = operator.name;
-            document.getElementById('opEmail').value = operator.email || '';
-        }
-
-        // QRZ
-        function checkQRZ(id) {
-            const call = document.getElementById(id).value.toUpperCase().trim();
-            if(call) {
-                window.open(`https://www.qrz.com/db/${call}`, '_blank');
-            }
-        }
-
-        // Procesar QSO
-        function processQSO() {
-            if (isEditing) {
-                updateQSO();
-            } else {
-                addQSO();
-            }
-        }
-
-        function addQSO() {
-            const call = document.getElementById('qsoCall').value.toUpperCase().trim();
-            if(!call) {
-                alert('Por favor ingrese un indicativo');
-                document.getElementById('qsoCall').focus();
-                return;
-            }
-
-            const rawDate = document.getElementById('qsoDate').value.replace(/-/g, '');
-            const rawTime = document.getElementById('qsoTime').value.replace(/:/g, '');
-
-            const newQso = {
-                id: Date.now(),
-                call: call,
-                name: document.getElementById('qsoName').value.trim(),
-                email: document.getElementById('qsoEmail').value.trim(),
-                rst: document.getElementById('qsoRst').value.trim() || '59',
-                date: rawDate,
-                time: rawTime,
-                band: document.getElementById('qsoBand').value,
-                freq: document.getElementById('qsoFreq').value.trim(),
-                mode: document.getElementById('qsoMode').value,
-                notes: document.getElementById('qsoNotes').value,
-                qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
-                timestamp: new Date().toISOString()
-            };
-
-            qsos.unshift(newQso);
-            saveAndRender();
-            clearForm();
-            
-            // Feedback visual
-            const btn = document.getElementById('btnSubmit');
-            const originalBg = btn.style.background;
-            btn.style.background = '#4CAF50';
-            setTimeout(() => btn.style.background = originalBg, 500);
-        }
-
-        // Editar QSO
-        function editQSO(id) {
-            const q = qsos.find(item => item.id === id);
-            if (!q) return;
-
-            isEditing = true;
-            document.getElementById('editId').value = q.id;
-            document.getElementById('qsoCall').value = q.call;
-            document.getElementById('qsoName').value = q.name;
-            document.getElementById('qsoEmail').value = q.email;
-            document.getElementById('qsoRst').value = q.rst;
-            document.getElementById('qsoDate').value = `${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}`;
-            document.getElementById('qsoTime').value = `${q.time.slice(0,2)}:${q.time.slice(2,4)}`;
-            document.getElementById('qsoBand').value = q.band;
-            document.getElementById('qsoFreq').value = q.freq || '';
-            document.getElementById('qsoMode').value = q.mode;
-            document.getElementById('qsoNotes').value = q.notes;
-            document.getElementById('exportQRZ').checked = q.qrz === 'Y';
-
-            // Estética de edición
-            document.getElementById('formPanel').classList.add('editing-mode');
-            document.getElementById('formTitle').innerHTML = '✏️ EDITANDO CONTACTO';
-            document.getElementById('formTitle').style.color = "var(--neon-yellow)";
-            document.getElementById('btnSubmitIcon').textContent = '💾';
-            document.getElementById('btnSubmitText').textContent = 'Actualizar';
-            document.getElementById('btnSubmit').className = "btn-action btn-csv";
-            document.getElementById('btnCancelEdit').style.display = "flex";
-            
-            document.getElementById('qsoCall').focus();
-        }
-
-        function updateQSO() {
-            const id = parseInt(document.getElementById('editId').value);
-            const index = qsos.findIndex(q => q.id === id);
-            
-            if (index !== -1) {
-                const rawDate = document.getElementById('qsoDate').value.replace(/-/g, '');
-                const rawTime = document.getElementById('qsoTime').value.replace(/:/g, '');
-
-                qsos[index] = {
-                    ...qsos[index],
-                    call: document.getElementById('qsoCall').value.toUpperCase().trim(),
-                    name: document.getElementById('qsoName').value.trim(),
-                    email: document.getElementById('qsoEmail').value.trim(),
-                    rst: document.getElementById('qsoRst').value.trim(),
-                    date: rawDate,
-                    time: rawTime,
-                    band: document.getElementById('qsoBand').value,
-                    freq: document.getElementById('qsoFreq').value.trim(),
-                    mode: document.getElementById('qsoMode').value,
-                    notes: document.getElementById('qsoNotes').value,
-                    qrz: document.getElementById('exportQRZ').checked ? 'Y' : 'N',
-                    timestamp: new Date().toISOString()
-                };
-
-                saveAndRender();
-                cancelEdit();
-            }
-        }
-
-        function cancelEdit() {
-            isEditing = false;
-            document.getElementById('formPanel').classList.remove('editing-mode');
-            document.getElementById('formTitle').innerHTML = '📻 REGISTRAR QSO';
-            document.getElementById('formTitle').style.color = "var(--neon-pink)";
-            document.getElementById('btnSubmitIcon').textContent = '⚡';
-            document.getElementById('btnSubmitText').textContent = 'Grabar Contacto';
-            document.getElementById('btnSubmit').className = "btn-action btn-adif";
-            document.getElementById('btnCancelEdit').style.display = "none";
-            clearForm();
-        }
-
-        function clearForm() {
-            document.getElementById('editId').value = "";
-            document.getElementById('qsoCall').value = "";
-            document.getElementById('qsoName').value = "";
-            document.getElementById('qsoEmail').value = "";
-            document.getElementById('qsoFreq').value = "";
-            document.getElementById('qsoNotes').value = "";
-            document.getElementById('qsoDate').value = "";
-            document.getElementById('qsoTime').value = "";
-            document.getElementById('qsoRst').value = "59";
-            document.getElementById('qsoBand').value = "40m";
-            document.getElementById('qsoMode').value = "SSB";
-            document.getElementById('exportQRZ').checked = true;
-            updateClock();
-        }
-
-        // Renderizar tabla
-        function saveAndRender() {
-            localStorage.setItem('qsos', JSON.stringify(qsos));
-            const term = document.getElementById('searchLog').value.toUpperCase();
-            const body = document.getElementById('logBody');
-            const filtered = qsos.filter(q => 
-                q.call.includes(term) || 
-                (q.name && q.name.toUpperCase().includes(term)) ||
-                (q.notes && q.notes.toUpperCase().includes(term)) ||
-                (q.freq && q.freq.includes(term))
-            );
-
-            body.innerHTML = filtered.map(q => `
-                <tr>
-                    <td>
-                        <b style="color:var(--neon-yellow); font-size: 0.85rem;">${q.call}</b><br>
-                        <small style="color: #aaa; font-size: 0.75rem;">${q.name || ''}</small>
-                    </td>
-                    <td style="font-family: monospace; font-size: 0.8rem;">
-                        ${q.date.slice(0,4)}-${q.date.slice(4,6)}-${q.date.slice(6,8)}<br>
-                        <span style="color:var(--neon-cyan)">${q.time.slice(0,2)}:${q.time.slice(2,4)}z</span>
-                    </td>
-                    <td>
-                        <span style="color: var(--neon-yellow); font-size: 0.85rem;">${q.band}</span><br>
-                        <small style="font-size: 0.75rem; color: ${q.freq ? 'var(--neon-cyan)' : '#666'}">
-                            ${q.freq ? q.freq + ' MHz' : 'Sin freq.'}
-                        </small>
-                    </td>
-                    <td style="font-size: 0.75rem;">
-                        ${q.mode}
-                    </td>
-                    <td>
-                        <span style="color:${q.qrz === 'Y' ? 'var(--neon-cyan)' : '#666'}; 
-                              font-weight: bold; font-size: 0.85rem;">
-                            ${q.qrz === 'Y' ? '✓' : '✗'}
-                        </span>
-                    </td>
-                    <td style="text-align: right; white-space: nowrap;">
-                        <button onclick="editQSO(${q.id})" class="btn-action btn-edit" 
-                                style="padding: 5px 8px; font-size: 0.75rem; margin-right: 5px;" 
-                                title="Editar">
-                            ✎
-                        </button>
-                        <button onclick="deleteQSO(${q.id})" 
-                                style="background:none; border:none; color:var(--neon-pink); 
-                                       cursor:pointer; font-size: 1.1rem; padding: 0 5px;" 
-                                title="Eliminar">
-                            ×
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-
-            document.getElementById('totalQSOs').innerText = qsos.length;
-            document.getElementById('totalCount').innerText = qsos.length;
-            document.getElementById('visibleCount').innerText = filtered.length;
-        }
-
-        function deleteQSO(id) {
-            if(confirm("¿Eliminar este contacto del log?")) {
-                if (isEditing && document.getElementById('editId').value == id) {
-                    cancelEdit();
-                }
-                qsos = qsos.filter(q => q.id !== id);
-                saveAndRender();
-            }
-        }
-
-        function clearAll() {
-            if(confirm("¿Borrar TODOS los contactos del log?\n\nEsta acción no se puede deshacer.")) {
-                qsos = [];
-                cancelEdit();
-                saveAndRender();
-            }
-        }
-
-        // Exportar
-        function downloadADIF() {
-            if (qsos.length === 0) {
-                alert('No hay contactos para exportar');
-                return;
-            }
-
-            let adif = "ADIF Export from NEON LOG STATION v4.3.5\n";
-            adif += "<ADIF_VER:5>3.1.0\n";
-            adif += `<PROGRAMID:8>NEON_LOG\n<PROGRAMVERSION:5>4.3.5\n`;
-            adif += `<CREATED_TIMESTAMP:15>${new Date().toISOString().replace(/[-:]/g, '').slice(0,15)}\n`;
-            adif += "<EOH>\n";
-            
-            qsos.forEach((q, idx) => {
-                adif += `<CALL:${q.call.length}>${q.call}\n`;
-                adif += `<QSO_DATE:8>${q.date}\n`;
-                adif += `<TIME_ON:${q.time.length}>${q.time}\n`;
-                adif += `<BAND:${q.band.length}>${q.band}\n`;
-                adif += `<MODE:${q.mode.length}>${q.mode}\n`;
-                adif += `<RST_SENT:${q.rst.length}>${q.rst}\n`;
-                
-                if(q.freq) adif += `<FREQ:${q.freq.length}>${q.freq}\n`;
-                if(q.name) adif += `<NAME:${q.name.length}>${q.name}\n`;
-                if(q.email) adif += `<EMAIL:${q.email.length}>${q.email}\n`;
-                if(q.notes) adif += `<COMMENT:${q.notes.length}>${q.notes}\n`;
-                
-                if(operator.call) adif += `<STATION_CALLSIGN:${operator.call.length}>${operator.call}\n`;
-                if(operator.call) adif += `<OPERATOR:${operator.call.length}>${operator.call}\n`;
-                if(operator.name) adif += `<MY_NAME:${operator.name.length}>${operator.name}\n`;
-                if(operator.email) adif += `<MY_EMAIL:${operator.email.length}>${operator.email}\n`;
-                
-                adif += `<EOR>\n`;
+            tr.querySelector('.delete-trigger').addEventListener('click', () => {
+                deleteQSO(q.id);
             });
 
-            downloadFile(adif, `NEON_LOG_${new Date().toISOString().slice(0,10)}.adi`, 'text/plain');
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteQSO(id) {
+        if(confirm("¿Estás seguro de que deseas eliminar este registro?")) {
+            qsoList = qsoList.filter(q => q.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
+            renderTable(); 
+            updateCount(); 
         }
+    }
 
-        function downloadCSV() {
-            if (qsos.length === 0) {
-                alert('No hay contactos para exportar');
-                return;
-            }
+    function clearLogs() { 
+        if(confirm("¡ATENCIÓN! Se borrarán TODOS los registros del libro de guardia permanentemente. ¿Continuar?")) { 
+            qsoList = []; 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([])); 
+            updateCount(); 
+            renderTable();
+            alert("Libro de guardia vaciado con éxito.");
+        } 
+    }
 
-            let csv = "Call,Date,Time,Band,Freq (MHz),Mode,RST,Name,Email,Notes,QRZ\n";
-            qsos.forEach(q => {
-                csv += `"${q.call}","${q.date}","${q.time}","${q.band}","${q.freq || ''}","${q.mode}","${q.rst}","${q.name || ''}","${q.email || ''}","${q.notes || ''}","${q.qrz}"\n`;
-            });
-            downloadFile(csv, `NEON_LOG_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
-        }
+    function updateCount() { 
+        const count = qsoList.length;
+        document.getElementById('header-count').textContent = count; 
+    }
 
-        function downloadFile(content, fileName, mimeType = 'text/plain') {
-            const blob = new Blob(["\uFEFF" + content], {type: mimeType});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
+    function exportADIF() {
+        if(qsoList.length === 0) return alert("No hay registros para exportar.");
+        
+        let adi = `ADIF Export - NEON LOG STATION v5.3.5\n`;
+        adi += `<PROGRAMID:12>NEONLOGSTN53\n<ADIF_VER:5>3.1.4\n<EOH>\n\n`;
 
-        // Funciones para ADIF2CABR
-        function openADIF2CABRModal() {
-            document.getElementById('adif2cabr-modal').style.display = 'flex';
-            // Resetear el estado
-            selectedADIFFile = null;
-            document.getElementById('selected-file-name').textContent = 'Ningún archivo seleccionado';
-            document.getElementById('adif-file-input').value = '';
-            document.getElementById('conversion-progress').style.display = 'none';
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('status-message').style.display = 'none';
-        }
-
-        function closeModal() {
-            document.getElementById('adif2cabr-modal').style.display = 'none';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' bytes';
-            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-            else return (bytes / 1048576).toFixed(1) + ' MB';
-        }
-
-        // Función para simular el procesamiento de ADIF2CABR.exe
-        function processADIF2CABR() {
-            if (!selectedADIFFile) {
-                showStatus('Por favor selecciona un archivo ADIF primero.', 'error');
-                return;
-            }
-
-            const reader = new FileReader();
-            const progressBar = document.getElementById('progress-bar');
-            const progressContainer = document.getElementById('conversion-progress');
+        qsoList.forEach(q => {
+            adi += `<CALL:${q.call.length}>${q.call}`;
+            adi += `<QSO_DATE:${q.date.length}>${q.date}`;
+            adi += `<TIME_ON:${q.time.length}>${q.time}`;
+            adi += `<BAND:${q.band.length}>${q.band}`;
+            adi += `<MODE:${q.mode.length}>${q.mode}`;
+            adi += `<RST_SENT:${q.rst_s.length}>${q.rst_s}`;
+            adi += `<RST_RCVD:${q.rst_r.length}>${q.rst_r}`;
             
-            progressContainer.style.display = 'block';
-            progressBar.style.width = '30%';
+            if(q.email) adi += `<EMAIL:${q.email.length}>${q.email}`;
+            if(q.freq) adi += `<FREQ:${q.freq.length}>${q.freq}`;
+            if(q.comment) adi += `<COMMENT:${q.comment.length}>${q.comment}`;
             
-            reader.onload = function(e) {
-                // Simular procesamiento
-                setTimeout(() => {
-                    progressBar.style.width = '60%';
-                    
-                    setTimeout(() => {
-                        progressBar.style.width = '100%';
-                        
-                        // Leer contenido del archivo ADIF
-                        const adifContent = e.target.result;
-                        
-                        // Aquí normalmente se llamaría al ejecutable ADIF2CABR.exe
-                        // Como no podemos ejecutarlo en el navegador, simulamos la conversión
-                        // En un entorno real, esto se haría en el servidor o con una API
-                        
-                        // Simular conversión a CABR (formato ficticio)
-                        const cabrContent = convertADIFtoCABR(adifContent);
-                        
-                        // Descargar el archivo CABR resultante
-                        const cabrFileName = selectedADIFFile.name.replace('.adi', '.cabr').replace('.txt', '.cabr') || 'converted.cabr';
-                        downloadFile(cabrContent, cabrFileName, 'text/plain');
-                        
-                        showStatus('✅ Conversión completada. Archivo CABR descargado.', 'success');
-                        
-                        // Cerrar modal después de un tiempo
-                        setTimeout(() => {
-                            closeModal();
-                        }, 2000);
-                    }, 500);
-                }, 500);
-            };
+            if(opData.call) adi += `<STATION_CALLSIGN:${opData.call.length}>${opData.call}`;
+            if(opData.name) adi += `<OPERATOR:${opData.name.length}>${opData.name}`;
+            if(opData.email) adi += `<MY_EMAIL:${opData.email.length}>${opData.email}`;
             
-            reader.onerror = function() {
-                showStatus('❌ Error al leer el archivo ADIF.', 'error');
-                progressContainer.style.display = 'none';
-            };
-            
-            reader.readAsText(selectedADIFFile);
-        }
-
-        // Función para simular la conversión ADIF a CABR
-        function convertADIFtoCABR(adifContent) {
-            // Esta es una simulación de conversión
-            // En un entorno real, esto se haría con ADIF2CABR.exe
-            // Aquí solo reformateamos ligeramente el contenido
-            
-            let cabrContent = `CABR File - Converted from ADIF by NEON LOG STATION v4.3.5\n`;
-            cabrContent += `Conversion date: ${new Date().toLocaleString()}\n`;
-            cabrContent += `Operator: ${operator.call || 'Unknown'}\n`;
-            cabrContent += `==========================================\n\n`;
-            
-            // Parsear líneas ADIF básicas
-            const lines = adifContent.split('\n');
-            let inQSO = false;
-            let currentQSO = {};
-            
-            lines.forEach(line => {
-                if (line.includes('<CALL:')) {
-                    const callMatch = line.match(/<CALL:(\d+)>(.*)/);
-                    if (callMatch) currentQSO.call = callMatch[2];
-                }
-                if (line.includes('<QSO_DATE:')) {
-                    const dateMatch = line.match(/<QSO_DATE:(\d+)>(.*)/);
-                    if (dateMatch) currentQSO.date = dateMatch[2];
-                }
-                if (line.includes('<TIME_ON:')) {
-                    const timeMatch = line.match(/<TIME_ON:(\d+)>(.*)/);
-                    if (timeMatch) currentQSO.time = timeMatch[2];
-                }
-                if (line.includes('<BAND:')) {
-                    const bandMatch = line.match(/<BAND:(\d+)>(.*)/);
-                    if (bandMatch) currentQSO.band = bandMatch[2];
-                }
-                if (line.includes('<MODE:')) {
-                    const modeMatch = line.match(/<MODE:(\d+)>(.*)/);
-                    if (modeMatch) currentQSO.mode = modeMatch[2];
-                }
-                if (line.includes('<EOR>')) {
-                    // Fin de QSO, agregar a CABR
-                    if (currentQSO.call) {
-                        cabrContent += `${currentQSO.date || ''}|${currentQSO.time || ''}|${currentQSO.call || ''}|${currentQSO.band || ''}|${currentQSO.mode || ''}\n`;
-                    }
-                    currentQSO = {};
-                }
-            });
-            
-            cabrContent += `\n==========================================\n`;
-            cabrContent += `Total QSOs: ${lines.filter(l => l.includes('<EOR>')).length}\n`;
-            cabrContent += `Generated by NEON LOG STATION - Alfred CL7ADV`;
-            
-            return cabrContent;
-        }
-
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('status-message');
-            statusEl.textContent = message;
-            statusEl.className = `status-message status-${type}`;
-            statusEl.style.display = 'block';
-        }
-
-        // Redimensionamiento
-        window.addEventListener('resize', adjustForPC);
-
-        // Prevenir envío de formulario con Enter
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
-                e.preventDefault();
-                processQSO();
-            }
+            adi += `<EOR>\n`;
         });
 
-        // Cerrar modal con Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
+        const blob = new Blob([adi], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Log_Alfred_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
+        a.click();
+    }
+
+    window.onload = function() {
+        document.getElementById('op_call').value = opData.call || "";
+        document.getElementById('op_name').value = opData.name || "";
+        document.getElementById('op_grid').value = opData.grid || "";
+        document.getElementById('op_email').value = opData.email || "";
+        document.getElementById('header-op').textContent = opData.call || "---";
+        
+        updateCount();
+        updateClock();
+        renderTable();
+    }
+</script>
 </body>
 </html>
