@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Log Station v5.3.5 - Alfred CL7ADV</title>
+    <title>Neon Log Station v5.4.1 - Alfred CL7ADV</title>
     <style>
         :root {
             --bg-dark: #050a14;
@@ -232,7 +232,7 @@
 
 <div id="main-content">
     <header>
-        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.3.5</h1>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.4.1</h1>
         <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
         <div id="clock" class="time-display">00:00:00 UTC</div>
     </header>
@@ -249,8 +249,12 @@
             <div id="btn-table" class="menu-item" onclick="togglePanel('panel-table', 'btn-table')">
                 <span class="number">3</span><i>📋</i><span>Libro</span>
             </div>
-            <div id="btn-export" class="menu-item" onclick="exportADIF()">
-                <span class="number">4</span><i>💾</i><span>Exportar</span>
+            <div id="btn-export" class="menu-item" onclick="exportADIF('standard')">
+                <span class="number">4</span><i>💾</i><span>Exportar ADIF</span>
+            </div>
+            <!-- NUEVO BOTON QRZ -->
+            <div id="btn-export-qrz" class="menu-item" style="border-color: var(--neon-yellow);" onclick="exportADIF('qrz')">
+                <span class="number">5</span><i>⚡</i><span>Exportar QRZ</span>
             </div>
             <div id="btn-clear" class="menu-item" onclick="clearLogs()">
                 <span class="number">(Opcional)</span><i>🗑️</i><span>Limpiar</span>
@@ -573,13 +577,15 @@
         document.getElementById('header-count').textContent = count; 
     }
 
-    function exportADIF() {
+    // FUNCION DE EXPORTACION ACTUALIZADA PARA QRZ Y DATOS COMPLETOS
+    function exportADIF(type = 'standard') {
         if(qsoList.length === 0) return alert("No hay registros para exportar.");
         
-        let adi = `ADIF Export - NEON LOG STATION v5.3.5\n`;
-        adi += `<PROGRAMID:12>NEONLOGSTN53\n<ADIF_VER:5>3.1.4\n<EOH>\n\n`;
+        let adi = `ADIF Export - NEON LOG STATION v5.4.1\n`;
+        adi += `<PROGRAMID:12>NEONLOGSTN54\n<ADIF_VER:5>3.1.4\n<EOH>\n\n`;
 
         qsoList.forEach(q => {
+            // Datos del QSO (Corresponsal)
             adi += `<CALL:${q.call.length}>${q.call}`;
             adi += `<QSO_DATE:${q.date.length}>${q.date}`;
             adi += `<TIME_ON:${q.time.length}>${q.time}`;
@@ -592,9 +598,14 @@
             if(q.freq) adi += `<FREQ:${q.freq.length}>${q.freq}`;
             if(q.comment) adi += `<COMMENT:${q.comment.length}>${q.comment}`;
             
+            // DATOS DEL OPERADOR (TU ESTACION) - OBLIGATORIO PARA QRZ
             if(opData.call) adi += `<STATION_CALLSIGN:${opData.call.length}>${opData.call}`;
             if(opData.name) adi += `<OPERATOR:${opData.name.length}>${opData.name}`;
+            if(opData.name) adi += `<MY_NAME:${opData.name.length}>${opData.name}`; // Redundancia para asegurar
             if(opData.email) adi += `<MY_EMAIL:${opData.email.length}>${opData.email}`;
+            
+            // AÑADIDO: Exportar TU Grilla
+            if(opData.grid) adi += `<MY_GRIDSQUARE:${opData.grid.length}>${opData.grid}`;
             
             adi += `<EOR>\n`;
         });
@@ -602,7 +613,16 @@
         const blob = new Blob([adi], {type: 'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `Log_Alfred_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
+        
+        // Nombre del archivo diferenciado si es para QRZ
+        if (type === 'qrz') {
+            a.download = `QRZ_IMPORT_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
+            // AQUI ESTA EL CAMBIO: Abre QRZ en una nueva pestaña
+            window.open('https://www.qrz.com/logbook', '_blank');
+        } else {
+            a.download = `Log_Alfred_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
+        }
+        
         a.click();
     }
 
