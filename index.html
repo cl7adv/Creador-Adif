@@ -1,9 +1,11 @@
+Este es el código HTML mejorado de tu estación de registro "Neon Log Station". Incorpora nuevas funcionalidades basadas en el ejemplo de ADIFMaster, como la gestión de cuadrículas, potencia de transmisión, importación de archivos ADIF y exportación más completa.
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Log Station v5.4.1 - Alfred CL7ADV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Neon Log Station v5.5.0 - ADIF Master Style | CL7ADV</title>
     <style>
         :root {
             --bg-dark: #050a14;
@@ -28,12 +30,11 @@
             position: relative;
         }
 
-        /* MARCA DE AGUA DEL CREADOR */
         .watermark {
             position: fixed;
             bottom: 15px;
             right: 15px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: rgba(0, 229, 255, 0.5);
             z-index: 3000;
             pointer-events: none;
@@ -44,7 +45,6 @@
             font-family: 'Courier New', Courier, monospace;
         }
 
-        /* PANTALLA DE INTRODUCCIÓN */
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -78,7 +78,6 @@
             text-align: center;
         }
 
-        /* CONTENIDO PRINCIPAL */
         #main-content {
             height: 100%;
             display: flex;
@@ -103,12 +102,11 @@
             margin-top: 5px;
         }
 
-        .container { padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; flex-grow: 1; }
+        .container { padding: 20px; max-width: 1300px; margin: 0 auto; width: 100%; flex-grow: 1; }
 
-        /* MENU CASILLAS */
         .grid-menu {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
             gap: 12px;
             margin-bottom: 25px;
         }
@@ -117,27 +115,25 @@
             background: var(--panel-bg);
             border: 1px solid #333;
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100px; opacity: 0.7;
+            min-height: 85px;
+            opacity: 0.7;
         }
 
         .menu-item:hover { transform: scale(1.02); opacity: 1; border-color: var(--neon-cyan); }
-        
         .menu-item.active-item {
             border-color: var(--neon-cyan);
             box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 10px rgba(0, 229, 255, 0.2);
             background: #1b263b; opacity: 1; transform: translateY(-2px);
         }
+        .menu-item .number { position: absolute; top: 5px; left: 8px; font-size: 0.7rem; color: var(--neon-pink); font-weight: bold; }
+        .menu-item i { font-size: 1.5rem; margin-bottom: 4px; color: var(--neon-yellow); }
 
-        .menu-item .number { position: absolute; top: 5px; left: 8px; font-size: 0.75rem; color: var(--neon-pink); font-weight: bold; }
-        .menu-item i { font-size: 1.6rem; margin-bottom: 6px; color: var(--neon-yellow); }
-
-        /* PANELES */
         .log-entry-panel {
             background: var(--card-bg);
             padding: 25px;
@@ -152,43 +148,35 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
-        
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 8px; }
         label { font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-
         input, select {
             background: rgba(27, 38, 59, 0.8);
             border: 1px solid #444;
             color: white;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             outline: none;
             transition: 0.3s;
         }
-
         input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
 
         .btn {
-            padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer;
+            padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer;
             font-weight: bold; text-transform: uppercase; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
         .btn-pink { background: var(--neon-pink); color: #fff; }
         .btn-green { background: var(--neon-green); color: #000; }
         .btn-cyan { background: var(--neon-cyan); color: #000; }
 
-        /* ESTILO PARA EL BUSCADOR QRZ */
-        .qrz-input-wrapper {
-            display: flex;
-            gap: 5px;
-        }
+        .qrz-input-wrapper { display: flex; gap: 6px; }
         .qrz-input-wrapper input { flex-grow: 1; }
         .btn-qrz {
             background: #ffea00;
             color: #000;
-            padding: 0 15px;
+            padding: 0 14px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
@@ -199,170 +187,123 @@
             font-size: 1.2rem;
             box-shadow: 0 0 10px rgba(255, 234, 0, 0.4);
         }
-        .btn-qrz:hover { background: #fff; box-shadow: 0 0 20px #ffea00; }
 
         .table-container { width: 100%; overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 0.85rem; }
-        th { background: var(--panel-bg); color: var(--neon-yellow); text-align: left; padding: 12px; border-bottom: 2px solid var(--neon-cyan); }
-        td { padding: 10px; border-bottom: 1px solid #222; }
+        table { width: 100%; border-collapse: collapse; min-width: 880px; font-size: 0.8rem; }
+        th { background: var(--panel-bg); color: var(--neon-yellow); text-align: left; padding: 10px; border-bottom: 2px solid var(--neon-cyan); }
+        td { padding: 8px; border-bottom: 1px solid #222; }
         tr:hover { background: rgba(0,229,255,0.05); }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; transition: 0.2s; }
+        .action-btn:hover { transform: scale(1.2); }
 
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; transition: 0.2s; }
-        .action-btn:hover { transform: scale(1.3); }
-
-        @media (max-width: 600px) {
-            .grid-menu { grid-template-columns: repeat(2, 1fr); }
+        @media (max-width: 700px) {
+            .grid-menu { grid-template-columns: repeat(3, 1fr); }
             .form-row { grid-template-columns: 1fr 1fr; }
         }
+        @media (max-width: 500px) {
+            .grid-menu { grid-template-columns: repeat(2, 1fr); }
+        }
+        .search-box { background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-green); padding: 8px; border-radius: 20px; width: 100%; }
+        #file-import { display: none; }
     </style>
 </head>
 <body>
 
-<!-- FIRMA DE AGUA -->
-<div class="watermark">CL7ADV-CUBA Creador</div>
+<div class="watermark">CL7ADV-CUBA Creador · ADIF MASTER STYLE</div>
 
-<!-- PANTALLA INTRO -->
 <div id="intro-screen">
     <div class="sun"></div>
     <div class="intro-text">
         Amanecer en el Caribe<br>
-        <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--neon-cyan);">Cargando Estación Creadora de ADIF...</span>
+        <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--neon-cyan);">Cargando Estación ADIF+Grid/Power</span>
     </div>
 </div>
 
 <div id="main-content">
     <header>
-        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.4.1</h1>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.5.0 | ADIF Master Ready</h1>
         <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
         <div id="clock" class="time-display">00:00:00 UTC</div>
     </header>
 
     <div class="container">
-        <!-- CASILLAS MENU -->
         <div class="grid-menu">
-            <div id="btn-op" class="menu-item" onclick="togglePanel('panel-op', 'btn-op')">
-                <span class="number">1</span><i>👤</i><span>Operador</span>
-            </div>
-            <div id="btn-log" class="menu-item active-item" onclick="togglePanel('panel-log', 'btn-log')">
-                <span class="number">2</span><i>📝</i><span>Nuevo QSO</span>
-            </div>
-            <div id="btn-table" class="menu-item" onclick="togglePanel('panel-table', 'btn-table')">
-                <span class="number">3</span><i>📋</i><span>Libro</span>
-            </div>
-            <div id="btn-export" class="menu-item" onclick="exportADIF('standard')">
-                <span class="number">4</span><i>💾</i><span>Exportar ADIF</span>
-            </div>
-            <!-- NUEVO BOTON QRZ -->
-            <div id="btn-export-qrz" class="menu-item" style="border-color: var(--neon-yellow);" onclick="exportADIF('qrz')">
-                <span class="number">5</span><i>⚡</i><span>Exportar QRZ</span>
-            </div>
-            <div id="btn-clear" class="menu-item" onclick="clearLogs()">
-                <span class="number">(Opcional)</span><i>🗑️</i><span>Limpiar</span>
-            </div>
+            <div id="btn-op" class="menu-item" onclick="togglePanel('panel-op', 'btn-op')"><span class="number">1</span><i>👤</i><span>Operador</span></div>
+            <div id="btn-log" class="menu-item active-item" onclick="togglePanel('panel-log', 'btn-log')"><span class="number">2</span><i>📝</i><span>Nuevo QSO</span></div>
+            <div id="btn-table" class="menu-item" onclick="togglePanel('panel-table', 'btn-table')"><span class="number">3</span><i>📋</i><span>Libro</span></div>
+            <div id="btn-export" class="menu-item" onclick="exportADIF('standard')"><span class="number">4</span><i>💾</i><span>Exportar ADIF</span></div>
+            <div id="btn-export-qrz" class="menu-item" onclick="exportADIF('qrz')"><span class="number">5</span><i>⚡</i><span>Exportar QRZ</span></div>
+            <div id="btn-import" class="menu-item" onclick="document.getElementById('file-import').click()"><span class="number">6</span><i>📂</i><span>Importar ADIF</span></div>
+            <div id="btn-clear" class="menu-item" onclick="clearLogs()"><span class="number">ⓘ</span><i>🗑️</i><span>Limpiar</span></div>
         </div>
 
-        <!-- PANEL OPERADOR -->
+        <!-- PANEL OPERADOR (MY STATION) -->
         <div id="panel-op" class="log-entry-panel">
-            <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">Ajustes de Estación (Mía)</h3>
+            <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">Ajustes de Estación (MY_GRIDSQUARE / STATION_CALLSIGN)</h3>
             <div class="form-row">
                 <div class="form-group"><label>Tu Indicativo</label><input type="text" id="op_call" placeholder="CL7ADV" oninput="saveOperatorData()"></div>
                 <div class="form-group"><label>Tu Nombre</label><input type="text" id="op_name" placeholder="Alfred" oninput="saveOperatorData()"></div>
-                <div class="form-group"><label>Tu Grilla</label><input type="text" id="op_grid" placeholder="FL01aa" oninput="saveOperatorData()"></div>
+                <div class="form-group"><label>Tu Grilla (MY_GRIDSQUARE)</label><input type="text" id="op_grid" placeholder="FL10ar" oninput="saveOperatorData()"></div>
             </div>
             <div class="form-row">
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Tu Correo Electrónico (Opcional)</label>
-                    <input type="email" id="op_email" placeholder="tu_correo@ejemplo.com" oninput="saveOperatorData()">
-                </div>
+                <div class="form-group"><label>Correo (opcional)</label><input type="email" id="op_email" placeholder="tu_correo@ejemplo.com" oninput="saveOperatorData()"></div>
             </div>
         </div>
 
-        <!-- PANEL NUEVO/EDITAR QSO -->
+        <!-- PANEL NUEVO/EDITAR QSO - MEJORADO CON GRIDSQUARE Y TX_PWR -->
         <div id="panel-log" class="log-entry-panel active-panel">
-            <h3 id="panel-title" style="color: var(--neon-pink); margin-bottom: 15px;">Registro de Contacto</h3>
+            <h3 id="panel-title" style="color: var(--neon-pink); margin-bottom: 15px;">Registro de Contacto (estilo ADIF Master)</h3>
             <input type="hidden" id="edit_id">
             <div class="form-row">
                 <div class="form-group" style="grid-column: span 2;">
                     <label>Callsign Corresponsal</label>
                     <div class="qrz-input-wrapper">
-                        <input type="text" id="call" placeholder="Indicativo" onkeyup="this.value = this.value.toUpperCase()">
-                        <button type="button" class="btn-qrz" title="Ver en QRZ.com" onclick="checkQRZ()">⚡</button>
+                        <input type="text" id="call" placeholder="Ej: AASWH" onkeyup="this.value = this.value.toUpperCase()">
+                        <button type="button" class="btn-qrz" title="Buscar en QRZ.com" onclick="checkQRZ()">⚡</button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Frecuencia (MHz)</label>
-                    <input type="text" id="freq" placeholder="7.150">
-                </div>
-                <div class="form-group">
-                    <label>Banda</label>
-                    <select id="band">
-                        <option value="40M">40M</option><option value="20M">20M</option>
-                        <option value="15M">15M</option><option value="10M">10M</option>
-                        <option value="6M">6M</option><option value="2M">2M</option>
-                        <option value="70CM">70CM</option><option value="23CM">23CM</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Modo</label>
-                    <input list="modes" id="mode" placeholder="Modo...">
-                    <datalist id="modes">
-                        <option value="SSB"><option value="FM"><option value="CW"><option value="FT8">
-                        <option value="FT4"><option value="Digital Voice"><option value="DMR">
-                        <option value="RTTY"><option value="JS8">
-                    </datalist>
-                </div>
+                <div class="form-group"><label>Gridsquare (Corresponsal)</label><input type="text" id="gridsquare" placeholder="EL09 / FN42" onkeyup="this.value = this.value.toUpperCase()"></div>
+                <div class="form-group"><label>TX Power (W)</label><input type="text" id="tx_pwr" placeholder="100"></div>
             </div>
-            
             <div class="form-row">
-                <div class="form-group">
-                    <label>Fecha UTC (AAAA/MM/DD)</label>
-                    <input type="text" id="manual_date" placeholder="Auto si vacío">
-                </div>
-                <div class="form-group">
-                    <label>Hora UTC (HH:MM:SS)</label>
-                    <input type="text" id="manual_time" placeholder="Auto si vacío">
-                </div>
+                <div class="form-group"><label>Frecuencia (MHz)</label><input type="text" id="freq" placeholder="7.074"></div>
+                <div class="form-group"><label>Banda</label><select id="band"><option value="40M">40M</option><option value="20M">20M</option><option value="15M">15M</option><option value="10M">10M</option><option value="6M">6M</option><option value="2M">2M</option><option value="70CM">70CM</option><option value="23CM">23CM</option></select></div>
+                <div class="form-group"><label>Modo</label><input list="modes" id="mode" placeholder="FT8/SSB"><datalist id="modes"><option value="SSB"><option value="FM"><option value="CW"><option value="FT8"><option value="FT4"><option value="Digital Voice"><option value="DMR"><option value="RTTY"></datalist></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Fecha UTC (AAAA/MM/DD)</label><input type="text" id="manual_date" placeholder="Auto UTC"></div>
+                <div class="form-group"><label>Hora UTC (HH:MM:SS)</label><input type="text" id="manual_time" placeholder="Auto UTC"></div>
                 <div class="form-group"><label>RST Sent</label><input type="text" id="rst_s" value="59"></div>
                 <div class="form-group"><label>RST Rcvd</label><input type="text" id="rst_r" value="59"></div>
             </div>
-
             <div class="form-row">
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Correo del Corresponsal (Opcional)</label>
-                    <input type="email" id="email" placeholder="correo_contacto@ejemplo.com">
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label>Comentarios / Nombre</label>
-                    <input type="text" id="comment" placeholder="Ej: Juan de Camagüey...">
-                </div>
+                <div class="form-group" style="grid-column: span 2;"><label>Correo del Corresponsal</label><input type="email" id="email" placeholder="opcional"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Comentarios / Nombre</label><input type="text" id="comment" placeholder="Ej: 73, nombre"></div>
             </div>
-            
             <div style="display: flex; gap: 10px;">
                 <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex: 2;">💾 Guardar Registro</button>
                 <button id="cancel-edit" class="btn btn-cyan" onclick="resetForm()" style="flex: 1; display: none;">Cancelar</button>
             </div>
         </div>
 
-        <!-- PANEL TABLA LIBRO -->
+        <!-- PANEL TABLA LIBRO - AÑADIMOS COLUMNAS GRIDSQUARE Y TX_PWR -->
         <div id="panel-table" class="log-entry-panel">
-            <h3 style="color: var(--neon-cyan); margin-bottom: 10px;">Libro de Guardia</h3>
-            <input type="text" id="search" class="search-box" placeholder="🔎 Filtrar por indicativo..." oninput="renderTable()" style="width:100%; padding:10px; background:#000; border:1px solid var(--neon-cyan); color:var(--neon-green); margin-bottom:15px; border-radius:5px;">
+            <h3 style="color: var(--neon-cyan); margin-bottom: 10px;">Libro de Guardia (con Grid y Potencia)</h3>
+            <input type="text" id="search" class="search-box" placeholder="🔎 Filtrar por indicativo..." oninput="renderTable()" style="margin-bottom:15px;">
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr><th>Fecha/Hora UTC</th><th>Callsign</th><th>Freq</th><th>Banda</th><th>Modo</th><th>RST</th><th>Acción</th></tr>
-                    </thead>
+                    <thead><tr><th>Fecha/Hora UTC</th><th>Callsign</th><th>Grid</th><th>Freq</th><th>Banda</th><th>Modo</th><th>RST</th><th>PWR(W)</th><th>Acción</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+<input type="file" id="file-import" accept=".adi,.txt" style="display:none" onchange="importADIF(this.files)">
 
 <script>
-    const STORAGE_KEY = 'cl7adv_logs_v5_3_5';
-    const OP_KEY = 'cl7adv_operator_v5_3_5';
-
+    const STORAGE_KEY = 'cl7adv_logs_v5_5_0';
+    const OP_KEY = 'cl7adv_operator_v5_5_0';
     let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
@@ -371,12 +312,13 @@
             const intro = document.getElementById('intro-screen');
             const main = document.getElementById('main-content');
             intro.style.opacity = '0';
-            setTimeout(() => {
-                intro.style.visibility = 'hidden';
-                main.style.opacity = '1';
-                document.body.style.overflow = 'auto';
-            }, 1000);
-        }, 1000); 
+            setTimeout(() => { intro.style.visibility = 'hidden'; main.style.opacity = '1'; document.body.style.overflow = 'auto'; }, 1000);
+        }, 1000);
+        updateClock();
+        setInterval(updateClock, 1000);
+        loadOperatorUI();
+        updateCount();
+        renderTable();
     });
 
     function getUTCInfo() {
@@ -387,31 +329,15 @@
         const hh = now.getUTCHours().toString().padStart(2, '0');
         const mm = now.getUTCMinutes().toString().padStart(2, '0');
         const ss = now.getUTCSeconds().toString().padStart(2, '0');
-        
-        return {
-            dateRaw: `${y}${m}${d}`,
-            timeRaw: `${hh}${mm}${ss}`,
-            dateFormatted: `${y}/${m}/${d}`,
-            timeFormatted: `${hh}:${mm}:${ss}`,
-            display: `${hh}:${mm}:${ss}`
-        };
+        return { dateRaw: `${y}${m}${d}`, timeRaw: `${hh}${mm}${ss}`, dateFormatted: `${y}/${m}/${d}`, timeFormatted: `${hh}:${mm}:${ss}`, display: `${hh}:${mm}:${ss}` };
     }
-
-    function updateClock() {
-        document.getElementById('clock').textContent = getUTCInfo().display + " UTC";
-    }
-    setInterval(updateClock, 1000);
+    function updateClock() { document.getElementById('clock').textContent = getUTCInfo().display + " UTC"; }
 
     function togglePanel(panelId, buttonId) {
         document.querySelectorAll('.log-entry-panel').forEach(p => p.classList.remove('active-panel'));
         document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active-item'));
-        
-        const targetPanel = document.getElementById(panelId);
-        if (targetPanel) targetPanel.classList.add('active-panel');
-        
-        const targetBtn = document.getElementById(buttonId);
-        if (targetBtn) targetBtn.classList.add('active-item');
-
+        document.getElementById(panelId)?.classList.add('active-panel');
+        document.getElementById(buttonId)?.classList.add('active-item');
         if(panelId === 'panel-table') renderTable();
     }
 
@@ -423,33 +349,32 @@
         localStorage.setItem(OP_KEY, JSON.stringify(opData));
         document.getElementById('header-op').textContent = opData.call || "---";
     }
-
-    // FUNCION PARA VERIFICAR EN QRZ.COM
-    function checkQRZ() {
-        const call = document.getElementById('call').value.trim().toUpperCase();
-        if (!call) {
-            alert("Por favor, introduce un indicativo primero.");
-            return;
-        }
-        window.open(`https://www.qrz.com/db/${call}`, '_blank');
+    function loadOperatorUI() {
+        document.getElementById('op_call').value = opData.call || "";
+        document.getElementById('op_name').value = opData.name || "";
+        document.getElementById('op_grid').value = opData.grid || "";
+        document.getElementById('op_email').value = opData.email || "";
+        document.getElementById('header-op').textContent = opData.call || "---";
     }
+    function checkQRZ() { const call = document.getElementById('call').value.trim().toUpperCase(); if(call) window.open(`https://www.qrz.com/db/${call}`, '_blank'); else alert("Introduce un indicativo"); }
 
     function saveQSO() {
         const call = document.getElementById('call').value.trim().toUpperCase();
-        if(!call) return alert("Por favor, ingrese el indicativo (Callsign).");
-
+        if(!call) return alert("Indicativo requerido");
         const utc = getUTCInfo();
         const editId = document.getElementById('edit_id').value;
+        let rawDate = document.getElementById('manual_date').value.trim();
+        let rawTime = document.getElementById('manual_time').value.trim();
+        let finalDate = rawDate === "" ? utc.dateRaw : rawDate.replace(/\D/g, '').substring(0,8);
+        let finalTime = rawTime === "" ? utc.timeRaw : rawTime.replace(/\D/g, '').substring(0,6);
+        if(finalDate.length !== 8) finalDate = utc.dateRaw;
+        if(finalTime.length !== 6) finalTime = utc.timeRaw;
         
-        let rawInputDate = document.getElementById('manual_date').value.trim();
-        let rawInputTime = document.getElementById('manual_time').value.trim();
-
-        let finalDate = rawInputDate === "" ? utc.dateRaw : rawInputDate.replace(/\D/g, '').substring(0, 8);
-        let finalTime = rawInputTime === "" ? utc.timeRaw : rawInputTime.replace(/\D/g, '').substring(0, 6);
-
         const qso = {
             id: editId ? parseInt(editId) : Date.now(),
             call: call,
+            gridsquare: document.getElementById('gridsquare').value.trim().toUpperCase(),
+            tx_pwr: document.getElementById('tx_pwr').value.trim(),
             freq: document.getElementById('freq').value.trim(),
             band: document.getElementById('band').value,
             mode: document.getElementById('mode').value.toUpperCase() || "SSB",
@@ -460,24 +385,22 @@
             email: document.getElementById('email').value.trim(),
             comment: document.getElementById('comment').value.trim()
         };
-
         if (editId) {
             const index = qsoList.findIndex(q => q.id === qso.id);
             if (index !== -1) qsoList[index] = qso;
-        } else {
-            qsoList.unshift(qso);
-        }
-
+        } else { qsoList.unshift(qso); }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
         resetForm();
         updateCount();
         if(editId) togglePanel('panel-table', 'btn-table');
-        else alert("¡Registro guardado correctamente!");
+        else alert("QSO guardado con Grid, PWR y campos ADIF");
     }
 
     function resetForm() {
         document.getElementById('edit_id').value = "";
         document.getElementById('call').value = "";
+        document.getElementById('gridsquare').value = "";
+        document.getElementById('tx_pwr').value = "";
         document.getElementById('comment').value = "";
         document.getElementById('email').value = "";
         document.getElementById('manual_date').value = "";
@@ -485,7 +408,6 @@
         document.getElementById('freq').value = "";
         document.getElementById('rst_s').value = "59";
         document.getElementById('rst_r').value = "59";
-        
         document.getElementById('panel-title').textContent = "Registro de Contacto";
         document.getElementById('panel-title').style.color = "var(--neon-pink)";
         document.getElementById('save-btn').textContent = "💾 Guardar Registro";
@@ -495,13 +417,13 @@
     function editQSO(id) {
         const q = qsoList.find(item => item.id === id);
         if (!q) return;
-
         const vDate = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
         const vTime = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
-
         document.getElementById('edit_id').value = q.id;
         document.getElementById('call').value = q.call;
-        document.getElementById('freq').value = q.freq;
+        document.getElementById('gridsquare').value = q.gridsquare || "";
+        document.getElementById('tx_pwr').value = q.tx_pwr || "";
+        document.getElementById('freq').value = q.freq || "";
         document.getElementById('band').value = q.band;
         document.getElementById('mode').value = q.mode;
         document.getElementById('rst_s').value = q.rst_s;
@@ -509,13 +431,11 @@
         document.getElementById('manual_date').value = vDate;
         document.getElementById('manual_time').value = vTime;
         document.getElementById('email').value = q.email || "";
-        document.getElementById('comment').value = q.comment;
-
-        document.getElementById('panel-title').textContent = "Editando Registro";
+        document.getElementById('comment').value = q.comment || "";
+        document.getElementById('panel-title').textContent = "Editando Registro (ADIF Full)";
         document.getElementById('panel-title').style.color = "var(--neon-cyan)";
         document.getElementById('save-btn').textContent = "✅ Actualizar Registro";
         document.getElementById('cancel-edit').style.display = "block";
-
         togglePanel('panel-log', 'btn-log');
     }
 
@@ -523,120 +443,128 @@
         const filterStr = document.getElementById('search').value.toUpperCase();
         const tbody = document.getElementById('table-body');
         tbody.innerHTML = "";
-        
         const filtered = qsoList.filter(q => q.call.includes(filterStr));
-
         filtered.forEach(q => {
             const displayDate = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
             const displayTime = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
-
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="font-family:monospace">${displayDate} | ${displayTime}</td>
+                <td style="font-family:monospace">${displayDate} ${displayTime}</td>
                 <td style="color:var(--neon-yellow); font-weight:bold">${q.call}</td>
-                <td style="color:var(--neon-green)">${q.freq || '---'}</td>
+                <td style="color:var(--neon-green)">${q.gridsquare || '—'}</td>
+                <td>${q.freq || '—'}</td>
                 <td>${q.band}</td>
                 <td>${q.mode}</td>
                 <td>${q.rst_s}/${q.rst_r}</td>
-                <td>
-                    <button title="Editar" class="action-btn" onclick="editQSO(${q.id})">✏️</button>
+                <td>${q.tx_pwr || '—'}</td>
+                <td><button title="Editar" class="action-btn" onclick="editQSO(${q.id})">✏️</button>
                     <button title="QRZ" class="action-btn" onclick="window.open('https://www.qrz.com/db/${q.call}', '_blank')">🌐</button>
-                    <button title="Borrar" class="action-btn delete-trigger" style="color:red">❌</button>
-                </td>
+                    <button title="Borrar" class="action-btn delete-trigger" style="color:red">❌</button></td>
             `;
-            
-            tr.querySelector('.delete-trigger').addEventListener('click', () => {
-                deleteQSO(q.id);
-            });
-
+            tr.querySelector('.delete-trigger').addEventListener('click', () => deleteQSO(q.id));
             tbody.appendChild(tr);
         });
     }
 
-    function deleteQSO(id) {
-        if(confirm("¿Estás seguro de que deseas eliminar este registro?")) {
-            qsoList = qsoList.filter(q => q.id !== id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
-            renderTable(); 
-            updateCount(); 
-        }
+    function deleteQSO(id) { if(confirm("¿Eliminar este QSO?")) { qsoList = qsoList.filter(q => q.id !== id); localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList)); renderTable(); updateCount(); } }
+    function clearLogs() { if(confirm("BORRAR TODOS LOS REGISTROS?")) { qsoList = []; localStorage.setItem(STORAGE_KEY, JSON.stringify([])); updateCount(); renderTable(); alert("Log vaciado"); } }
+    function updateCount() { document.getElementById('header-count').textContent = qsoList.length; }
+
+    // Conversión de banda visible (40M) a ADIF estándar (40m)
+    function toADIFBand(bandDisplay) {
+        const map = { "40M":"40m", "20M":"20m", "15M":"15m", "10M":"10m", "6M":"6m", "2M":"2m", "70CM":"70cm", "23CM":"23cm" };
+        return map[bandDisplay] || bandDisplay.toLowerCase();
     }
 
-    function clearLogs() { 
-        if(confirm("¡ATENCIÓN! Se borrarán TODOS los registros del libro de guardia permanentemente. ¿Continuar?")) { 
-            qsoList = []; 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify([])); 
-            updateCount(); 
-            renderTable();
-            alert("Libro de guardia vaciado con éxito.");
-        } 
-    }
-
-    function updateCount() { 
-        const count = qsoList.length;
-        document.getElementById('header-count').textContent = count; 
-    }
-
-    // FUNCION DE EXPORTACION ACTUALIZADA PARA QRZ Y DATOS COMPLETOS
-    function exportADIF(type = 'standard') {
-        if(qsoList.length === 0) return alert("No hay registros para exportar.");
-        
-        let adi = `ADIF Export - NEON LOG STATION v5.4.1\n`;
-        adi += `<PROGRAMID:12>NEONLOGSTN54\n<ADIF_VER:5>3.1.4\n<EOH>\n\n`;
-
+    // EXPORT ADIF MEJORADO: incluye GRIDSQUARE, TX_PWR, MY_GRIDSQUARE, QSO_DATE_OFF/TIME_OFF, STATION_CALLSIGN
+    function exportADIF(type) {
+        if(qsoList.length === 0) return alert("No hay QSOs para exportar");
+        let adi = `ADIF Export from Neon Log v5.5.0 (ADIF Master style)\n<PROGRAMID:12>NEONLOGSTN55\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
         qsoList.forEach(q => {
-            // Datos del QSO (Corresponsal)
+            const myCall = opData.call || "NOCALL";
+            const myGrid = opData.grid || "";
+            const bandAdif = toADIFBand(q.band);
             adi += `<CALL:${q.call.length}>${q.call}`;
-            adi += `<QSO_DATE:${q.date.length}>${q.date}`;
-            adi += `<TIME_ON:${q.time.length}>${q.time}`;
-            adi += `<BAND:${q.band.length}>${q.band}`;
+            adi += `<QSO_DATE:8>${q.date}`;
+            adi += `<TIME_ON:6>${q.time}`;
+            adi += `<QSO_DATE_OFF:8>${q.date}`;     // mismo día por defecto
+            adi += `<TIME_OFF:6>${q.time}`;
+            adi += `<BAND:${bandAdif.length}>${bandAdif}`;
             adi += `<MODE:${q.mode.length}>${q.mode}`;
             adi += `<RST_SENT:${q.rst_s.length}>${q.rst_s}`;
             adi += `<RST_RCVD:${q.rst_r.length}>${q.rst_r}`;
-            
-            if(q.email) adi += `<EMAIL:${q.email.length}>${q.email}`;
-            if(q.freq) adi += `<FREQ:${q.freq.length}>${q.freq}`;
-            if(q.comment) adi += `<COMMENT:${q.comment.length}>${q.comment}`;
-            
-            // DATOS DEL OPERADOR (TU ESTACION) - OBLIGATORIO PARA QRZ
-            if(opData.call) adi += `<STATION_CALLSIGN:${opData.call.length}>${opData.call}`;
-            if(opData.name) adi += `<OPERATOR:${opData.name.length}>${opData.name}`;
-            if(opData.name) adi += `<MY_NAME:${opData.name.length}>${opData.name}`; // Redundancia para asegurar
-            if(opData.email) adi += `<MY_EMAIL:${opData.email.length}>${opData.email}`;
-            
-            // AÑADIDO: Exportar TU Grilla
-            if(opData.grid) adi += `<MY_GRIDSQUARE:${opData.grid.length}>${opData.grid}`;
-            
+            if(q.gridsquare && q.gridsquare.length>0) adi += `<GRIDSQUARE:${q.gridsquare.length}>${q.gridsquare}`;
+            if(q.tx_pwr && q.tx_pwr.length>0) adi += `<TX_PWR:${q.tx_pwr.length}>${q.tx_pwr}`;
+            if(q.freq && q.freq.length>0) adi += `<FREQ:${q.freq.length}>${q.freq}`;
+            if(q.comment && q.comment.length>0) adi += `<COMMENT:${q.comment.length}>${q.comment}`;
+            if(q.email && q.email.length>0) adi += `<EMAIL:${q.email.length}>${q.email}`;
+            adi += `<STATION_CALLSIGN:${myCall.length}>${myCall}`;
+            if(opData.name && opData.name.length>0) { adi += `<OPERATOR:${opData.name.length}>${opData.name}`; adi += `<MY_NAME:${opData.name.length}>${opData.name}`; }
+            if(myGrid && myGrid.length>0) adi += `<MY_GRIDSQUARE:${myGrid.length}>${myGrid}`;
+            if(opData.email && opData.email.length>0) adi += `<MY_EMAIL:${opData.email.length}>${opData.email}`;
             adi += `<EOR>\n`;
         });
-
         const blob = new Blob([adi], {type: 'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        
-        // Nombre del archivo diferenciado si es para QRZ
-        if (type === 'qrz') {
-            a.download = `QRZ_IMPORT_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
-            // AQUI ESTA EL CAMBIO: Abre QRZ en una nueva pestaña
+        const dateStamp = getUTCInfo().dateRaw;
+        if(type === 'qrz') {
+            a.download = `QRZ_${opData.call || 'Station'}_${dateStamp}.adi`;
             window.open('https://www.qrz.com/logbook', '_blank');
-        } else {
-            a.download = `Log_Alfred_${opData.call || 'Station'}_${getUTCInfo().dateRaw}.adi`;
-        }
-        
+        } else { a.download = `ADIF_Log_${opData.call || 'Station'}_${dateStamp}.adi`; }
         a.click();
     }
 
-    window.onload = function() {
-        document.getElementById('op_call').value = opData.call || "";
-        document.getElementById('op_name').value = opData.name || "";
-        document.getElementById('op_grid').value = opData.grid || "";
-        document.getElementById('op_email').value = opData.email || "";
-        document.getElementById('header-op').textContent = opData.call || "---";
-        
-        updateCount();
-        updateClock();
-        renderTable();
+    // IMPORTAR ADIF: extrae campos clave, soporta GRIDSQUARE, TX_PWR, MY_GRIDSQUARE se ignora, etc.
+    async function importADIF(files) {
+        if(!files || files.length === 0) return;
+        const file = files[0];
+        const text = await file.text();
+        const records = text.split(/(?=<EOR>)/i);
+        let importedCount = 0;
+        for(let record of records) {
+            if(!record.trim() || record.includes("<EOH>")) continue;
+            const getTag = (tag) => {
+                const regex = new RegExp(`<${tag}:(\\d+)>([^<]*)`, 'i');
+                const match = record.match(regex);
+                return match ? match[2].trim() : "";
+            };
+            const call = getTag('CALL').toUpperCase();
+            if(!call) continue;
+            const qsoDate = getTag('QSO_DATE').replace(/\D/g,'');
+            const timeOn = getTag('TIME_ON').replace(/\D/g,'');
+            let date = qsoDate.length===8 ? qsoDate : getUTCInfo().dateRaw;
+            let time = timeOn.length===6 ? timeOn : getUTCInfo().timeRaw;
+            const mode = getTag('MODE').toUpperCase() || "SSB";
+            let bandRaw = getTag('BAND').toLowerCase();
+            const bandMapRev = { "40m":"40M","20m":"20M","15m":"15M","10m":"10M","6m":"6M","2m":"2M","70cm":"70CM","23cm":"23CM" };
+            let bandDisplay = bandMapRev[bandRaw] || (bandRaw.toUpperCase());
+            if(!["40M","20M","15M","10M","6M","2M","70CM","23CM"].includes(bandDisplay)) bandDisplay = "20M";
+            const freq = getTag('FREQ');
+            const rst_s = getTag('RST_SENT') || "59";
+            const rst_r = getTag('RST_RCVD') || "59";
+            const gridsquare = getTag('GRIDSQUARE').toUpperCase();
+            const tx_pwr = getTag('TX_PWR');
+            const comment = getTag('COMMENT');
+            const email = getTag('EMAIL');
+            const newId = Date.now() + Math.random() * 10000 + importedCount;
+            const newQSO = {
+                id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode,
+                rst_s, rst_r, date, time, email, comment
+            };
+            qsoList.unshift(newQSO);
+            importedCount++;
+        }
+        if(importedCount>0) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
+            updateCount();
+            renderTable();
+            alert(`Importación completada: ${importedCount} QSOs añadidos (con Grid/Power si estaban presentes)`);
+            togglePanel('panel-table', 'btn-table');
+        } else { alert("No se encontraron registros ADIF válidos en el archivo."); }
+        document.getElementById('file-import').value = '';
     }
 </script>
 </body>
 </html>
+```
