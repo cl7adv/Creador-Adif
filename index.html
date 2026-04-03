@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Neon Log Station v5.5.0 - ADIF Master Style | CL7ADV</title>
+    <title>Neon Log Station v5.6.0 - UTC Dual Mode | CL7ADV</title>
     <style>
         :root {
             --bg-dark: #050a14;
@@ -160,6 +159,7 @@
             transition: 0.3s;
         }
         input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+        input:disabled { opacity: 0.6; background: #1a1f2e; cursor: not-allowed; }
 
         .btn {
             padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer;
@@ -169,6 +169,7 @@
         .btn-pink { background: var(--neon-pink); color: #fff; }
         .btn-green { background: var(--neon-green); color: #000; }
         .btn-cyan { background: var(--neon-cyan); color: #000; }
+        .btn-small { padding: 6px 12px; font-size: 0.7rem; }
 
         .qrz-input-wrapper { display: flex; gap: 6px; }
         .qrz-input-wrapper input { flex-grow: 1; }
@@ -187,6 +188,25 @@
             box-shadow: 0 0 10px rgba(255, 234, 0, 0.4);
         }
 
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 40px;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--neon-yellow);
+        }
+        .radio-group input { width: auto; margin: 0; transform: scale(0.9); }
+
         .table-container { width: 100%; overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; min-width: 880px; font-size: 0.8rem; }
         th { background: var(--panel-bg); color: var(--neon-yellow); text-align: left; padding: 10px; border-bottom: 2px solid var(--neon-cyan); }
@@ -204,11 +224,12 @@
         }
         .search-box { background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-green); padding: 8px; border-radius: 20px; width: 100%; }
         #file-import { display: none; }
+        .inline-help { font-size: 0.65rem; color: #aaa; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-<div class="watermark">CL7ADV-CUBA Creador ADIF </div>
+<div class="watermark">CL7ADV-CUBA Creador ADIF | Modo UTC Dual</div>
 
 <div id="intro-screen">
     <div class="sun"></div>
@@ -220,7 +241,7 @@
 
 <div id="main-content">
     <header>
-        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.5.0 | ADIF Master Ready</h1>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.6.0 | UTC Dual Mode (Actual/Manual)</h1>
         <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
         <div id="clock" class="time-display">00:00:00 UTC</div>
     </header>
@@ -236,7 +257,7 @@
             <div id="btn-clear" class="menu-item" onclick="clearLogs()"><span class="number">ⓘ</span><i>🗑️</i><span>Limpiar</span></div>
         </div>
 
-        <!-- PANEL OPERADOR (MY STATION) -->
+        <!-- PANEL OPERADOR -->
         <div id="panel-op" class="log-entry-panel">
             <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">Ajustes de Estación (MY_GRIDSQUARE / STATION_CALLSIGN)</h3>
             <div class="form-row">
@@ -249,10 +270,22 @@
             </div>
         </div>
 
-        <!-- PANEL NUEVO/EDITAR QSO - MEJORADO CON GRIDSQUARE Y TX_PWR -->
+        <!-- PANEL NUEVO/EDITAR QSO - CON SELECCIÓN UTC ACTUAL / MANUAL -->
         <div id="panel-log" class="log-entry-panel active-panel">
             <h3 id="panel-title" style="color: var(--neon-pink); margin-bottom: 15px;">Registro de Contacto (estilo ADIF Master)</h3>
             <input type="hidden" id="edit_id">
+            
+            <!-- Selector dual: UTC actual o manual -->
+            <div class="radio-group" style="margin-bottom: 15px;">
+                <label style="display: flex; align-items: center;">
+                    <input type="radio" name="utc_mode" value="actual" checked> ⚡ UTC Actual (tiempo real)
+                </label>
+                <label style="display: flex; align-items: center;">
+                    <input type="radio" name="utc_mode" value="manual"> ✏️ UTC Manual (editable)
+                </label>
+                <button type="button" class="btn-small btn-cyan" id="fillCurrentBtn" style="margin-left: auto; padding: 5px 12px;">📌 Rellenar con hora actual</button>
+            </div>
+
             <div class="form-row">
                 <div class="form-group" style="grid-column: span 2;">
                     <label>Callsign Corresponsal</label>
@@ -270,8 +303,8 @@
                 <div class="form-group"><label>Modo</label><input list="modes" id="mode" placeholder="FT8/SSB"><datalist id="modes"><option value="SSB"><option value="FM"><option value="CW"><option value="FT8"><option value="FT4"><option value="Digital Voice"><option value="DMR"><option value="RTTY"></datalist></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Fecha UTC (AAAA/MM/DD)</label><input type="text" id="manual_date" placeholder="Auto UTC"></div>
-                <div class="form-group"><label>Hora UTC (HH:MM:SS)</label><input type="text" id="manual_time" placeholder="Auto UTC"></div>
+                <div class="form-group"><label>📅 Fecha UTC (AAAA/MM/DD)</label><input type="text" id="manual_date" placeholder="Ej: 2026/04/03" disabled></div>
+                <div class="form-group"><label>⏱️ Hora UTC (HH:MM:SS)</label><input type="text" id="manual_time" placeholder="Ej: 14:30:00" disabled></div>
                 <div class="form-group"><label>RST Sent</label><input type="text" id="rst_s" value="59"></div>
                 <div class="form-group"><label>RST Rcvd</label><input type="text" id="rst_r" value="59"></div>
             </div>
@@ -283,9 +316,10 @@
                 <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex: 2;">💾 Guardar Registro</button>
                 <button id="cancel-edit" class="btn btn-cyan" onclick="resetForm()" style="flex: 1; display: none;">Cancelar</button>
             </div>
+            <div class="inline-help" style="margin-top: 10px;">💡 <strong>Modo UTC Actual</strong>: usa la hora del sistema en tiempo real. <strong>Modo Manual</strong>: puedes editar fecha/hora libremente (formato flexible).</div>
         </div>
 
-        <!-- PANEL TABLA LIBRO - AÑADIMOS COLUMNAS GRIDSQUARE Y TX_PWR -->
+        <!-- PANEL TABLA LIBRO -->
         <div id="panel-table" class="log-entry-panel">
             <h3 style="color: var(--neon-cyan); margin-bottom: 10px;">Libro de Guardia (con Grid y Potencia)</h3>
             <input type="text" id="search" class="search-box" placeholder="🔎 Filtrar por indicativo..." oninput="renderTable()" style="margin-bottom:15px;">
@@ -301,8 +335,8 @@
 <input type="file" id="file-import" accept=".adi,.txt" style="display:none" onchange="importADIF(this.files)">
 
 <script>
-    const STORAGE_KEY = 'cl7adv_logs_v5_5_0';
-    const OP_KEY = 'cl7adv_operator_v5_5_0';
+    const STORAGE_KEY = 'cl7adv_logs_v5_6_0';
+    const OP_KEY = 'cl7adv_operator_v5_6_0';
     let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
@@ -318,7 +352,109 @@
         loadOperatorUI();
         updateCount();
         renderTable();
+        initUTCModeToggle();   // Configurar los radios y botón
     });
+
+    // ----- LÓGICA DUAL UTC (ACTUAL / MANUAL) -----
+    function initUTCModeToggle() {
+        const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
+        const radioManual = document.querySelector('input[name="utc_mode"][value="manual"]');
+        const dateField = document.getElementById('manual_date');
+        const timeField = document.getElementById('manual_time');
+        const fillBtn = document.getElementById('fillCurrentBtn');
+
+        function updateFieldsState() {
+            const isManual = radioManual.checked;
+            dateField.disabled = !isManual;
+            timeField.disabled = !isManual;
+            if (!isManual) {
+                // Modo actual: limpiar campos manuales visualmente pero no borramos valores guardados (se ignoran al guardar)
+                dateField.placeholder = "Auto UTC";
+                timeField.placeholder = "Auto UTC";
+            } else {
+                dateField.placeholder = "AAAA/MM/DD o AAAA-MM-DD";
+                timeField.placeholder = "HH:MM:SS o HHMMSS";
+            }
+        }
+
+        radioActual.addEventListener('change', updateFieldsState);
+        radioManual.addEventListener('change', updateFieldsState);
+        updateFieldsState();
+
+        // Botón para rellenar campos manuales con la hora UTC actual (útil cuando está en modo manual)
+        fillBtn.addEventListener('click', () => {
+            if (!radioManual.checked) {
+                // Cambiar a modo manual automáticamente para comodidad
+                radioManual.checked = true;
+                updateFieldsState();
+            }
+            const nowUTC = getUTCInfo();
+            dateField.value = nowUTC.dateFormatted;   // YYYY/MM/DD
+            timeField.value = nowUTC.timeFormatted;    // HH:MM:SS
+        });
+    }
+
+    // Funciones robustas para parsear fecha/hora manual
+    function parseFlexibleDate(dateStr) {
+        if (!dateStr || dateStr.trim() === "") return null;
+        let cleaned = dateStr.trim();
+        // Reemplazar guiones, barras o puntos por separador uniforme
+        let parts = cleaned.split(/[\/\-\.]/);
+        if (parts.length === 3) {
+            let year, month, day;
+            // Si el primer segmento tiene 4 dígitos asumimos AAAA/MM/DD
+            if (parts[0].length === 4) {
+                year = parts[0];
+                month = parts[1].padStart(2,'0');
+                day = parts[2].padStart(2,'0');
+            } 
+            // Formato DD/MM/AAAA (europeo) -> convertir a AAAA/MM/DD para UTC
+            else if (parts[2].length === 4) {
+                year = parts[2];
+                month = parts[1].padStart(2,'0');
+                day = parts[0].padStart(2,'0');
+            } else {
+                return null;
+            }
+            let numYear = parseInt(year,10);
+            let numMonth = parseInt(month,10);
+            let numDay = parseInt(day,10);
+            if (numYear < 1970 || numYear > 2150) return null;
+            if (numMonth < 1 || numMonth > 12) return null;
+            if (numDay < 1 || numDay > 31) return null;
+            return `${year}${month}${day}`;
+        }
+        // Si es solo números: YYYYMMDD
+        let digits = cleaned.replace(/\D/g, '');
+        if (digits.length === 8) return digits;
+        return null;
+    }
+
+    function parseFlexibleTime(timeStr) {
+        if (!timeStr || timeStr.trim() === "") return null;
+        let cleaned = timeStr.trim();
+        let digits = cleaned.replace(/\D/g, '');
+        if (digits.length === 6) return digits;
+        if (digits.length === 4) {
+            // HHMM -> asumimos segundos 00
+            return digits + "00";
+        }
+        if (digits.length === 2) {
+            // solo hora -> HH0000
+            return digits + "0000";
+        }
+        // Intentar con formato HH:MM:SS
+        let match = cleaned.match(/(\d{1,2}):(\d{1,2}):?(\d{0,2})/);
+        if (match) {
+            let hh = match[1].padStart(2,'0');
+            let mm = match[2].padStart(2,'0');
+            let ss = match[3] ? match[3].padStart(2,'0') : "00";
+            if (parseInt(hh,10) <= 23 && parseInt(mm,10) <= 59 && parseInt(ss,10) <= 59) {
+                return `${hh}${mm}${ss}`;
+            }
+        }
+        return null;
+    }
 
     function getUTCInfo() {
         const now = new Date();
@@ -357,17 +493,44 @@
     }
     function checkQRZ() { const call = document.getElementById('call').value.trim().toUpperCase(); if(call) window.open(`https://www.qrz.com/db/${call}`, '_blank'); else alert("Introduce un indicativo"); }
 
+    // NUEVO: Guardar respetando modo UTC actual o manual
     function saveQSO() {
         const call = document.getElementById('call').value.trim().toUpperCase();
         if(!call) return alert("Indicativo requerido");
-        const utc = getUTCInfo();
         const editId = document.getElementById('edit_id').value;
-        let rawDate = document.getElementById('manual_date').value.trim();
-        let rawTime = document.getElementById('manual_time').value.trim();
-        let finalDate = rawDate === "" ? utc.dateRaw : rawDate.replace(/\D/g, '').substring(0,8);
-        let finalTime = rawTime === "" ? utc.timeRaw : rawTime.replace(/\D/g, '').substring(0,6);
-        if(finalDate.length !== 8) finalDate = utc.dateRaw;
-        if(finalTime.length !== 6) finalTime = utc.timeRaw;
+        const utcMode = document.querySelector('input[name="utc_mode"]:checked').value;
+        
+        let finalDate, finalTime;
+        if (utcMode === 'actual') {
+            const autoUTC = getUTCInfo();
+            finalDate = autoUTC.dateRaw;
+            finalTime = autoUTC.timeRaw;
+        } else {
+            // Modo manual: parsear campos
+            const rawDate = document.getElementById('manual_date').value.trim();
+            const rawTime = document.getElementById('manual_time').value.trim();
+            let parsedDate = null, parsedTime = null;
+            if (rawDate !== "") parsedDate = parseFlexibleDate(rawDate);
+            if (rawTime !== "") parsedTime = parseFlexibleTime(rawTime);
+            
+            if (rawDate !== "" && !parsedDate) {
+                alert("Formato de fecha inválido. Usa AAAA/MM/DD, AAAA-MM-DD o DD/MM/AAAA (ej: 2025/12/31)");
+                return;
+            }
+            if (rawTime !== "" && !parsedTime) {
+                alert("Formato de hora inválido. Ejemplos: 14:30:00 , 143000 , 14:30");
+                return;
+            }
+            finalDate = parsedDate || getUTCInfo().dateRaw;
+            finalTime = parsedTime || getUTCInfo().timeRaw;
+            // Si el usuario dejó vacío alguno, usamos UTC actual pero con advertencia sutil
+            if (rawDate === "") console.log("Fecha vacía en modo manual -> usando UTC actual");
+            if (rawTime === "") console.log("Hora vacía en modo manual -> usando UTC actual");
+        }
+        
+        // Validación final de formato largo
+        if (finalDate.length !== 8) finalDate = getUTCInfo().dateRaw;
+        if (finalTime.length !== 6) finalTime = getUTCInfo().timeRaw;
         
         const qso = {
             id: editId ? parseInt(editId) : Date.now(),
@@ -392,7 +555,7 @@
         resetForm();
         updateCount();
         if(editId) togglePanel('panel-table', 'btn-table');
-        else alert("QSO guardado con Grid, PWR y campos ADIF");
+        else alert("QSO guardado con sistema dual UTC (Actual o Manual según selección)");
     }
 
     function resetForm() {
@@ -411,13 +574,19 @@
         document.getElementById('panel-title').style.color = "var(--neon-pink)";
         document.getElementById('save-btn').textContent = "💾 Guardar Registro";
         document.getElementById('cancel-edit').style.display = "none";
+        // Restablecer selector a modo "UTC Actual" por defecto (mejor para nuevos registros)
+        const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
+        if (radioActual) radioActual.checked = true;
+        // Disparar cambio de estado para deshabilitar campos manuales
+        const event = new Event('change');
+        radioActual.dispatchEvent(event);
     }
 
     function editQSO(id) {
         const q = qsoList.find(item => item.id === id);
         if (!q) return;
-        const vDate = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
-        const vTime = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
+        const vDateFormatted = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
+        const vTimeFormatted = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
         document.getElementById('edit_id').value = q.id;
         document.getElementById('call').value = q.call;
         document.getElementById('gridsquare').value = q.gridsquare || "";
@@ -427,14 +596,19 @@
         document.getElementById('mode').value = q.mode;
         document.getElementById('rst_s').value = q.rst_s;
         document.getElementById('rst_r').value = q.rst_r;
-        document.getElementById('manual_date').value = vDate;
-        document.getElementById('manual_time').value = vTime;
+        document.getElementById('manual_date').value = vDateFormatted;
+        document.getElementById('manual_time').value = vTimeFormatted;
         document.getElementById('email').value = q.email || "";
         document.getElementById('comment').value = q.comment || "";
         document.getElementById('panel-title').textContent = "Editando Registro (ADIF Full)";
         document.getElementById('panel-title').style.color = "var(--neon-cyan)";
         document.getElementById('save-btn').textContent = "✅ Actualizar Registro";
         document.getElementById('cancel-edit').style.display = "block";
+        // Cambiar modo a "Manual" para reflejar la fecha/hora existente y permitir edición
+        const radioManual = document.querySelector('input[name="utc_mode"][value="manual"]');
+        if (radioManual) radioManual.checked = true;
+        const changeEvent = new Event('change');
+        radioManual.dispatchEvent(changeEvent);
         togglePanel('panel-log', 'btn-log');
     }
 
@@ -469,16 +643,14 @@
     function clearLogs() { if(confirm("BORRAR TODOS LOS REGISTROS?")) { qsoList = []; localStorage.setItem(STORAGE_KEY, JSON.stringify([])); updateCount(); renderTable(); alert("Log vaciado"); } }
     function updateCount() { document.getElementById('header-count').textContent = qsoList.length; }
 
-    // Conversión de banda visible (40M) a ADIF estándar (40m)
     function toADIFBand(bandDisplay) {
         const map = { "40M":"40m", "20M":"20m", "15M":"15m", "10M":"10m", "6M":"6m", "2M":"2m", "70CM":"70cm", "23CM":"23cm" };
         return map[bandDisplay] || bandDisplay.toLowerCase();
     }
 
-    // EXPORT ADIF MEJORADO: incluye GRIDSQUARE, TX_PWR, MY_GRIDSQUARE, QSO_DATE_OFF/TIME_OFF, STATION_CALLSIGN
     function exportADIF(type) {
         if(qsoList.length === 0) return alert("No hay QSOs para exportar");
-        let adi = `ADIF Export from Neon Log v5.5.0 (ADIF Master style)\n<PROGRAMID:12>NEONLOGSTN55\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+        let adi = `ADIF Export from Neon Log v5.6.0 (UTC Dual)\n<PROGRAMID:15>NEONLOGSTN56\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
         qsoList.forEach(q => {
             const myCall = opData.call || "NOCALL";
             const myGrid = opData.grid || "";
@@ -486,7 +658,7 @@
             adi += `<CALL:${q.call.length}>${q.call}`;
             adi += `<QSO_DATE:8>${q.date}`;
             adi += `<TIME_ON:6>${q.time}`;
-            adi += `<QSO_DATE_OFF:8>${q.date}`;     // mismo día por defecto
+            adi += `<QSO_DATE_OFF:8>${q.date}`;
             adi += `<TIME_OFF:6>${q.time}`;
             adi += `<BAND:${bandAdif.length}>${bandAdif}`;
             adi += `<MODE:${q.mode.length}>${q.mode}`;
@@ -507,14 +679,11 @@
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         const dateStamp = getUTCInfo().dateRaw;
-        if(type === 'qrz') {
-            a.download = `QRZ_${opData.call || 'Station'}_${dateStamp}.adi`;
-            window.open('https://www.qrz.com/logbook', '_blank');
-        } else { a.download = `ADIF_Log_${opData.call || 'Station'}_${dateStamp}.adi`; }
+        if(type === 'qrz') { a.download = `QRZ_${opData.call || 'Station'}_${dateStamp}.adi`; window.open('https://www.qrz.com/logbook', '_blank'); } 
+        else { a.download = `ADIF_Log_${opData.call || 'Station'}_${dateStamp}.adi`; }
         a.click();
     }
 
-    // IMPORTAR ADIF: extrae campos clave, soporta GRIDSQUARE, TX_PWR, MY_GRIDSQUARE se ignora, etc.
     async function importADIF(files) {
         if(!files || files.length === 0) return;
         const file = files[0];
@@ -523,11 +692,7 @@
         let importedCount = 0;
         for(let record of records) {
             if(!record.trim() || record.includes("<EOH>")) continue;
-            const getTag = (tag) => {
-                const regex = new RegExp(`<${tag}:(\\d+)>([^<]*)`, 'i');
-                const match = record.match(regex);
-                return match ? match[2].trim() : "";
-            };
+            const getTag = (tag) => { const regex = new RegExp(`<${tag}:(\\d+)>([^<]*)`, 'i'); const match = record.match(regex); return match ? match[2].trim() : ""; };
             const call = getTag('CALL').toUpperCase();
             if(!call) continue;
             const qsoDate = getTag('QSO_DATE').replace(/\D/g,'');
@@ -547,20 +712,12 @@
             const comment = getTag('COMMENT');
             const email = getTag('EMAIL');
             const newId = Date.now() + Math.random() * 10000 + importedCount;
-            const newQSO = {
-                id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode,
-                rst_s, rst_r, date, time, email, comment
-            };
+            const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode, rst_s, rst_r, date, time, email, comment };
             qsoList.unshift(newQSO);
             importedCount++;
         }
-        if(importedCount>0) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
-            updateCount();
-            renderTable();
-            alert(`Importación completada: ${importedCount} QSOs añadidos (con Grid/Power si estaban presentes)`);
-            togglePanel('panel-table', 'btn-table');
-        } else { alert("No se encontraron registros ADIF válidos en el archivo."); }
+        if(importedCount>0) { localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList)); updateCount(); renderTable(); alert(`Importación completada: ${importedCount} QSOs añadidos`); togglePanel('panel-table', 'btn-table'); } 
+        else { alert("No se encontraron registros ADIF válidos."); }
         document.getElementById('file-import').value = '';
     }
 </script>
