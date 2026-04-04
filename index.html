@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Neon Log Station v5.6.0 - UTC Dual Mode | CL7ADV</title>
+    <title>Neon Log Station v5.7.0 - ADIF Pro | CL7ADV</title>
     <style>
         :root {
             --bg-dark: #050a14;
@@ -229,7 +229,7 @@
 </head>
 <body>
 
-<div class="watermark">CL7ADV-CUBA Creador ADIF | Modo UTC Dual</div>
+<div class="watermark">CL7ADV-CUBA Creador ADIF | Modo UTC Dual | Modos ADIF Normalizados</div>
 
 <div id="intro-screen">
     <div class="sun"></div>
@@ -241,7 +241,7 @@
 
 <div id="main-content">
     <header>
-        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.6.0 | UTC Dual Mode (Actual/Manual)</h1>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.7.0 | UTC Dual + Modos ADIF Pro (DIGITALVOICE unido)</h1>
         <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
         <div id="clock" class="time-display">00:00:00 UTC</div>
     </header>
@@ -300,7 +300,7 @@
             <div class="form-row">
                 <div class="form-group"><label>Frecuencia (MHz)</label><input type="text" id="freq" placeholder="7.074"></div>
                 <div class="form-group"><label>Banda</label><select id="band"><option value="40M">40M</option><option value="20M">20M</option><option value="15M">15M</option><option value="10M">10M</option><option value="6M">6M</option><option value="2M">2M</option><option value="70CM">70CM</option><option value="23CM">23CM</option></select></div>
-                <div class="form-group"><label>Modo</label><input list="modes" id="mode" placeholder="FT8/SSB"><datalist id="modes"><option value="SSB"><option value="FM"><option value="CW"><option value="FT8"><option value="FT4"><option value="Digital Voice"><option value="DMR"><option value="RTTY"></datalist></div>
+                <div class="form-group"><label>Modo</label><input list="modes" id="mode" placeholder="FT8/SSB/Digital Voice"><datalist id="modes"><option value="SSB"><option value="FM"><option value="CW"><option value="FT8"><option value="FT4"><option value="Digital Voice"><option value="DIGITALVOICE"><option value="DMR"><option value="DSTAR"><option value="RTTY"></datalist></div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>📅 Fecha UTC (AAAA/MM/DD)</label><input type="text" id="manual_date" placeholder="Ej: 2026/04/03" disabled></div>
@@ -316,7 +316,7 @@
                 <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex: 2;">💾 Guardar Registro</button>
                 <button id="cancel-edit" class="btn btn-cyan" onclick="resetForm()" style="flex: 1; display: none;">Cancelar</button>
             </div>
-            <div class="inline-help" style="margin-top: 10px;">💡 <strong>Modo UTC Actual</strong>: usa la hora del sistema en tiempo real. <strong>Modo Manual</strong>: puedes editar fecha/hora libremente (formato flexible).</div>
+            <div class="inline-help" style="margin-top: 10px;">💡 <strong>Modo UTC Actual</strong>: usa la hora del sistema en tiempo real. <strong>Modo Manual</strong>: puedes editar fecha/hora libremente. <strong>Modos ADIF</strong>: "Digital Voice" se exportará como DIGITALVOICE (unido) para máxima compatibilidad QRZ.</div>
         </div>
 
         <!-- PANEL TABLA LIBRO -->
@@ -335,11 +335,28 @@
 <input type="file" id="file-import" accept=".adi,.txt" style="display:none" onchange="importADIF(this.files)">
 
 <script>
-    const STORAGE_KEY = 'cl7adv_logs_v5_6_0';
-    const OP_KEY = 'cl7adv_operator_v5_6_0';
+    const STORAGE_KEY = 'cl7adv_logs_v5_7_0';
+    const OP_KEY = 'cl7adv_operator_v5_7_0';
     let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
+    // ========== NORMALIZACIÓN DE MODOS PARA ADIF (CORRECCIÓN CLAVE: DIGITALVOICE UNIDO) ==========
+    function normalizeModeForADIF(rawMode) {
+        if (!rawMode) return "SSB";
+        let mode = rawMode.trim().toUpperCase();
+        // Mapeo especial: cualquier variante de "Digital Voice" (con o sin espacio, guión) se convierte a DIGITALVOICE
+        // También cubre "DIGITALVOICE", "DIGITAL VOICE", "DIGITAL-VOICE"
+        if (mode.replace(/[ -]/g, '') === "DIGITALVOICE") {
+            return "DIGITALVOICE";
+        }
+        // Para otros modos comunes, aseguramos mayúsculas y eliminamos espacios extra si los tuvieran (ejemplo: "FUSION" no se toca)
+        // Pero dejamos modos como "SSB", "FM", "CW", "FT8", "FT4", "DMR", "DSTAR" intactos en mayúsculas.
+        // Si el modo tiene espacios y no es digitalvoice, lo compactamos? No, mejor mantener estándar ADIF conocido.
+        // Por ejemplo "DATA" no es necesario.
+        return mode;
+    }
+
+    // ========== FUNCIONES UTC Y RELOJ ==========
     window.addEventListener('load', () => {
         setTimeout(() => {
             const intro = document.getElementById('intro-screen');
@@ -352,10 +369,9 @@
         loadOperatorUI();
         updateCount();
         renderTable();
-        initUTCModeToggle();   // Configurar los radios y botón
+        initUTCModeToggle();
     });
 
-    // ----- LÓGICA DUAL UTC (ACTUAL / MANUAL) -----
     function initUTCModeToggle() {
         const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
         const radioManual = document.querySelector('input[name="utc_mode"][value="manual"]');
@@ -368,7 +384,6 @@
             dateField.disabled = !isManual;
             timeField.disabled = !isManual;
             if (!isManual) {
-                // Modo actual: limpiar campos manuales visualmente pero no borramos valores guardados (se ignoran al guardar)
                 dateField.placeholder = "Auto UTC";
                 timeField.placeholder = "Auto UTC";
             } else {
@@ -381,50 +396,38 @@
         radioManual.addEventListener('change', updateFieldsState);
         updateFieldsState();
 
-        // Botón para rellenar campos manuales con la hora UTC actual (útil cuando está en modo manual)
         fillBtn.addEventListener('click', () => {
             if (!radioManual.checked) {
-                // Cambiar a modo manual automáticamente para comodidad
                 radioManual.checked = true;
                 updateFieldsState();
             }
             const nowUTC = getUTCInfo();
-            dateField.value = nowUTC.dateFormatted;   // YYYY/MM/DD
-            timeField.value = nowUTC.timeFormatted;    // HH:MM:SS
+            dateField.value = nowUTC.dateFormatted;
+            timeField.value = nowUTC.timeFormatted;
         });
     }
 
-    // Funciones robustas para parsear fecha/hora manual
     function parseFlexibleDate(dateStr) {
         if (!dateStr || dateStr.trim() === "") return null;
         let cleaned = dateStr.trim();
-        // Reemplazar guiones, barras o puntos por separador uniforme
         let parts = cleaned.split(/[\/\-\.]/);
         if (parts.length === 3) {
             let year, month, day;
-            // Si el primer segmento tiene 4 dígitos asumimos AAAA/MM/DD
             if (parts[0].length === 4) {
                 year = parts[0];
                 month = parts[1].padStart(2,'0');
                 day = parts[2].padStart(2,'0');
-            } 
-            // Formato DD/MM/AAAA (europeo) -> convertir a AAAA/MM/DD para UTC
-            else if (parts[2].length === 4) {
+            } else if (parts[2].length === 4) {
                 year = parts[2];
                 month = parts[1].padStart(2,'0');
                 day = parts[0].padStart(2,'0');
-            } else {
-                return null;
-            }
-            let numYear = parseInt(year,10);
-            let numMonth = parseInt(month,10);
-            let numDay = parseInt(day,10);
+            } else { return null; }
+            let numYear = parseInt(year,10), numMonth = parseInt(month,10), numDay = parseInt(day,10);
             if (numYear < 1970 || numYear > 2150) return null;
             if (numMonth < 1 || numMonth > 12) return null;
             if (numDay < 1 || numDay > 31) return null;
             return `${year}${month}${day}`;
         }
-        // Si es solo números: YYYYMMDD
         let digits = cleaned.replace(/\D/g, '');
         if (digits.length === 8) return digits;
         return null;
@@ -435,23 +438,12 @@
         let cleaned = timeStr.trim();
         let digits = cleaned.replace(/\D/g, '');
         if (digits.length === 6) return digits;
-        if (digits.length === 4) {
-            // HHMM -> asumimos segundos 00
-            return digits + "00";
-        }
-        if (digits.length === 2) {
-            // solo hora -> HH0000
-            return digits + "0000";
-        }
-        // Intentar con formato HH:MM:SS
+        if (digits.length === 4) return digits + "00";
+        if (digits.length === 2) return digits + "0000";
         let match = cleaned.match(/(\d{1,2}):(\d{1,2}):?(\d{0,2})/);
         if (match) {
-            let hh = match[1].padStart(2,'0');
-            let mm = match[2].padStart(2,'0');
-            let ss = match[3] ? match[3].padStart(2,'0') : "00";
-            if (parseInt(hh,10) <= 23 && parseInt(mm,10) <= 59 && parseInt(ss,10) <= 59) {
-                return `${hh}${mm}${ss}`;
-            }
+            let hh = match[1].padStart(2,'0'), mm = match[2].padStart(2,'0'), ss = match[3] ? match[3].padStart(2,'0') : "00";
+            if (parseInt(hh,10) <= 23 && parseInt(mm,10) <= 59 && parseInt(ss,10) <= 59) return `${hh}${mm}${ss}`;
         }
         return null;
     }
@@ -493,7 +485,6 @@
     }
     function checkQRZ() { const call = document.getElementById('call').value.trim().toUpperCase(); if(call) window.open(`https://www.qrz.com/db/${call}`, '_blank'); else alert("Introduce un indicativo"); }
 
-    // NUEVO: Guardar respetando modo UTC actual o manual
     function saveQSO() {
         const call = document.getElementById('call').value.trim().toUpperCase();
         if(!call) return alert("Indicativo requerido");
@@ -506,29 +497,16 @@
             finalDate = autoUTC.dateRaw;
             finalTime = autoUTC.timeRaw;
         } else {
-            // Modo manual: parsear campos
             const rawDate = document.getElementById('manual_date').value.trim();
             const rawTime = document.getElementById('manual_time').value.trim();
             let parsedDate = null, parsedTime = null;
             if (rawDate !== "") parsedDate = parseFlexibleDate(rawDate);
             if (rawTime !== "") parsedTime = parseFlexibleTime(rawTime);
-            
-            if (rawDate !== "" && !parsedDate) {
-                alert("Formato de fecha inválido. Usa AAAA/MM/DD, AAAA-MM-DD o DD/MM/AAAA (ej: 2025/12/31)");
-                return;
-            }
-            if (rawTime !== "" && !parsedTime) {
-                alert("Formato de hora inválido. Ejemplos: 14:30:00 , 143000 , 14:30");
-                return;
-            }
+            if (rawDate !== "" && !parsedDate) { alert("Formato de fecha inválido. Usa AAAA/MM/DD, AAAA-MM-DD o DD/MM/AAAA"); return; }
+            if (rawTime !== "" && !parsedTime) { alert("Formato de hora inválido. Ej: 14:30:00 , 143000"); return; }
             finalDate = parsedDate || getUTCInfo().dateRaw;
             finalTime = parsedTime || getUTCInfo().timeRaw;
-            // Si el usuario dejó vacío alguno, usamos UTC actual pero con advertencia sutil
-            if (rawDate === "") console.log("Fecha vacía en modo manual -> usando UTC actual");
-            if (rawTime === "") console.log("Hora vacía en modo manual -> usando UTC actual");
         }
-        
-        // Validación final de formato largo
         if (finalDate.length !== 8) finalDate = getUTCInfo().dateRaw;
         if (finalTime.length !== 6) finalTime = getUTCInfo().timeRaw;
         
@@ -539,7 +517,7 @@
             tx_pwr: document.getElementById('tx_pwr').value.trim(),
             freq: document.getElementById('freq').value.trim(),
             band: document.getElementById('band').value,
-            mode: document.getElementById('mode').value.toUpperCase() || "SSB",
+            mode: document.getElementById('mode').value.trim().toUpperCase() || "SSB",  // Guardamos como mayúsculas
             rst_s: document.getElementById('rst_s').value.trim() || "59",
             rst_r: document.getElementById('rst_r').value.trim() || "59",
             date: finalDate,
@@ -555,7 +533,7 @@
         resetForm();
         updateCount();
         if(editId) togglePanel('panel-table', 'btn-table');
-        else alert("QSO guardado con sistema dual UTC (Actual o Manual según selección)");
+        else alert("QSO guardado con sistema dual UTC. Modo almacenado: " + qso.mode);
     }
 
     function resetForm() {
@@ -570,14 +548,13 @@
         document.getElementById('freq').value = "";
         document.getElementById('rst_s').value = "59";
         document.getElementById('rst_r').value = "59";
+        document.getElementById('mode').value = "";
         document.getElementById('panel-title').textContent = "Registro de Contacto";
         document.getElementById('panel-title').style.color = "var(--neon-pink)";
         document.getElementById('save-btn').textContent = "💾 Guardar Registro";
         document.getElementById('cancel-edit').style.display = "none";
-        // Restablecer selector a modo "UTC Actual" por defecto (mejor para nuevos registros)
         const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
         if (radioActual) radioActual.checked = true;
-        // Disparar cambio de estado para deshabilitar campos manuales
         const event = new Event('change');
         radioActual.dispatchEvent(event);
     }
@@ -601,10 +578,8 @@
         document.getElementById('email').value = q.email || "";
         document.getElementById('comment').value = q.comment || "";
         document.getElementById('panel-title').textContent = "Editando Registro (ADIF Full)";
-        document.getElementById('panel-title').style.color = "var(--neon-cyan)";
         document.getElementById('save-btn').textContent = "✅ Actualizar Registro";
         document.getElementById('cancel-edit').style.display = "block";
-        // Cambiar modo a "Manual" para reflejar la fecha/hora existente y permitir edición
         const radioManual = document.querySelector('input[name="utc_mode"][value="manual"]');
         if (radioManual) radioManual.checked = true;
         const changeEvent = new Event('change');
@@ -648,20 +623,22 @@
         return map[bandDisplay] || bandDisplay.toLowerCase();
     }
 
+    // EXPORTADOR MEJORADO: usa normalizeModeForADIF para garantizar DIGITALVOICE unido
     function exportADIF(type) {
         if(qsoList.length === 0) return alert("No hay QSOs para exportar");
-        let adi = `ADIF Export from Neon Log v5.6.0 (UTC Dual)\n<PROGRAMID:15>NEONLOGSTN56\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+        let adi = `ADIF Export from Neon Log v5.7.0 (Modos Normalizados)\n<PROGRAMID:15>NEONLOGSTN57\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
         qsoList.forEach(q => {
             const myCall = opData.call || "NOCALL";
             const myGrid = opData.grid || "";
             const bandAdif = toADIFBand(q.band);
+            const exportMode = normalizeModeForADIF(q.mode);   // <--- CORRECCIÓN CLAVE: Modo unido "DIGITALVOICE"
             adi += `<CALL:${q.call.length}>${q.call}`;
             adi += `<QSO_DATE:8>${q.date}`;
             adi += `<TIME_ON:6>${q.time}`;
             adi += `<QSO_DATE_OFF:8>${q.date}`;
             adi += `<TIME_OFF:6>${q.time}`;
             adi += `<BAND:${bandAdif.length}>${bandAdif}`;
-            adi += `<MODE:${q.mode.length}>${q.mode}`;
+            adi += `<MODE:${exportMode.length}>${exportMode}`;
             adi += `<RST_SENT:${q.rst_s.length}>${q.rst_s}`;
             adi += `<RST_RCVD:${q.rst_r.length}>${q.rst_r}`;
             if(q.gridsquare && q.gridsquare.length>0) adi += `<GRIDSQUARE:${q.gridsquare.length}>${q.gridsquare}`;
@@ -699,8 +676,8 @@
             const timeOn = getTag('TIME_ON').replace(/\D/g,'');
             let date = qsoDate.length===8 ? qsoDate : getUTCInfo().dateRaw;
             let time = timeOn.length===6 ? timeOn : getUTCInfo().timeRaw;
-            const mode = getTag('MODE').toUpperCase() || "SSB";
-            let bandRaw = getTag('BAND').toLowerCase();
+            let modeRaw = getTag('MODE').toUpperCase() || "SSB";
+            const bandRaw = getTag('BAND').toLowerCase();
             const bandMapRev = { "40m":"40M","20m":"20M","15m":"15M","10m":"10M","6m":"6M","2m":"2M","70cm":"70CM","23cm":"23CM" };
             let bandDisplay = bandMapRev[bandRaw] || (bandRaw.toUpperCase());
             if(!["40M","20M","15M","10M","6M","2M","70CM","23CM"].includes(bandDisplay)) bandDisplay = "20M";
@@ -712,7 +689,7 @@
             const comment = getTag('COMMENT');
             const email = getTag('EMAIL');
             const newId = Date.now() + Math.random() * 10000 + importedCount;
-            const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode, rst_s, rst_r, date, time, email, comment };
+            const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode: modeRaw, rst_s, rst_r, date, time, email, comment };
             qsoList.unshift(newQSO);
             importedCount++;
         }
