@@ -308,7 +308,7 @@
                         <option value="OLIVIA">
                         <option value="DOMINO">
                         <option value="THOR">
-                        <option value="DIGITALVOICE">   <!-- Sin "estándar" -->
+                        <option value="DIGITALVOICE">
                         <option value="DV">
                         <option value="DMR">
                         <option value="DSTAR">
@@ -526,7 +526,6 @@
         if (finalDate.length !== 8) finalDate = getUTCInfo().dateRaw;
         if (finalTime.length !== 6) finalTime = getUTCInfo().timeRaw;
 
-        // Obtener modo del input (ya está en mayúsculas por el oninput)
         const mode = document.getElementById('mode').value.trim().toUpperCase();
         if (!mode) {
             alert("Por favor escribe o selecciona un modo.");
@@ -549,7 +548,6 @@
             comment: document.getElementById('comment').value.trim()
         };
 
-        // Si estamos editando (editId no vacío)
         if (editId) {
             const index = qsoList.findIndex(q => q.id === qso.id);
             if (index !== -1) {
@@ -564,7 +562,6 @@
                 alert("❌ Error: no se encontró el QSO para editar. Intenta de nuevo.");
             }
         } else {
-            // Nuevo QSO
             qsoList.unshift(qso);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
             resetForm();
@@ -716,6 +713,8 @@
             let date = qsoDate.length===8 ? qsoDate : getUTCInfo().dateRaw;
             let time = timeOn.length===6 ? timeOn : getUTCInfo().timeRaw;
             let modeRaw = getTag('MODE').toUpperCase() || "SSB";
+            // Normalizamos el modo al importar
+            const mode = normalizeModeForADIF(modeRaw);
             const bandRaw = getTag('BAND').toLowerCase();
             const bandMapRev = { "40m":"40M","20m":"20M","15m":"15M","10m":"10M","6m":"6M","2m":"2M","70cm":"70CM","23cm":"23CM" };
             let bandDisplay = bandMapRev[bandRaw] || (bandRaw.toUpperCase());
@@ -727,8 +726,9 @@
             const tx_pwr = getTag('TX_PWR');
             const comment = getTag('COMMENT');
             const email = getTag('EMAIL');
-            const newId = Date.now() + Math.random() * 10000 + importedCount;
-            const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode: modeRaw, rst_s, rst_r, date, time, email, comment };
+            // ID entero, sin decimales
+            const newId = Date.now() + importedCount;
+            const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode, rst_s, rst_r, date, time, email, comment };
             qsoList.unshift(newQSO);
             importedCount++;
         }
