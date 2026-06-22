@@ -3,46 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Neon Log Station v5.7.0 - ADIF Pro | CL7ADV</title>
+    <title>Neon Log Station v5.9.1 - ADIF Pro | CL7ADV</title>
     <style>
         :root {
-            --bg-dark: #050a14;
-            --panel-bg: #0d1b2a;
+            --bg-dark: #0b0f1a;
+            --panel-bg: #121c2e;
             --neon-cyan: #00e5ff;
-            --neon-pink: #ff007f;
-            --neon-yellow: #ffea00;
+            --neon-pink: #ff3b7f;
+            --neon-yellow: #ffd700;
             --neon-green: #00ff88;
             --text-main: #e6f1ff;
-            --card-bg: rgba(20, 33, 61, 0.9);
-            --sunrise: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #050a14 100%);
+            --card-bg: rgba(18, 30, 50, 0.92);
+            --border-glow: 0 0 12px rgba(0, 229, 255, 0.25);
+            --sunrise: linear-gradient(0deg, #ff7e5f 0%, #feb47b 50%, #0b0f1a 100%);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body, html {
             height: 100%;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
-            position: relative;
         }
-
         .watermark {
             position: fixed;
-            bottom: 15px;
-            right: 15px;
-            font-size: 0.7rem;
-            color: rgba(0, 229, 255, 0.5);
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.65rem;
+            color: rgba(0, 229, 255, 0.35);
             z-index: 3000;
             pointer-events: none;
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: bold;
-            text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Courier New', monospace;
         }
-
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +49,6 @@
             z-index: 2000;
             transition: opacity 1.5s ease, visibility 1.5s;
         }
-
         .sun {
             width: 100px; height: 100px;
             background: #fffbe6;
@@ -63,9 +57,7 @@
             margin-bottom: 20px;
             animation: pulse 3s infinite alternate;
         }
-
         @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
-
         .intro-text {
             font-size: 1.5rem;
             font-weight: bold;
@@ -75,7 +67,6 @@
             text-shadow: 0 0 20px rgba(0,0,0,0.5);
             text-align: center;
         }
-
         #main-content {
             height: 100%;
             display: flex;
@@ -83,35 +74,30 @@
             opacity: 0;
             transition: opacity 2s ease;
         }
-
         header {
-            background: rgba(13, 27, 42, 0.95);
+            background: rgba(11, 15, 26, 0.95);
             padding: 10px 15px;
             text-align: center;
             border-bottom: 2px solid var(--neon-cyan);
-            box-shadow: 0 0 15px var(--neon-cyan);
+            box-shadow: var(--border-glow);
             position: sticky; top: 0; z-index: 100;
         }
-
         .time-display {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Courier New', monospace;
             color: var(--neon-green);
             font-size: 0.9rem;
             margin-top: 5px;
         }
-
         .container { padding: 20px; max-width: 1300px; margin: 0 auto; width: 100%; flex-grow: 1; }
-
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
             gap: 12px;
             margin-bottom: 25px;
         }
-
         .menu-item {
             background: var(--panel-bg);
-            border: 1px solid #333;
+            border: 1px solid #2a3a5a;
             border-radius: 12px;
             padding: 12px 8px;
             text-align: center;
@@ -120,14 +106,14 @@
             position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             min-height: 85px;
-            opacity: 0.7;
+            opacity: 0.8;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-
-        .menu-item:hover { transform: scale(1.02); opacity: 1; border-color: var(--neon-cyan); }
+        .menu-item:hover { transform: scale(1.02); opacity: 1; border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
         .menu-item.active-item {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 10px rgba(0, 229, 255, 0.2);
-            background: #1b263b; opacity: 1; transform: translateY(-2px);
+            box-shadow: 0 0 25px var(--neon-cyan), inset 0 0 15px rgba(0, 229, 255, 0.15);
+            background: #1b2b4a; opacity: 1; transform: translateY(-2px);
         }
         .menu-item .number { position: absolute; top: 5px; left: 8px; font-size: 0.7rem; color: var(--neon-pink); font-weight: bold; }
         .menu-item i { font-size: 1.5rem; margin-bottom: 4px; color: var(--neon-yellow); }
@@ -139,34 +125,36 @@
             border-top: 3px solid var(--neon-pink);
             margin-bottom: 20px;
             display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
         }
-
         .active-panel { display: block; animation: slideUp 0.4s ease; }
-
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 15px; }
         .form-group { display: flex; flex-direction: column; margin-bottom: 8px; }
         label { font-size: 0.7rem; color: var(--neon-cyan); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
         input, select {
-            background: rgba(27, 38, 59, 0.8);
-            border: 1px solid #444;
-            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #3a4a6a;
+            color: #fff;
             padding: 10px;
             border-radius: 8px;
             outline: none;
             transition: 0.3s;
+            font-size: 0.9rem;
         }
-        input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
-        input:disabled { opacity: 0.6; background: #1a1f2e; cursor: not-allowed; }
+        input:focus, select:focus { border-color: var(--neon-green); box-shadow: 0 0 12px rgba(0,255,136,0.25); }
+        input:disabled { opacity: 0.5; background: #1a1f2e; cursor: not-allowed; }
+        select option { background: #1a2a3a; color: #fff; }
 
         .btn {
             padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer;
             font-weight: bold; text-transform: uppercase; transition: 0.3s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-pink { background: var(--neon-pink); color: #fff; }
+        .btn-pink { background: var(--neon-pink); color: #fff; box-shadow: 0 0 20px rgba(255,42,127,0.3); }
+        .btn-pink:hover { box-shadow: 0 0 30px rgba(255,42,127,0.6); transform: scale(1.02); }
         .btn-green { background: var(--neon-green); color: #000; }
         .btn-cyan { background: var(--neon-cyan); color: #000; }
         .btn-small { padding: 6px 12px; font-size: 0.7rem; }
@@ -174,7 +162,7 @@
         .qrz-input-wrapper { display: flex; gap: 6px; }
         .qrz-input-wrapper input { flex-grow: 1; }
         .btn-qrz {
-            background: #ffea00;
+            background: #ffd700;
             color: #000;
             padding: 0 14px;
             border: none;
@@ -185,17 +173,20 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            box-shadow: 0 0 10px rgba(255, 234, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            transition: 0.3s;
         }
+        .btn-qrz:hover { box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
 
         .radio-group {
             display: flex;
             gap: 20px;
             align-items: center;
             margin-bottom: 12px;
-            background: rgba(0,0,0,0.3);
-            padding: 8px 12px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 16px;
             border-radius: 40px;
+            border: 1px solid #2a3a5a;
         }
         .radio-group label {
             display: flex;
@@ -207,10 +198,10 @@
         }
         .radio-group input { width: auto; margin: 0; transform: scale(0.9); }
 
-        .table-container { width: 100%; overflow-x: auto; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .table-container { width: 100%; overflow-x: auto; background: rgba(0,0,0,0.4); border-radius: 8px; border: 1px solid #2a3a5a; }
         table { width: 100%; border-collapse: collapse; min-width: 880px; font-size: 0.8rem; }
         th { background: var(--panel-bg); color: var(--neon-yellow); text-align: left; padding: 10px; border-bottom: 2px solid var(--neon-cyan); }
-        td { padding: 8px; border-bottom: 1px solid #222; }
+        td { padding: 8px; border-bottom: 1px solid #1a2a3a; }
         tr:hover { background: rgba(0,229,255,0.05); }
         .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; transition: 0.2s; }
         .action-btn:hover { transform: scale(1.2); }
@@ -224,12 +215,12 @@
         }
         .search-box { background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-green); padding: 8px; border-radius: 20px; width: 100%; }
         #file-import { display: none; }
-        .inline-help { font-size: 0.65rem; color: #aaa; margin-top: 4px; }
+        .inline-help { font-size: 0.65rem; color: #aac; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-<div class="watermark">CL7ADV-CUBA Creador ADIF | Modo UTC Dual | Modos ADIF Normalizados</div>
+<div class="watermark">CL7ADV-CUBA | Modo UTC Dual | Modos ADIF + Personalizados</div>
 
 <div id="intro-screen">
     <div class="sun"></div>
@@ -241,7 +232,7 @@
 
 <div id="main-content">
     <header>
-        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.7.0 | UTC Dual + Modos ADIF Pro (DIGITALVOICE unido)</h1>
+        <h1 style="font-size: 1.3rem;">NEON LOG STATION v5.9.1 | UTC Dual + Modos Libres (DV → DIGITALVOICE)</h1>
         <p style="font-size: 0.8rem;">Op: <span id="header-op" style="color:var(--neon-yellow)">---</span> | <span id="header-count">0</span> QSOs registrados</p>
         <div id="clock" class="time-display">00:00:00 UTC</div>
     </header>
@@ -270,19 +261,14 @@
             </div>
         </div>
 
-        <!-- PANEL NUEVO/EDITAR QSO - CON SELECCIÓN UTC ACTUAL / MANUAL -->
+        <!-- PANEL NUEVO/EDITAR QSO -->
         <div id="panel-log" class="log-entry-panel active-panel">
             <h3 id="panel-title" style="color: var(--neon-pink); margin-bottom: 15px;">Registro de Contacto (estilo ADIF Master)</h3>
             <input type="hidden" id="edit_id">
             
-            <!-- Selector dual: UTC actual o manual -->
             <div class="radio-group" style="margin-bottom: 15px;">
-                <label style="display: flex; align-items: center;">
-                    <input type="radio" name="utc_mode" value="actual" checked> ⚡ UTC Actual (tiempo real)
-                </label>
-                <label style="display: flex; align-items: center;">
-                    <input type="radio" name="utc_mode" value="manual"> ✏️ UTC Manual (editable)
-                </label>
+                <label><input type="radio" name="utc_mode" value="actual" checked> ⚡ UTC Actual</label>
+                <label><input type="radio" name="utc_mode" value="manual"> ✏️ UTC Manual</label>
                 <button type="button" class="btn-small btn-cyan" id="fillCurrentBtn" style="margin-left: auto; padding: 5px 12px;">📌 Rellenar con hora actual</button>
             </div>
 
@@ -300,7 +286,44 @@
             <div class="form-row">
                 <div class="form-group"><label>Frecuencia (MHz)</label><input type="text" id="freq" placeholder="7.074"></div>
                 <div class="form-group"><label>Banda</label><select id="band"><option value="40M">40M</option><option value="20M">20M</option><option value="15M">15M</option><option value="10M">10M</option><option value="6M">6M</option><option value="2M">2M</option><option value="70CM">70CM</option><option value="23CM">23CM</option></select></div>
-                <div class="form-group"><label>Modo</label><input list="modes" id="mode" placeholder="FT8/SSB/Digital Voice"><datalist id="modes"><option value="SSB"><option value="FM"><option value="CW"><option value="FT8"><option value="FT4"><option value="Digital Voice"><option value="DIGITALVOICE"><option value="DMR"><option value="DSTAR"><option value="RTTY"></datalist></div>
+                <div class="form-group">
+                    <label>Modo</label>
+                    <input list="modes-list" id="mode" placeholder="Escribe o selecciona (ej: SSTV, DV, FT8)">
+                    <datalist id="modes-list">
+                        <option value="SSB">
+                        <option value="FM">
+                        <option value="CW">
+                        <option value="FT8">
+                        <option value="FT4">
+                        <option value="RTTY">
+                        <option value="PSK31">
+                        <option value="PSK63">
+                        <option value="PSK125">
+                        <option value="JT65">
+                        <option value="JT9">
+                        <option value="WSPR">
+                        <option value="SSTV">
+                        <option value="HELL">
+                        <option value="MFSK">
+                        <option value="OLIVIA">
+                        <option value="DOMINO">
+                        <option value="THOR">
+                        <option value="DIGITALVOICE">   <!-- Sin "estándar" -->
+                        <option value="DV">
+                        <option value="DMR">
+                        <option value="DSTAR">
+                        <option value="FUSION">
+                        <option value="PACKET">
+                        <option value="AX.25">
+                        <option value="FSK441">
+                        <option value="ISCAT">
+                        <option value="Q65">
+                        <option value="ROS">
+                        <option value="ATV">
+                        <option value="AM">
+                        <option value="FAX">
+                    </datalist>
+                </div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>📅 Fecha UTC (AAAA/MM/DD)</label><input type="text" id="manual_date" placeholder="Ej: 2026/04/03" disabled></div>
@@ -316,10 +339,10 @@
                 <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex: 2;">💾 Guardar Registro</button>
                 <button id="cancel-edit" class="btn btn-cyan" onclick="resetForm()" style="flex: 1; display: none;">Cancelar</button>
             </div>
-            <div class="inline-help" style="margin-top: 10px;">💡 <strong>Modo UTC Actual</strong>: usa la hora del sistema en tiempo real. <strong>Modo Manual</strong>: puedes editar fecha/hora libremente. <strong>Modos ADIF</strong>: "Digital Voice" se exportará como DIGITALVOICE (unido) para máxima compatibilidad QRZ.</div>
+            <div class="inline-help" style="margin-top: 10px;">💡 <strong>UTC Actual</strong>: tiempo real. <strong>UTC Manual</strong>: edita fecha/hora. <strong>Modo</strong>: escribe cualquier modo o selecciona de la lista. Al exportar, "DV" se convierte automáticamente a DIGITALVOICE.</div>
         </div>
 
-        <!-- PANEL TABLA LIBRO -->
+        <!-- PANEL TABLA -->
         <div id="panel-table" class="log-entry-panel">
             <h3 style="color: var(--neon-cyan); margin-bottom: 10px;">Libro de Guardia (con Grid y Potencia)</h3>
             <input type="text" id="search" class="search-box" placeholder="🔎 Filtrar por indicativo..." oninput="renderTable()" style="margin-bottom:15px;">
@@ -335,28 +358,22 @@
 <input type="file" id="file-import" accept=".adi,.txt" style="display:none" onchange="importADIF(this.files)">
 
 <script>
-    const STORAGE_KEY = 'cl7adv_logs_v5_7_0';
-    const OP_KEY = 'cl7adv_operator_v5_7_0';
+    const STORAGE_KEY = 'cl7adv_logs_v5_9_1';
+    const OP_KEY = 'cl7adv_operator_v5_9_1';
     let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
-    // ========== NORMALIZACIÓN DE MODOS PARA ADIF (CORRECCIÓN CLAVE: DIGITALVOICE UNIDO) ==========
+    // Normalización: DV → DIGITALVOICE (y variantes con espacios/guiones)
     function normalizeModeForADIF(rawMode) {
         if (!rawMode) return "SSB";
         let mode = rawMode.trim().toUpperCase();
-        // Mapeo especial: cualquier variante de "Digital Voice" (con o sin espacio, guión) se convierte a DIGITALVOICE
-        // También cubre "DIGITALVOICE", "DIGITAL VOICE", "DIGITAL-VOICE"
-        if (mode.replace(/[ -]/g, '') === "DIGITALVOICE") {
+        if (mode === "DV" || mode.replace(/[ -]/g, '') === "DIGITALVOICE") {
             return "DIGITALVOICE";
         }
-        // Para otros modos comunes, aseguramos mayúsculas y eliminamos espacios extra si los tuvieran (ejemplo: "FUSION" no se toca)
-        // Pero dejamos modos como "SSB", "FM", "CW", "FT8", "FT4", "DMR", "DSTAR" intactos en mayúsculas.
-        // Si el modo tiene espacios y no es digitalvoice, lo compactamos? No, mejor mantener estándar ADIF conocido.
-        // Por ejemplo "DATA" no es necesario.
         return mode;
     }
 
-    // ========== FUNCIONES UTC Y RELOJ ==========
+    // ========== UTC y reloj ==========
     window.addEventListener('load', () => {
         setTimeout(() => {
             const intro = document.getElementById('intro-screen');
@@ -391,7 +408,6 @@
                 timeField.placeholder = "HH:MM:SS o HHMMSS";
             }
         }
-
         radioActual.addEventListener('change', updateFieldsState);
         radioManual.addEventListener('change', updateFieldsState);
         updateFieldsState();
@@ -509,7 +525,14 @@
         }
         if (finalDate.length !== 8) finalDate = getUTCInfo().dateRaw;
         if (finalTime.length !== 6) finalTime = getUTCInfo().timeRaw;
-        
+
+        // Obtener modo del input (ya está en mayúsculas por el oninput)
+        const mode = document.getElementById('mode').value.trim().toUpperCase();
+        if (!mode) {
+            alert("Por favor escribe o selecciona un modo.");
+            return;
+        }
+
         const qso = {
             id: editId ? parseInt(editId) : Date.now(),
             call: call,
@@ -517,7 +540,7 @@
             tx_pwr: document.getElementById('tx_pwr').value.trim(),
             freq: document.getElementById('freq').value.trim(),
             band: document.getElementById('band').value,
-            mode: document.getElementById('mode').value.trim().toUpperCase() || "SSB",  // Guardamos como mayúsculas
+            mode: mode,
             rst_s: document.getElementById('rst_s').value.trim() || "59",
             rst_r: document.getElementById('rst_r').value.trim() || "59",
             date: finalDate,
@@ -525,15 +548,29 @@
             email: document.getElementById('email').value.trim(),
             comment: document.getElementById('comment').value.trim()
         };
+
+        // Si estamos editando (editId no vacío)
         if (editId) {
             const index = qsoList.findIndex(q => q.id === qso.id);
-            if (index !== -1) qsoList[index] = qso;
-        } else { qsoList.unshift(qso); }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
-        resetForm();
-        updateCount();
-        if(editId) togglePanel('panel-table', 'btn-table');
-        else alert("QSO guardado con sistema dual UTC. Modo almacenado: " + qso.mode);
+            if (index !== -1) {
+                qsoList[index] = qso;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
+                resetForm();
+                updateCount();
+                renderTable();
+                alert("✅ QSO actualizado correctamente.");
+                togglePanel('panel-table', 'btn-table');
+            } else {
+                alert("❌ Error: no se encontró el QSO para editar. Intenta de nuevo.");
+            }
+        } else {
+            // Nuevo QSO
+            qsoList.unshift(qso);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList));
+            resetForm();
+            updateCount();
+            alert("QSO guardado. Modo: " + qso.mode);
+        }
     }
 
     function resetForm() {
@@ -561,7 +598,10 @@
 
     function editQSO(id) {
         const q = qsoList.find(item => item.id === id);
-        if (!q) return;
+        if (!q) {
+            alert("❌ No se encontró el QSO con ID: " + id);
+            return;
+        }
         const vDateFormatted = q.date.replace(/(\d{4})(\d{2})(\d{2})/, "$1/$2/$3");
         const vTimeFormatted = q.time.replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3");
         document.getElementById('edit_id').value = q.id;
@@ -623,15 +663,14 @@
         return map[bandDisplay] || bandDisplay.toLowerCase();
     }
 
-    // EXPORTADOR MEJORADO: usa normalizeModeForADIF para garantizar DIGITALVOICE unido
     function exportADIF(type) {
         if(qsoList.length === 0) return alert("No hay QSOs para exportar");
-        let adi = `ADIF Export from Neon Log v5.7.0 (Modos Normalizados)\n<PROGRAMID:15>NEONLOGSTN57\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
+        let adi = `ADIF Export from Neon Log v5.9.1 (Modos Normalizados)\n<PROGRAMID:15>NEONLOGSTN59\n<ADIF_VER:5>3.1.4\n<EOH>\n`;
         qsoList.forEach(q => {
             const myCall = opData.call || "NOCALL";
             const myGrid = opData.grid || "";
             const bandAdif = toADIFBand(q.band);
-            const exportMode = normalizeModeForADIF(q.mode);   // <--- CORRECCIÓN CLAVE: Modo unido "DIGITALVOICE"
+            const exportMode = normalizeModeForADIF(q.mode);
             adi += `<CALL:${q.call.length}>${q.call}`;
             adi += `<QSO_DATE:8>${q.date}`;
             adi += `<TIME_ON:6>${q.time}`;
