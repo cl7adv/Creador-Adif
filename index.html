@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Neon Log Station v5.9.1 - ADIF Pro | CL7ADV</title>
+    <title>Neon Log Station v5.9.1 - ADIF Pro | CM7ADV</title>
     <style>
         :root {
             --bg-dark: #0b0f1a;
@@ -220,7 +220,7 @@
 </head>
 <body>
 
-<div class="watermark">CL7ADV-CUBA | Modo UTC Dual | Modos ADIF + Personalizados</div>
+<div class="watermark">CM7ADV-CUBA | Modo UTC Dual | Modos ADIF + Personalizados</div>
 
 <div id="intro-screen">
     <div class="sun"></div>
@@ -252,7 +252,7 @@
         <div id="panel-op" class="log-entry-panel">
             <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">Ajustes de Estación (MY_GRIDSQUARE / STATION_CALLSIGN)</h3>
             <div class="form-row">
-                <div class="form-group"><label>Tu Indicativo</label><input type="text" id="op_call" placeholder="CL7ADV" oninput="saveOperatorData()"></div>
+                <div class="form-group"><label>Tu Indicativo</label><input type="text" id="op_call" placeholder="CM7ADV" oninput="saveOperatorData()"></div>
                 <div class="form-group"><label>Tu Nombre</label><input type="text" id="op_name" placeholder="Alfred" oninput="saveOperatorData()"></div>
                 <div class="form-group"><label>Tu Grilla (MY_GRIDSQUARE)</label><input type="text" id="op_grid" placeholder="FL10ar" oninput="saveOperatorData()"></div>
             </div>
@@ -285,7 +285,26 @@
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Frecuencia (MHz)</label><input type="text" id="freq" placeholder="7.074"></div>
-                <div class="form-group"><label>Banda</label><select id="band"><option value="40M">40M</option><option value="20M">20M</option><option value="15M">15M</option><option value="10M">10M</option><option value="6M">6M</option><option value="2M">2M</option><option value="70CM">70CM</option><option value="23CM">23CM</option></select></div>
+                <div class="form-group"><label>Banda</label>
+                    <select id="band">
+                        <option value="160M">160M</option>
+                        <option value="80M">80M</option>
+                        <option value="60M">60M</option>
+                        <option value="40M">40M</option>
+                        <option value="30M">30M</option>
+                        <option value="20M">20M</option>
+                        <option value="17M">17M</option>
+                        <option value="15M">15M</option>
+                        <option value="12M">12M</option>
+                        <option value="10M">10M</option>
+                        <option value="6M">6M</option>
+                        <option value="4M">4M</option>
+                        <option value="2M">2M</option>
+                        <option value="70CM">70CM</option>
+                        <option value="23CM">23CM</option>
+                        <option value="1.25M">1.25M</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Modo</label>
                     <input list="modes-list" id="mode" placeholder="Escribe o selecciona (ej: SSTV, DV, FT8)">
@@ -358,8 +377,9 @@
 <input type="file" id="file-import" accept=".adi,.txt" style="display:none" onchange="importADIF(this.files)">
 
 <script>
-    const STORAGE_KEY = 'cl7adv_logs_v5_9_1';
-    const OP_KEY = 'cl7adv_operator_v5_9_1';
+    // Claves de almacenamiento actualizadas para CM7ADV
+    const STORAGE_KEY = 'cm7adv_logs_v5_9_1';
+    const OP_KEY = 'cm7adv_operator_v5_9_1';
     let qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     let opData = JSON.parse(localStorage.getItem(OP_KEY)) || { call: "", name: "", grid: "", email: "" };
 
@@ -655,9 +675,27 @@
     function clearLogs() { if(confirm("BORRAR TODOS LOS REGISTROS?")) { qsoList = []; localStorage.setItem(STORAGE_KEY, JSON.stringify([])); updateCount(); renderTable(); alert("Log vaciado"); } }
     function updateCount() { document.getElementById('header-count').textContent = qsoList.length; }
 
+    // MAPEO DE BANDAS PARA ADIF (exportación)
     function toADIFBand(bandDisplay) {
-        const map = { "40M":"40m", "20M":"20m", "15M":"15m", "10M":"10m", "6M":"6m", "2M":"2m", "70CM":"70cm", "23CM":"23cm" };
+        const map = {
+            "160M":"160m", "80M":"80m", "60M":"60m", "40M":"40m", "30M":"30m",
+            "20M":"20m", "17M":"17m", "15M":"15m", "12M":"12m", "10M":"10m",
+            "6M":"6m", "4M":"4m", "2M":"2m", "70CM":"70cm", "23CM":"23cm",
+            "1.25M":"1.25m"
+        };
         return map[bandDisplay] || bandDisplay.toLowerCase();
+    }
+
+    // MAPEO INVERSO PARA IMPORTACIÓN
+    function bandFromADIF(adifBand) {
+        const revMap = {
+            "160m":"160M", "80m":"80M", "60m":"60M", "40m":"40M", "30m":"30M",
+            "20m":"20M", "17m":"17M", "15m":"15M", "12m":"12M", "10m":"10M",
+            "6m":"6M", "4m":"4M", "2m":"2M", "70cm":"70CM", "23cm":"23CM",
+            "1.25m":"1.25M"
+        };
+        const lower = adifBand.toLowerCase();
+        return revMap[lower] || (adifBand.toUpperCase());
     }
 
     function exportADIF(type) {
@@ -713,12 +751,10 @@
             let date = qsoDate.length===8 ? qsoDate : getUTCInfo().dateRaw;
             let time = timeOn.length===6 ? timeOn : getUTCInfo().timeRaw;
             let modeRaw = getTag('MODE').toUpperCase() || "SSB";
-            // Normalizamos el modo al importar
             const mode = normalizeModeForADIF(modeRaw);
             const bandRaw = getTag('BAND').toLowerCase();
-            const bandMapRev = { "40m":"40M","20m":"20M","15m":"15M","10m":"10M","6m":"6M","2m":"2M","70cm":"70CM","23cm":"23CM" };
-            let bandDisplay = bandMapRev[bandRaw] || (bandRaw.toUpperCase());
-            if(!["40M","20M","15M","10M","6M","2M","70CM","23CM"].includes(bandDisplay)) bandDisplay = "20M";
+            let bandDisplay = bandFromADIF(bandRaw);
+            if(!["160M","80M","60M","40M","30M","20M","17M","15M","12M","10M","6M","4M","2M","70CM","23CM","1.25M"].includes(bandDisplay)) bandDisplay = "20M";
             const freq = getTag('FREQ');
             const rst_s = getTag('RST_SENT') || "59";
             const rst_r = getTag('RST_RCVD') || "59";
@@ -726,7 +762,6 @@
             const tx_pwr = getTag('TX_PWR');
             const comment = getTag('COMMENT');
             const email = getTag('EMAIL');
-            // ID entero, sin decimales
             const newId = Date.now() + importedCount;
             const newQSO = { id: newId, call, gridsquare, tx_pwr, freq, band: bandDisplay, mode, rst_s, rst_r, date, time, email, comment };
             qsoList.unshift(newQSO);
