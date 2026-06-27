@@ -216,6 +216,18 @@
         .search-box { background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-green); padding: 8px; border-radius: 20px; width: 100%; }
         #file-import { display: none; }
         .inline-help { font-size: 0.65rem; color: #aac; margin-top: 4px; }
+        /* Estilo para el panel de agradecimientos */
+        .thanks-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #f0e6d0;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--neon-yellow);
+        }
+        .thanks-text strong { color: var(--neon-yellow); }
+        .thanks-text .callsign { color: var(--neon-cyan); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -245,6 +257,8 @@
             <div id="btn-export" class="menu-item" onclick="exportADIF('standard')"><span class="number">4</span><i>💾</i><span>Exportar ADIF</span></div>
             <div id="btn-export-qrz" class="menu-item" onclick="exportADIF('qrz')"><span class="number">5</span><i>⚡</i><span>Exportar QRZ</span></div>
             <div id="btn-import" class="menu-item" onclick="document.getElementById('file-import').click()"><span class="number">6</span><i>📂</i><span>Importar ADIF</span></div>
+            <!-- NUEVO BOTÓN DE AGRADECIMIENTOS -->
+            <div id="btn-thanks" class="menu-item" onclick="togglePanel('panel-thanks', 'btn-thanks')"><span class="number">7</span><i>❤️</i><span>Agradecimientos</span></div>
             <div id="btn-clear" class="menu-item" onclick="clearLogs()"><span class="number">ⓘ</span><i>🗑️</i><span>Limpiar</span></div>
         </div>
 
@@ -334,6 +348,7 @@
                         <option value="FUSION">
                         <option value="PACKET">
                         <option value="AX.25">
+                        <option value="PKT">      <!-- NUEVO MODO PKT -->
                         <option value="FSK441">
                         <option value="ISCAT">
                         <option value="Q65">
@@ -370,6 +385,21 @@
                     <thead><tr><th>Fecha/Hora UTC</th><th>Callsign</th><th>Grid</th><th>Freq</th><th>Banda</th><th>Modo</th><th>RST</th><th>PWR(W)</th><th>Acción</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- PANEL DE AGRADECIMIENTOS -->
+        <div id="panel-thanks" class="log-entry-panel" style="border-top-color: var(--neon-yellow);">
+            <h3 style="color: var(--neon-yellow); margin-bottom: 15px;">🙏 Agradecimientos</h3>
+            <div class="thanks-text">
+                <p>Un sincero agradecimiento a mis <strong>colegas y amigos</strong> por sus valiosos consejos, apoyo y ayuda incondicional en el mundo de los radioaficionados.</p>
+                <p style="margin-top: 12px;">Menciones especiales para:</p>
+                <ul style="list-style: none; padding-left: 0; font-size: 1.1rem;">
+                    <li style="margin: 6px 0;">🔹 <span class="callsign">CO5ABC</span></li>
+                    <li style="margin: 6px 0;">🔹 <span class="callsign">CO5WE</span></li>
+                    <li style="margin: 6px 0;">🔹 <span class="callsign">LU4AGR</span></li>
+                </ul>
+                <p style="margin-top: 18px; font-style: italic; color: var(--neon-cyan);">¡Y a todos los que contribuyen a hacer de esta comunidad un lugar mejor! 73.</p>
             </div>
         </div>
     </div>
