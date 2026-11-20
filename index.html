@@ -2,792 +2,2555 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON LOG STATION v12.0 · CL7ADV Cuba</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
+<meta name="theme-color" content="#101a2b">
+<title>🌴 NEON LOG STATION v12.1 — CL7ADV Caribe Pro</title>
 <style>
-  :root {
-    --bg-deep: #071322;
-    --bg-mid: #0e1f33;
-    --bg-panel: rgba(16, 33, 54, 0.72);
-    --bg-panel-solid: #12233a;
-    --border: rgba(0, 212, 255, 0.18);
-    --border-hi: rgba(0, 212, 255, 0.45);
-    --primary: #22d3ee;
-    --primary-2: #06b6d4;
-    --primary-glow: rgba(34, 211, 238, 0.35);
-    --secondary: #f472b6;
-    --secondary-2: #ec4899;
-    --accent: #fbbf24;
-    --success: #34d399;
-    --danger: #f87171;
-    --text: #e6eef8;
-    --text-dim: #94a3b8;
-    --text-mute: #64748b;
-    --radius: 14px;
-    --radius-lg: 20px;
-    --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { min-height: 100%; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text);
-    line-height: 1.5;
-    min-height: 100vh;
+:root {
+    --bg-dark: #101a2b;
+    --panel-bg: #1c2940;
+    --card-bg: rgba(28, 41, 64, 0.92);
+    --neon-cyan: #6ec5ce;
+    --neon-pink: #e898a3;
+    --neon-yellow: #f0c56a;
+    --neon-green: #8dd4a8;
+    --neon-orange: #f0a868;
+    --neon-purple: #b8a8e0;
+    --neon-red: #e08888;
+    --text-main: #ebe0c9;
+    --text-dim: #a0b4c8;
+    --text-muted: #6a7e94;
+    --border-glow: 0 0 12px rgba(110, 197, 206, 0.2);
+    --sunrise: linear-gradient(0deg, #e8987a 0%, #f4c896 50%, #101a2b 100%);
+    --tropical: linear-gradient(135deg, #6ec5ce 0%, #8dd4a8 50%, #f0c56a 100%);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    background-color: var(--bg-dark);
     background-image:
-      radial-gradient(ellipse 80% 60% at 15% 0%, rgba(34, 211, 238, 0.13), transparent 60%),
-      radial-gradient(ellipse 70% 50% at 90% 10%, rgba(244, 114, 182, 0.10), transparent 60%),
-      radial-gradient(ellipse 90% 70% at 50% 100%, rgba(251, 191, 36, 0.07), transparent 70%),
-      linear-gradient(180deg, #071322 0%, #0a1929 50%, #071322 100%);
+        radial-gradient(ellipse at top left, rgba(110, 197, 206, 0.07), transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(232, 152, 163, 0.05), transparent 50%);
     background-attachment: fixed;
-    padding-bottom: 60px;
-  }
+    color: var(--text-main);
+    overflow-x: hidden;
+    line-height: 1.5;
+    font-size: 14px;
+    -webkit-text-size-adjust: 100%;
+}
+.watermark {
+    position: fixed; bottom: 10px; right: 10px;
+    font-size: 0.65rem; color: rgba(110, 197, 206, 0.4);
+    z-index: 3000; pointer-events: none;
+    text-transform: uppercase; letter-spacing: 2px;
+    font-weight: bold; font-family: 'Courier New', monospace;
+}
 
-  /* HEADER */
-  header {
-    padding: 22px clamp(16px, 4vw, 40px);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(10, 25, 41, 0.85), rgba(10, 25, 41, 0.4));
-    backdrop-filter: blur(12px);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .brand { display: flex; align-items: center; gap: 14px; }
-  .logo {
-    width: 46px; height: 46px; border-radius: 12px;
-    display: grid; place-items: center;
-    font-weight: 800; font-size: 22px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
-    color: #041016;
-    box-shadow: 0 0 24px var(--primary-glow);
-  }
-  .brand-text h1 {
-    font-size: 1.05rem; letter-spacing: 1.5px; font-weight: 800;
-    background: linear-gradient(90deg, var(--primary), #a5f3fc, var(--secondary));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .brand-text p {
-    font-size: 0.72rem; color: var(--text-dim);
-    letter-spacing: 2px; text-transform: uppercase;
-  }
-  .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-  /* BUTTONS */
-  .btn {
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text);
-    padding: 10px 18px; border-radius: 10px;
-    font-size: 0.85rem; font-weight: 600;
-    letter-spacing: 0.5px; cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: inherit;
-  }
-  .btn:hover {
-    border-color: var(--border-hi);
-    background: rgba(34, 211, 238, 0.08);
-    transform: translateY(-1px);
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
-    color: #041016; border: none;
-    box-shadow: 0 4px 18px var(--primary-glow);
-  }
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #67e8f9, var(--primary));
-    box-shadow: 0 6px 24px var(--primary-glow);
-  }
-  .btn-thanks {
-    background: linear-gradient(135deg, var(--secondary), var(--secondary-2));
-    color: white; border: none;
-    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.35);
-  }
-  .btn-thanks:hover {
-    background: linear-gradient(135deg, #f9a8d4, var(--secondary));
-    box-shadow: 0 6px 24px rgba(236, 72, 153, 0.55);
-    transform: translateY(-1px) scale(1.02);
-  }
-  .btn-danger { border-color: rgba(248, 113, 113, 0.4); color: var(--danger); }
-  .btn-danger:hover { background: rgba(248, 113, 113, 0.1); border-color: var(--danger); }
-  .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
-
-  /* MAIN */
-  main {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 28px clamp(16px, 4vw, 40px);
-    display: grid; gap: 24px;
-  }
-
-  /* STATS */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 14px;
-  }
-  .stat {
-    background: var(--bg-panel); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 18px 20px;
-    backdrop-filter: blur(10px);
-    position: relative; overflow: hidden;
-  }
-  .stat::before {
-    content: ''; position: absolute; top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: linear-gradient(180deg, var(--primary), var(--secondary));
-  }
-  .stat-label {
-    font-size: 0.7rem; text-transform: uppercase;
-    letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 6px;
-  }
-  .stat-value {
-    font-size: 1.85rem; font-weight: 800;
-    background: linear-gradient(90deg, var(--primary), #a5f3fc);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    line-height: 1;
-  }
-
-  /* PANEL */
-  .panel {
-    background: var(--bg-panel); border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(10px);
-    overflow: hidden; box-shadow: var(--shadow);
-  }
-  .panel-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  }
-  .panel-header h2 {
-    font-size: 0.95rem; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--text);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .panel-header h2::before {
-    content: ''; width: 8px; height: 8px;
-    border-radius: 50%; background: var(--primary);
-    box-shadow: 0 0 12px var(--primary);
-  }
-  .panel-body { padding: 22px 24px; }
-
-  /* FORM */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-  }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label {
-    font-size: 0.72rem; text-transform: uppercase;
-    letter-spacing: 1.2px; color: var(--text-dim); font-weight: 600;
-  }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 11px 14px;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text);
-    font-size: 0.9rem; font-family: inherit;
-    transition: all 0.2s ease;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
-    background: rgba(34, 211, 238, 0.05);
-  }
-  .field input::placeholder { color: var(--text-mute); }
-  .field select option { background: var(--bg-panel-solid); color: var(--text); }
-  .form-actions {
-    grid-column: 1 / -1;
-    display: flex; gap: 10px; padding-top: 6px; flex-wrap: wrap;
-  }
-
-  /* TABLE */
-  .table-wrap { overflow-x: auto; }
-  table {
-    width: 100%; border-collapse: collapse;
-    font-size: 0.85rem; min-width: 900px;
-  }
-  thead th {
-    text-align: left; padding: 12px 14px;
-    background: rgba(34, 211, 238, 0.06);
-    color: var(--text-dim); font-size: 0.7rem;
-    text-transform: uppercase; letter-spacing: 1.2px;
-    font-weight: 700; border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  tbody td {
-    padding: 12px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    white-space: nowrap;
-  }
-  tbody tr:hover { background: rgba(34, 211, 238, 0.04); }
-  .call-cell { font-weight: 700; color: var(--primary); letter-spacing: 0.5px; }
-  .badge {
-    display: inline-block; padding: 3px 10px;
-    border-radius: 6px; font-size: 0.72rem;
-    font-weight: 700; letter-spacing: 0.5px;
-  }
-  .badge-band {
-    background: rgba(251, 191, 36, 0.15);
-    color: var(--accent);
-    border: 1px solid rgba(251, 191, 36, 0.3);
-  }
-  .badge-mode {
-    background: rgba(244, 114, 182, 0.15);
-    color: var(--secondary);
-    border: 1px solid rgba(244, 114, 182, 0.3);
-  }
-  .empty { text-align: center; padding: 50px 20px; color: var(--text-mute); }
-  .empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
-  .row-actions { display: flex; gap: 6px; }
-  .icon-btn {
-    width: 30px; height: 30px; border-radius: 8px;
-    border: 1px solid var(--border);
-    background: transparent; color: var(--text-dim);
-    cursor: pointer; display: grid; place-items: center;
-    transition: all 0.15s; font-size: 0.85rem;
-  }
-  .icon-btn:hover {
-    background: rgba(34, 211, 238, 0.1);
-    color: var(--primary); border-color: var(--primary);
-  }
-  .icon-btn.danger:hover {
-    background: rgba(248, 113, 113, 0.1);
-    color: var(--danger); border-color: var(--danger);
-  }
-
-  /* MODAL */
-  .modal-backdrop {
-    display: none; position: fixed; inset: 0;
-    background: rgba(2, 8, 16, 0.75);
-    backdrop-filter: blur(6px);
-    z-index: 1000; padding: 20px; overflow-y: auto;
-  }
-  .modal-backdrop.show {
-    display: grid; place-items: center;
-    animation: fadeIn 0.2s ease;
-  }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.92) translateY(10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  .modal {
-    background: linear-gradient(160deg, #12233a, #0a1929);
-    border: 1px solid var(--border-hi);
-    border-radius: var(--radius-lg);
-    padding: 36px 32px; max-width: 520px; width: 100%;
+/* ============ INTRO ============ */
+#intro-screen {
+    position: fixed; inset: 0;
+    background: var(--sunrise);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 2000;
+    transition: opacity 1.2s ease, visibility 1.2s;
+}
+.sun {
+    width: 100px; height: 100px;
+    background: #fff4d6; border-radius: 50%;
+    box-shadow: 0 0 50px #f6c878, 0 0 100px #e8987a;
+    margin-bottom: 20px;
+    animation: sunPulse 3s infinite alternate;
+}
+@keyframes sunPulse { from { transform: scale(1); opacity: 0.85; } to { transform: scale(1.08); opacity: 1; } }
+.intro-text {
+    font-size: 1.4rem; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 5px;
+    color: white; text-shadow: 0 0 20px rgba(0,0,0,0.5);
     text-align: center;
-    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(244, 114, 182, 0.15);
-    animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative; overflow: hidden;
-  }
-  .modal::before {
-    content: ''; position: absolute; top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background:
-      radial-gradient(circle at 30% 20%, rgba(244, 114, 182, 0.15), transparent 40%),
-      radial-gradient(circle at 70% 80%, rgba(34, 211, 238, 0.12), transparent 40%);
-    pointer-events: none;
-  }
-  .modal > * { position: relative; }
-  .modal-icon {
-    font-size: 3.5rem; margin-bottom: 12px;
-    filter: drop-shadow(0 0 20px rgba(244, 114, 182, 0.5));
-  }
-  .modal h2 {
-    font-size: 1.6rem; margin-bottom: 14px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent; font-weight: 800; letter-spacing: 0.5px;
-  }
-  .modal p { color: var(--text-dim); line-height: 1.7; margin-bottom: 18px; }
-  .callsigns {
-    display: flex; justify-content: center;
-    gap: 16px; margin: 24px 0; flex-wrap: wrap;
-  }
-  .callsign-chip {
-    padding: 12px 22px;
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(244, 114, 182, 0.12));
-    border: 1px solid rgba(34, 211, 238, 0.4);
-    border-radius: 12px; font-weight: 800;
-    font-size: 1.2rem; letter-spacing: 2px;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
-  }
+}
+.intro-sub {
+    font-size: 0.8rem; letter-spacing: 2px;
+    color: #6ec5ce; margin-top: 8px;
+    text-transform: uppercase;
+}
 
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--bg-panel-solid);
-    border: 1px solid var(--border-hi);
-    color: var(--text); padding: 14px 22px;
-    border-radius: 12px; font-size: 0.9rem;
-    font-weight: 600;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-    opacity: 0; pointer-events: none;
-    transition: all 0.3s ease; z-index: 2000;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: var(--success); }
-  .toast.error { border-color: var(--danger); }
+/* ============ MAIN ============ */
+#main-content {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    opacity: 0; transition: opacity 1s ease;
+}
+header {
+    background: rgba(16, 26, 43, 0.96);
+    padding: 10px 15px;
+    border-bottom: 2px solid var(--neon-cyan);
+    box-shadow: var(--border-glow);
+    position: sticky; top: 0; z-index: 100;
+}
+.header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+}
+.header-brand { display: flex; align-items: center; gap: 10px; }
+.header-logo {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--tropical);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1em;
+    box-shadow: 0 0 12px rgba(110, 197, 206, 0.4);
+    flex-shrink: 0;
+}
+.header-title {
+    font-size: 0.95rem; font-weight: bold; letter-spacing: 1px;
+    background: var(--tropical);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.header-sub {
+    font-size: 0.68rem; color: var(--text-muted); letter-spacing: 1px;
+}
+.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.op-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px;
+    background: var(--panel-bg);
+    border: 1px solid #2f3f5a;
+    border-radius: 8px;
+    font-size: 0.75rem;
+}
+.op-badge .label { color: var(--text-muted); }
+.op-badge .value { color: var(--neon-yellow); font-weight: bold; font-family: 'Courier New', monospace; }
 
-  .search-box {
-    padding: 10px 14px;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text);
-    font-family: inherit; font-size: 0.85rem;
-    width: 220px; transition: all 0.2s;
-  }
-  .search-box:focus {
-    outline: none; border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
-  }
+.net-status {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: bold;
+    letter-spacing: 0.5px; border: 1px solid;
+    transition: all 0.3s;
+}
+.net-status.online { border-color: var(--neon-green); color: var(--neon-green); background: rgba(141,212,168,0.1); }
+.net-status.offline { border-color: var(--neon-red); color: var(--neon-red); background: rgba(224,136,136,0.1); }
+.net-status .bulb {
+    font-size: 1.1em;
+    filter: drop-shadow(0 0 5px currentColor);
+    animation: bulbPulse 2s infinite;
+}
+.net-status.offline .bulb { animation: none; opacity: 0.85; }
+@keyframes bulbPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  footer {
-    text-align: center; padding: 30px 20px;
-    color: var(--text-mute); font-size: 0.8rem; letter-spacing: 1px;
-  }
-  footer strong { color: var(--text-dim); }
+.clock-display {
+    font-family: 'Courier New', monospace;
+    color: var(--neon-green);
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 4px;
+}
 
-  @media (max-width: 640px) {
-    .brand-text h1 { font-size: 0.9rem; }
-    .brand-text p { font-size: 0.65rem; }
-    .header-actions .btn span { display: none; }
-    .stat-value { font-size: 1.5rem; }
-    .panel-body { padding: 18px 16px; }
-    .panel-header { padding: 14px 16px; }
-    .search-box { width: 100%; }
-  }
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: var(--bg-deep); }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(34, 211, 238, 0.25); border-radius: 5px;
-  }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.5); }
+.container {
+    padding: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    flex-grow: 1;
+}
+
+/* ============ GRID MENU ============ */
+.grid-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.menu-item {
+    background: var(--panel-bg);
+    border: 1px solid #2f3f5a;
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 82px;
+    opacity: 0.9;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.menu-item:hover {
+    transform: translateY(-2px); opacity: 1;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(110,197,206,0.2);
+}
+.menu-item.active-item {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 25px var(--neon-cyan), inset 0 0 15px rgba(110, 197, 206, 0.12);
+    background: #22344f; opacity: 1;
+    transform: translateY(-2px);
+}
+.menu-item .number {
+    position: absolute; top: 5px; left: 8px;
+    font-size: 0.68rem; color: var(--neon-pink); font-weight: bold;
+}
+.menu-item i { font-size: 1.4rem; margin-bottom: 4px; color: var(--neon-yellow); font-style: normal; }
+.menu-item span.label { font-size: 0.72rem; letter-spacing: 0.5px; font-weight: 600; }
+
+/* Gracias button */
+#btn-thanks {
+    background: linear-gradient(135deg, rgba(240,197,106,0.12), rgba(232,152,163,0.12));
+    border-color: rgba(240,197,106,0.45);
+}
+#btn-thanks:hover {
+    border-color: var(--neon-yellow);
+    box-shadow: 0 0 22px rgba(240,197,106,0.3);
+}
+#btn-thanks i { animation: heartBeat 2.4s infinite; display: inline-block; }
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    20% { transform: scale(1.12); }
+    40% { transform: scale(1); }
+    60% { transform: scale(1.08); }
+}
+
+/* ============ PANELS ============ */
+.log-entry-panel {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 15px;
+    border-top: 3px solid var(--neon-pink);
+    margin-bottom: 18px;
+    display: none;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.active-panel { display: block; animation: slideUp 0.35s ease; }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 15px; padding-bottom: 10px;
+    border-bottom: 1px solid #2f3f5a;
+    flex-wrap: wrap; gap: 8px;
+}
+.panel-header h3 {
+    font-size: 0.95rem; letter-spacing: 1px;
+    color: var(--neon-yellow);
+    display: flex; align-items: center; gap: 8px;
+}
+.panel-header h3 .count-badge {
+    background: rgba(110,197,206,0.15);
+    color: var(--neon-cyan);
+    padding: 2px 8px; border-radius: 6px;
+    font-size: 0.75em; font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+/* ============ FORM ============ */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.form-group { display: flex; flex-direction: column; margin-bottom: 4px; }
+.form-group.span-2 { grid-column: span 2; min-width: 200px; }
+label {
+    font-size: 0.68rem; color: var(--neon-cyan);
+    margin-bottom: 5px; text-transform: uppercase;
+    letter-spacing: 1px; font-weight: 600;
+}
+label .req { color: var(--neon-red); }
+label .hint { color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.9em; }
+input, select, textarea {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid #3a4a6a;
+    color: #fff; padding: 10px 12px;
+    border-radius: 8px; outline: none;
+    transition: 0.2s; font-size: 0.9rem;
+    font-family: inherit; width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 12px rgba(141,212,168,0.25);
+    background: rgba(0,0,0,0.65);
+}
+input:disabled { opacity: 0.5; background: #1e2538; cursor: not-allowed; }
+input.filled { border-color: var(--neon-green); background: rgba(141,212,168,0.06); }
+select option { background: #1a2a3a; color: #fff; }
+textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+
+.qrz-input-wrapper { display: flex; gap: 6px; }
+.qrz-input-wrapper input { flex-grow: 1; }
+.btn-qrz {
+    background: var(--neon-yellow); color: #101a2b;
+    padding: 0 14px; border: none;
+    border-radius: 8px; font-weight: bold;
+    cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.15rem; min-width: 42px;
+    box-shadow: 0 0 15px rgba(240,197,106,0.3);
+    transition: 0.2s;
+}
+.btn-qrz:hover { box-shadow: 0 0 25px rgba(240,197,106,0.5); transform: scale(1.05); }
+.btn-qrz:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ============ UTC RADIO ============ */
+.radio-group {
+    display: flex; gap: 15px; align-items: center;
+    margin-bottom: 12px; flex-wrap: wrap;
+    background: rgba(0,0,0,0.35);
+    padding: 10px 16px;
+    border-radius: 40px;
+    border: 1px solid #2f3f5a;
+}
+.radio-group label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; cursor: pointer;
+    color: var(--neon-yellow);
+    margin-bottom: 0;
+    text-transform: none; letter-spacing: 0;
+}
+.radio-group input { width: auto; margin: 0; accent-color: var(--neon-cyan); }
+
+/* ============ DUP CONTROL ============ */
+.dup-control {
+    background: rgba(240, 197, 106, 0.06);
+    border: 1px solid rgba(240, 197, 106, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+}
+.dup-control-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+    color: var(--neon-yellow);
+    font-weight: bold; font-size: 0.78rem;
+    letter-spacing: 1px; text-transform: uppercase;
+}
+.dup-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.dup-option { flex: 1; min-width: 140px; position: relative; }
+.dup-option input { position: absolute; opacity: 0; pointer-events: none; }
+.dup-option label {
+    display: block; padding: 9px 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid #3a4a6a;
+    border-radius: 8px; cursor: pointer;
+    font-size: 0.78rem; transition: 0.2s;
+    text-align: center; color: var(--text-dim);
+    font-weight: 500; text-transform: none;
+    letter-spacing: 0; margin: 0;
+}
+.dup-option label:hover { border-color: var(--neon-yellow); color: var(--text-main); }
+.dup-option input:checked + label {
+    background: rgba(240, 197, 106, 0.15);
+    border-color: var(--neon-yellow);
+    color: var(--neon-yellow); font-weight: bold;
+}
+.dup-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; }
+
+/* ============ BUTTONS ============ */
+.btn {
+    padding: 10px 16px; border: none;
+    border-radius: 8px; cursor: pointer;
+    font-weight: bold; font-family: inherit;
+    text-transform: uppercase; font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    touch-action: manipulation;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-pink { background: var(--neon-pink); color: #101a2b; box-shadow: 0 0 20px rgba(232,152,163,0.3); }
+.btn-pink:hover:not(:disabled) { box-shadow: 0 0 30px rgba(232,152,163,0.5); }
+.btn-green { background: var(--neon-green); color: #101a2b; }
+.btn-green:hover:not(:disabled) { box-shadow: 0 0 20px rgba(141,212,168,0.45); }
+.btn-cyan { background: var(--neon-cyan); color: #101a2b; }
+.btn-cyan:hover:not(:disabled) { box-shadow: 0 0 20px rgba(110,197,206,0.45); }
+.btn-yellow { background: transparent; border: 1px solid var(--neon-yellow); color: var(--neon-yellow); }
+.btn-yellow:hover:not(:disabled) { background: var(--neon-yellow); color: #101a2b; }
+.btn-purple { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); }
+.btn-purple:hover:not(:disabled) { background: var(--neon-purple); color: #101a2b; }
+.btn-orange { background: transparent; border: 1px solid var(--neon-orange); color: var(--neon-orange); }
+.btn-orange:hover:not(:disabled) { background: var(--neon-orange); color: #101a2b; }
+.btn-red { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); }
+.btn-red:hover:not(:disabled) { background: var(--neon-red); color: #fff; }
+.btn-ghost { background: transparent; border: 1px solid #3a4a6a; color: var(--text-dim); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+.btn-sm { padding: 6px 12px; font-size: 0.72rem; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* ============ STATS ============ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.stat-card {
+    background: rgba(28, 41, 64, 0.7);
+    border: 1px solid #2f3f5a;
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: 0.15s;
+}
+.stat-card:hover { border-color: var(--neon-cyan); }
+.stat-card .label {
+    font-size: 0.68rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 600; margin-bottom: 4px;
+}
+.stat-card .value {
+    font-size: 1.5rem; font-weight: bold;
+    color: var(--neon-cyan); line-height: 1;
+    font-family: 'Courier New', monospace;
+}
+.stat-card.green .value { color: var(--neon-green); }
+.stat-card.yellow .value { color: var(--neon-yellow); }
+.stat-card.purple .value { color: var(--neon-purple); }
+.stat-card.pink .value { color: var(--neon-pink); }
+
+/* ============ SEARCH BAR ============ */
+.toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px; align-items: center;
+}
+.toolbar input, .toolbar select {
+    background: #000;
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--neon-green);
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    transition: 0.2s;
+}
+.toolbar input:focus, .toolbar select:focus {
+    border-color: var(--neon-green);
+    box-shadow: 0 0 12px rgba(141,212,168,0.25);
+}
+.toolbar input { flex: 1; min-width: 160px; }
+.toolbar select { color: var(--text-main); border-color: #3a4a6a; }
+
+/* ============ TABLE ============ */
+.table-container {
+    width: 100%; overflow-x: auto;
+    background: rgba(0,0,0,0.35);
+    border-radius: 10px;
+    border: 1px solid #2f3f5a;
+    -webkit-overflow-scrolling: touch;
+}
+table {
+    width: 100%; border-collapse: collapse;
+    min-width: 800px; font-size: 0.82rem;
+}
+th {
+    background: var(--panel-bg);
+    color: var(--neon-yellow);
+    text-align: left; padding: 11px 8px;
+    border-bottom: 2px solid var(--neon-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.8px; font-size: 0.72rem;
+    cursor: pointer; user-select: none;
+    white-space: nowrap; position: sticky; top: 0;
+    z-index: 5;
+}
+th:hover { color: var(--neon-cyan); }
+th .arrow { color: var(--neon-cyan); margin-left: 3px; }
+td {
+    padding: 8px; border-bottom: 1px solid #223145;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: rgba(110,197,206,0.05); }
+tr.dup-row td { background: rgba(240,197,106,0.06); }
+tr.dup-row td:nth-child(2)::before { content: "🔁 "; font-size: 0.8em; }
+td.call-cell { color: var(--neon-yellow); font-weight: bold; }
+td.grid-cell { color: var(--neon-green); }
+
+.actions-cell { white-space: nowrap; text-align: right; font-family: inherit; }
+.icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; padding: 0;
+    border-radius: 6px; border: 1px solid;
+    background: transparent; cursor: pointer;
+    font-size: 0.9em; transition: 0.15s;
+    margin-left: 3px;
+}
+.icon-btn:hover { transform: translateY(-1px); }
+.icon-btn.edit { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+.icon-btn.edit:hover { background: var(--neon-yellow); color: #101a2b; }
+.icon-btn.qrz { border-color: var(--neon-purple); color: var(--neon-purple); }
+.icon-btn.qrz:hover { background: var(--neon-purple); color: #101a2b; }
+.icon-btn.del { border-color: var(--neon-red); color: var(--neon-red); }
+.icon-btn.del:hover { background: var(--neon-red); color: #fff; }
+.icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.icon-btn:disabled:hover { transform: none; background: transparent; color: inherit; }
+
+.empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-muted); font-style: italic;
+}
+.empty-state .icon { font-size: 3em; opacity: 0.3; margin-bottom: 10px; }
+
+/* ============ QRZ BOX ============ */
+.qrz-box {
+    background: rgba(184, 168, 224, 0.06);
+    border: 1px solid rgba(184, 168, 224, 0.3);
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-top: 12px;
+    display: none;
+    font-size: 0.85rem;
+}
+.qrz-box.show { display: block; animation: slideUp 0.2s; }
+.qrz-box .title {
+    color: var(--neon-purple); font-weight: bold;
+    margin-bottom: 8px; letter-spacing: 1px; font-size: 0.85rem;
+}
+.qrz-box .line { padding: 3px 0; color: var(--text-main); }
+.qrz-box .line strong { color: var(--neon-yellow); }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(8, 14, 24, 0.85);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 15px; overflow-y: auto;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+    background: var(--panel-bg);
+    border: 1px solid #2f3f5a;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 720px; width: 100%;
+    max-height: 92vh; overflow-y: auto;
+    box-shadow: 0 0 40px rgba(110, 197, 206, 0.25);
+    animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 15px; padding-bottom: 12px;
+    border-bottom: 1px solid #2f3f5a;
+}
+.modal-header h2 {
+    font-size: 1rem; color: var(--neon-pink);
+    letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
+}
+.modal-close {
+    background: transparent; border: 1px solid #3a4a6a;
+    color: var(--text-dim);
+    width: 30px; height: 30px;
+    border-radius: 8px; cursor: pointer;
+    font-size: 1.05em;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.15s;
+}
+.modal-close:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+/* ============ THANKS MODAL ============ */
+.thanks-modal { max-width: 520px; }
+.thanks-content { text-align: center; padding: 8px 0; }
+.thanks-content .thanks-hero {
+    font-size: 3rem; margin-bottom: 10px; line-height: 1;
+    animation: floatHeart 3s ease-in-out infinite;
+}
+@keyframes floatHeart {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.06); }
+}
+.thanks-content p {
+    margin-bottom: 12px;
+    color: var(--text-main);
+    line-height: 1.65;
+    font-size: 0.92rem;
+}
+.thanks-content .thanks-intro {
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+.thanks-call {
+    display: flex; gap: 15px; justify-content: center;
+    flex-wrap: wrap; margin: 22px 0;
+}
+.call-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(240,197,106,0.15), rgba(232,152,163,0.15));
+    border: 2px solid var(--neon-yellow);
+    color: var(--neon-yellow);
+    padding: 12px 26px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1.15rem;
+    letter-spacing: 2px;
+    box-shadow: 0 0 22px rgba(240,197,106,0.2);
+    font-family: 'Courier New', monospace;
+    text-decoration: none;
+    transition: 0.25s;
+}
+.call-badge:hover {
+    background: linear-gradient(135deg, rgba(240,197,106,0.3), rgba(232,152,163,0.3));
+    box-shadow: 0 0 32px rgba(240,197,106,0.45);
+    transform: translateY(-2px);
+    color: var(--neon-yellow);
+}
+.thanks-sign {
+    margin-top: 18px; padding-top: 14px;
+    border-top: 1px dashed #3a4a6a;
+    color: var(--neon-cyan);
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+}
+
+/* ============ TOAST ============ */
+.toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translate(-50%, 30px);
+    padding: 11px 20px; border-radius: 10px;
+    font-weight: bold; letter-spacing: 0.5px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 9999; font-size: 0.85rem;
+    max-width: 92vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.ok { background: var(--neon-green); color: #101a2b; }
+.toast.warn { background: var(--neon-yellow); color: #101a2b; }
+.toast.err { background: var(--neon-pink); color: #101a2b; }
+.toast.info { background: var(--neon-cyan); color: #101a2b; }
+
+/* ============ CHARTS ============ */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+.chart-item {
+    background: rgba(28, 41, 64, 0.7);
+    border: 1px solid #2f3f5a;
+    border-radius: 8px; padding: 10px 12px;
+}
+.chart-item .label {
+    font-size: 0.72rem; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 600; margin-bottom: 4px;
+}
+.chart-item .value {
+    font-size: 0.9rem; color: var(--text-main);
+    font-weight: bold; font-family: 'Courier New', monospace;
+    margin-bottom: 6px;
+}
+.chart-item .bar-track {
+    height: 6px; background: rgba(0,0,0,0.4);
+    border-radius: 3px; overflow: hidden;
+}
+.chart-item .bar-fill {
+    height: 100%; background: var(--tropical);
+    border-radius: 3px; transition: width 0.5s;
+}
+
+/* ============ INFO ============ */
+.info-list { display: flex; flex-direction: column; gap: 12px; }
+.info-item {
+    background: rgba(28, 41, 64, 0.7);
+    border: 1px solid #2f3f5a;
+    border-radius: 10px; padding: 14px 16px;
+}
+.info-item h4 {
+    font-size: 0.85rem; color: var(--neon-cyan);
+    margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.info-item p {
+    font-size: 0.82rem; color: var(--text-dim);
+    line-height: 1.6;
+}
+.info-item a { color: var(--neon-cyan); text-decoration: none; }
+.info-item a:hover { text-decoration: underline; }
+
+/* ============ API KEY BOX ============ */
+.api-key-box {
+    background: rgba(184, 168, 224, 0.06);
+    border: 1px solid rgba(184, 168, 224, 0.3);
+    border-radius: 10px; padding: 14px; margin-bottom: 12px;
+}
+.api-key-box label {
+    color: var(--neon-purple); font-weight: bold;
+    font-size: 0.78rem; letter-spacing: 1px;
+    text-transform: uppercase; display: block; margin-bottom: 6px;
+}
+.api-key-box input {
+    width: 100%; background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(184, 168, 224, 0.4);
+    border-radius: 8px; padding: 10px 12px;
+    color: var(--text-main);
+    font-family: 'Courier New', monospace;
+    outline: none; font-size: 0.9rem;
+}
+.api-key-box input:focus { border-color: var(--neon-purple); box-shadow: 0 0 0 3px rgba(184,168,224,.15); }
+.api-key-box .hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+.api-key-box .hint a { color: var(--neon-cyan); }
+
+/* ============ LIBRO ============ */
+.book-controls {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px; padding: 10px;
+    background: rgba(110,197,206,0.05);
+    border: 1px dashed var(--neon-cyan);
+    border-radius: 10px;
+}
+.book-controls input {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 6px; padding: 7px 10px;
+    color: var(--text-main); font-family: inherit;
+    font-size: 0.85rem; outline: none;
+    flex: 1; min-width: 110px;
+}
+.logbook {
+    background: #fdfaf3; color: #1a1a1a;
+    border-radius: 10px; padding: 25px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    box-shadow: var(--shadow-lg);
+    margin-top: 12px;
+}
+.logbook-header {
+    text-align: center;
+    border-bottom: 3px double #1a1a1a;
+    padding-bottom: 12px; margin-bottom: 15px;
+}
+.logbook-header h1 {
+    font-size: clamp(1.1em, 4vw, 1.5em);
+    letter-spacing: 3px; color: #1a1a1a;
+    font-family: 'Georgia', serif; font-weight: bold;
+}
+.logbook-header .subtitle { font-style: italic; font-size: 0.85em; color: #555; margin-top: 4px; }
+.logbook-meta {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px 18px; margin: 12px 0;
+    font-size: 0.85em; padding: 8px 0;
+    border-bottom: 1px solid #999;
+}
+.logbook-meta .field2 { display: flex; gap: 6px; align-items: baseline; }
+.logbook-meta .field2 .lbl {
+    font-weight: bold; min-width: 85px; color: #333;
+    text-transform: uppercase; font-size: 0.75em; letter-spacing: 1px;
+}
+.logbook-meta .field2 .val {
+    border-bottom: 1px dotted #666;
+    flex: 1; padding: 2px 5px;
+    font-family: 'Courier New', monospace; color: #000;
+}
+.logbook-table {
+    width: 100%; border-collapse: collapse;
+    font-family: 'Courier New', monospace;
+    font-size: 0.78em; margin-top: 8px;
+}
+.logbook-table th {
+    background: #e8e2d0 !important;
+    color: #1a1a1a !important;
+    border: 1px solid #666 !important;
+    padding: 7px 4px !important;
+    text-align: center !important;
+    font-family: 'Georgia', serif;
+    font-size: 0.85em; text-transform: uppercase;
+    letter-spacing: 1px; cursor: default !important;
+    position: static !important;
+}
+.logbook-table td {
+    border: 1px solid #999 !important;
+    padding: 5px 4px !important;
+    color: #000 !important; text-align: center;
+    background: #fdfaf3;
+    font-family: 'Courier New', monospace;
+}
+.logbook-table tr:nth-child(even) td { background: #f5f0e1 !important; }
+.logbook-table td.call-cell2 { font-weight: bold; text-align: left; padding-left: 8px !important; }
+.logbook-table td.remarks { text-align: left; font-size: 0.85em; }
+.logbook-footer {
+    margin-top: 20px; padding-top: 10px;
+    border-top: 2px solid #1a1a1a;
+    display: flex; justify-content: space-between;
+    font-size: 0.85em; font-style: italic;
+    color: #333; flex-wrap: wrap; gap: 10px;
+}
+.logbook-page-num { text-align: center; margin-top: 8px; font-size: 0.72em; color: #555; }
+
+/* ============ PRINT ============ */
+@media print {
+    body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+    .watermark, header, .grid-menu, .panel-header, .book-controls,
+    .btn-row, .dup-control, .toolbar, .stats-grid, .qrz-box,
+    .api-key-box, .chart-grid, .form-row, .net-status { display: none !important; }
+    .container { max-width: 100% !important; padding: 0 !important; }
+    .log-entry-panel { display: none !important; border: none !important; padding: 0 !important; box-shadow: none !important; background: #fff !important; }
+    #panel-book { display: block !important; }
+    .logbook { box-shadow: none !important; background: #fff !important; padding: 12mm !important; border-radius: 0 !important; color: #000 !important; }
+    .logbook-table th, .logbook-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { margin: 10mm; size: A4 portrait; }
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 700px) {
+    .grid-menu { grid-template-columns: repeat(3, 1fr); }
+    .form-row { grid-template-columns: 1fr 1fr; }
+    .form-group.span-2 { grid-column: span 2; }
+    .logbook { padding: 15px; }
+    .logbook-meta { grid-template-columns: 1fr; }
+    .modal { padding: 15px; }
+    .container { padding: 12px; }
+}
+@media (max-width: 500px) {
+    .grid-menu { grid-template-columns: repeat(2, 1fr); }
+    .header-title { font-size: 0.85rem; }
+    .header-right { width: 100%; justify-content: space-between; }
+    table { font-size: 0.75rem; min-width: 620px; }
+    th, td { padding: 7px 5px; }
+    .icon-btn { width: 28px; height: 28px; }
+}
+@media (max-width: 380px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-group.span-2 { grid-column: span 1; }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <div class="logo">N</div>
-    <div class="brand-text">
-      <h1>NEON LOG STATION</h1>
-      <p>v12.0 · CL7ADV Cuba</p>
-    </div>
-  </div>
-  <div class="header-actions">
-    <button class="btn btn-thanks" onclick="openThanks()">❤️ <span>Agradecimientos</span></button>
-    <button class="btn btn-primary" onclick="exportADIF()">💾 <span>Exportar ADIF</span></button>
-  </div>
-</header>
+<div class="watermark">CL7ADV · CO5ABC · CO5WE | v12.1 PRO | 🌴 Caribe</div>
 
-<main>
+<!-- INTRO -->
+<div id="intro-screen">
+    <div class="sun"></div>
+    <div class="intro-text">Amanecer en el Caribe</div>
+    <div class="intro-sub">Cargando Estación CL7ADV v12.1</div>
+</div>
 
-  <section class="stats">
-    <div class="stat"><div class="stat-label">Total QSO</div><div class="stat-value" id="statTotal">0</div></div>
-    <div class="stat"><div class="stat-label">Indicativos únicos</div><div class="stat-value" id="statCalls">0</div></div>
-    <div class="stat"><div class="stat-label">Bandas</div><div class="stat-value" id="statBands">0</div></div>
-    <div class="stat"><div class="stat-label">Modos</div><div class="stat-value" id="statModes">0</div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-header">
-      <h2>Nuevo QSO</h2>
-      <span style="font-size:0.75rem;color:var(--text-mute);letter-spacing:1px;">UTC</span>
-    </div>
-    <div class="panel-body">
-      <form id="qsoForm" class="form-grid" onsubmit="addQSO(event)">
-        <div class="field"><label>Indicativo *</label>
-          <input type="text" id="fCall" placeholder="CO5ABC" required maxlength="15" style="text-transform:uppercase;"></div>
-        <div class="field"><label>Fecha (UTC)</label>
-          <input type="date" id="fDate" required></div>
-        <div class="field"><label>Hora (UTC)</label>
-          <input type="time" id="fTime" step="1" required></div>
-        <div class="field"><label>Banda</label>
-          <select id="fBand">
-            <option>160M</option><option>80M</option><option>60M</option>
-            <option>40M</option><option>30M</option><option selected>20M</option>
-            <option>17M</option><option>15M</option><option>12M</option>
-            <option>10M</option><option>6M</option><option>2M</option><option>70CM</option>
-          </select></div>
-        <div class="field"><label>Frecuencia (MHz)</label>
-          <input type="number" id="fFreq" placeholder="14.200" step="0.001" min="0"></div>
-        <div class="field"><label>Modo</label>
-          <select id="fMode">
-            <option>SSB</option><option>CW</option><option>FM</option>
-            <option>AM</option><option>RTTY</option><option>FT8</option>
-            <option>FT4</option><option>PSK31</option><option>JT65</option>
-            <option>DIGITALVOICE</option><option>DV</option>
-          </select></div>
-        <div class="field"><label>RST Enviado</label>
-          <input type="text" id="fRstS" placeholder="59" value="59" maxlength="6"></div>
-        <div class="field"><label>RST Recibido</label>
-          <input type="text" id="fRstR" placeholder="59" value="59" maxlength="6"></div>
-        <div class="field"><label>Nombre</label>
-          <input type="text" id="fName" placeholder="Operador" maxlength="60"></div>
-        <div class="field"><label>QTH</label>
-          <input type="text" id="fQth" placeholder="Ciudad / País" maxlength="60"></div>
-        <div class="field"><label>Grid Square</label>
-          <input type="text" id="fGrid" placeholder="FL11aa" maxlength="10" style="text-transform:uppercase;"></div>
-        <div class="field"><label>Comentario</label>
-          <input type="text" id="fNotes" placeholder="Nota opcional" maxlength="100"></div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">➕ Agregar QSO</button>
-          <button type="button" class="btn" onclick="resetForm()">↻ Limpiar</button>
+<!-- MAIN -->
+<div id="main-content">
+    <header>
+        <div class="header-top">
+            <div class="header-brand">
+                <div class="header-logo">📻</div>
+                <div>
+                    <div class="header-title">NEON LOG STATION v12.1</div>
+                    <div class="header-sub" id="header-station">CL7ADV · CO5ABC · CO5WE · Caribe Pro</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="op-badge">
+                    <span class="label">OP:</span>
+                    <span class="value" id="header-op">—</span>
+                </div>
+                <div class="op-badge">
+                    <span class="label">QSO:</span>
+                    <span class="value" id="header-count">0</span>
+                </div>
+                <div class="net-status online" id="netStatus">
+                    <span class="bulb" id="netBulb">💡</span>
+                    <span id="netText">Online</span>
+                </div>
+            </div>
         </div>
-      </form>
-    </div>
-  </section>
+        <div class="clock-display" id="clock">00:00:00 UTC</div>
+    </header>
 
-  <section class="panel">
-    <div class="panel-header">
-      <h2>Registro de Contactos</h2>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-        <input type="search" class="search-box" placeholder="🔍 Buscar..." oninput="renderLog(this.value)">
-        <button class="btn btn-sm" onclick="exportCSV()">📄 CSV</button>
-        <button class="btn btn-sm" onclick="importADIF()">📥 Importar ADIF</button>
-        <button class="btn btn-sm btn-danger" onclick="clearLog()">🗑 Limpiar</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Fecha</th><th>Hora</th><th>Indicativo</th><th>Banda</th><th>Frec.</th>
-          <th>Modo</th><th>RST E</th><th>RST R</th><th>Nombre</th><th>QTH</th><th></th>
-        </tr></thead>
-        <tbody id="logBody"></tbody>
-      </table>
-    </div>
-    <div id="emptyState" class="empty" style="display:none;">
-      <div class="empty-icon">📻</div>
-      <p>No hay contactos aún. ¡Agrega tu primer QSO arriba!</p>
-    </div>
-  </section>
+    <div class="container">
 
-</main>
+        <!-- GRID MENU -->
+        <div class="grid-menu">
+            <div id="btn-op" class="menu-item" onclick="togglePanel('panel-op','btn-op')">
+                <span class="number">1</span><i>👤</i><span class="label">Estación</span>
+            </div>
+            <div id="btn-log" class="menu-item active-item" onclick="togglePanel('panel-log','btn-log')">
+                <span class="number">2</span><i>📝</i><span class="label">Nuevo QSO</span>
+            </div>
+            <div id="btn-table" class="menu-item" onclick="togglePanel('panel-table','btn-table')">
+                <span class="number">3</span><i>📋</i><span class="label">Libro</span>
+            </div>
+            <div id="btn-stats" class="menu-item" onclick="togglePanel('panel-stats','btn-stats')">
+                <span class="number">4</span><i>📊</i><span class="label">Estadísticas</span>
+            </div>
+            <div id="btn-book" class="menu-item" onclick="togglePanel('panel-book','btn-book')">
+                <span class="number">5</span><i>📖</i><span class="label">Guardia</span>
+            </div>
+            <div id="btn-tools" class="menu-item" onclick="togglePanel('panel-tools','btn-tools')">
+                <span class="number">6</span><i>🛠️</i><span class="label">Herramientas</span>
+            </div>
+            <div id="btn-thanks" class="menu-item" onclick="openThanksModal()">
+                <span class="number">7</span><i>🙏</i><span class="label">Gracias</span>
+            </div>
+            <div id="btn-clear" class="menu-item" onclick="clearLogs()">
+                <span class="number">ⓘ</span><i>🗑️</i><span class="label">Limpiar</span>
+            </div>
+        </div>
 
-<footer>
-  <strong>NEON LOG STATION v12.0</strong> · CL7ADV Cuba · ADIF 3.1.4 compatible
-</footer>
+        <!-- PANEL ESTACIÓN -->
+        <div id="panel-op" class="log-entry-panel">
+            <div class="panel-header">
+                <h3>🏠 Configuración de Estación</h3>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📻 Tu Indicativo <span class="req">*</span></label>
+                    <input type="text" id="op_call" placeholder="CL7ADV" style="text-transform:uppercase" autocapitalize="characters">
+                </div>
+                <div class="form-group">
+                    <label>👤 Tu Nombre</label>
+                    <input type="text" id="op_name" placeholder="Alfred">
+                </div>
+                <div class="form-group">
+                    <label>🗺️ Tu Grid (MY_GRIDSQUARE)</label>
+                    <input type="text" id="op_grid" placeholder="FL10ar" style="text-transform:uppercase" autocapitalize="characters">
+                </div>
+                <div class="form-group">
+                    <label>📍 QTH</label>
+                    <input type="text" id="op_qth" placeholder="Ciudad, País">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📡 Equipo</label>
+                    <input type="text" id="op_rig" placeholder="IC-7300 + Dipolo">
+                </div>
+                <div class="form-group">
+                    <label>⚡ Potencia</label>
+                    <input type="text" id="op_pwr" placeholder="100W">
+                </div>
+                <div class="form-group">
+                    <label>🌍 País / DXCC</label>
+                    <input type="text" id="op_country" placeholder="Cuba">
+                </div>
+                <div class="form-group">
+                    <label>📮 Email</label>
+                    <input type="email" id="op_email" placeholder="tu@email.com">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="saveOperatorData(true)">💾 Guardar Configuración</button>
+            </div>
+            <div class="dup-hint" style="margin-top:10px;">💡 Estos datos se incluyen automáticamente en cada exportación ADIF (MY_*, STATION_CALLSIGN, OPERATOR).</div>
+        </div>
 
-<!-- MODAL AGRADECIMIENTOS -->
-<div class="modal-backdrop" id="thanksModal">
-  <div class="modal">
-    <div class="modal-icon">🙏</div>
-    <h2>¡Gracias, colegas!</h2>
-    <p>Este proyecto no sería posible sin el aporte,<br>los consejos y la experiencia de grandes amigos y colegas.</p>
-    <div class="callsigns">
-      <div class="callsign-chip">CO5ABC</div>
-      <div class="callsign-chip">CO5WE</div>
+        <!-- PANEL NUEVO QSO -->
+        <div id="panel-log" class="log-entry-panel active-panel">
+            <div class="panel-header">
+                <h3 id="panel-title">📝 Registro de Contacto</h3>
+            </div>
+            <input type="hidden" id="edit_id">
+
+            <div class="radio-group">
+                <label><input type="radio" name="utc_mode" value="actual" checked> ⚡ UTC Actual</label>
+                <label><input type="radio" name="utc_mode" value="manual"> ✏️ UTC Manual</label>
+                <button type="button" class="btn btn-cyan btn-sm" id="fillCurrentBtn" style="margin-left:auto;">📌 Hora actual</button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group span-2">
+                    <label>📻 Indicativo Corresponsal <span class="req">*</span> <span class="hint">(Enter = QRZ)</span></label>
+                    <div class="qrz-input-wrapper">
+                        <input type="text" id="call" placeholder="Ej: EA8ABC" onkeyup="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter')checkQRZ()" autocapitalize="characters" autocomplete="off">
+                        <button type="button" class="btn-qrz" title="QRZ.com" onclick="checkQRZ()">⚡</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>🗺️ Grid (Corresponsal)</label>
+                    <input type="text" id="gridsquare" placeholder="EL09 / FN42" style="text-transform:uppercase" autocapitalize="characters">
+                </div>
+                <div class="form-group">
+                    <label>⚡ TX Power (W)</label>
+                    <input type="text" id="tx_pwr" placeholder="100">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📻 Frecuencia (MHz)</label>
+                    <input type="text" id="freq" placeholder="7.074" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                    <label>📶 Banda</label>
+                    <select id="band">
+                        <option value="160M">160M</option>
+                        <option value="80M">80M</option>
+                        <option value="60M">60M</option>
+                        <option value="40M" selected>40M</option>
+                        <option value="30M">30M</option>
+                        <option value="20M">20M</option>
+                        <option value="17M">17M</option>
+                        <option value="15M">15M</option>
+                        <option value="12M">12M</option>
+                        <option value="10M">10M</option>
+                        <option value="6M">6M</option>
+                        <option value="2M">2M</option>
+                        <option value="70CM">70CM</option>
+                        <option value="23CM">23CM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🎛️ Modo <span class="hint">(libre)</span></label>
+                    <input list="modes-list" id="mode" placeholder="Escribe o elige..." autocapitalize="characters">
+                    <datalist id="modes-list">
+                        <option value="SSB"><option value="FM"><option value="CW">
+                        <option value="AM"><option value="FT8"><option value="FT4">
+                        <option value="RTTY"><option value="PSK31"><option value="PSK63">
+                        <option value="PSK125"><option value="JT65"><option value="JT9">
+                        <option value="WSPR"><option value="SSTV"><option value="HELL">
+                        <option value="MFSK"><option value="OLIVIA"><option value="DOMINO">
+                        <option value="THOR"><option value="DIGITALVOICE"><option value="DV">
+                        <option value="DMR"><option value="DSTAR"><option value="FUSION">
+                        <option value="PACKET"><option value="AX.25"><option value="FSK441">
+                        <option value="ISCAT"><option value="Q65"><option value="ROS">
+                        <option value="ATV"><option value="FAX">
+                    </datalist>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>📅 Fecha UTC (AAAA/MM/DD)</label>
+                    <input type="text" id="manual_date" placeholder="Auto UTC" disabled>
+                </div>
+                <div class="form-group">
+                    <label>⏱️ Hora UTC (HH:MM:SS)</label>
+                    <input type="text" id="manual_time" placeholder="Auto UTC" disabled>
+                </div>
+                <div class="form-group">
+                    <label>📊 RST Env.</label>
+                    <input type="text" id="rst_s" value="59">
+                </div>
+                <div class="form-group">
+                    <label>📊 RST Rec.</label>
+                    <input type="text" id="rst_r" value="59">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group span-2">
+                    <label>📮 Email Corresponsal</label>
+                    <input type="email" id="email" placeholder="Opcional">
+                </div>
+                <div class="form-group span-2">
+                    <label>📝 Comentarios / Nombre</label>
+                    <input type="text" id="comment" placeholder="Ej: 73, nombre...">
+                </div>
+            </div>
+
+            <div class="qrz-box" id="qrzInfo">
+                <div class="title">📡 Información QRZ.com</div>
+                <div id="qrzContent"></div>
+            </div>
+
+            <div class="dup-control">
+                <div class="dup-control-header">🔁 Gestión de QSO Repetidos</div>
+                <div class="dup-options">
+                    <div class="dup-option">
+                        <input type="radio" name="dupAction" id="dupKeep" value="keep" checked>
+                        <label for="dupKeep">✅ Dejar duplicados</label>
+                    </div>
+                    <div class="dup-option">
+                        <input type="radio" name="dupAction" id="dupRemove" value="remove">
+                        <label for="dupRemove">🗑️ Reemplazar</label>
+                    </div>
+                    <div class="dup-option">
+                        <input type="radio" name="dupAction" id="dupSkip" value="skip">
+                        <label for="dupSkip">⏭️ Omitir nuevo</label>
+                    </div>
+                </div>
+                <div class="dup-hint">Criterio: Indicativo + Fecha + Hora + Banda + Modo · Afecta al guardar, importar y exportar</div>
+            </div>
+
+            <div class="btn-row">
+                <button id="save-btn" class="btn btn-pink" onclick="saveQSO()" style="flex:2;">💾 Guardar QSO</button>
+                <button id="cancel-edit" class="btn btn-ghost" onclick="resetForm()" style="flex:1; display:none;">❌ Cancelar</button>
+            </div>
+            <div class="dup-hint" style="margin-top:10px;">
+                💡 <strong>UTC Actual</strong>: tiempo real. <strong>UTC Manual</strong>: escribe la fecha/hora flexible (2026/04/03, 03-04-2026, 143000, etc). Al exportar, "DV" se convierte a DIGITALVOICE automáticamente.
+            </div>
+        </div>
+
+        <!-- PANEL TABLA -->
+        <div id="panel-table" class="log-entry-panel">
+            <div class="panel-header">
+                <h3>📋 Libro de Guardia <span class="count-badge" id="table-count">0</span></h3>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Total QSO</div>
+                    <div class="value" id="totalCount">0</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="label">Duplicados</div>
+                    <div class="value" id="dupCount">0</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="label">Bandas</div>
+                    <div class="value" id="bandCount">0</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="label">Calls únicos</div>
+                    <div class="value" id="uniqueCount">0</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <input type="text" id="search" placeholder="🔍 Filtrar por indicativo, grid..." oninput="renderTable()" autocomplete="off">
+                <select id="filterBand" onchange="renderTable()">
+                    <option value="">Todas las bandas</option>
+                </select>
+                <select id="filterMode" onchange="renderTable()">
+                    <option value="">Todos los modos</option>
+                </select>
+                <select id="sortSelect" onchange="renderTable()">
+                    <option value="date-desc">📅 Fecha ↓</option>
+                    <option value="date-asc">📅 Fecha ↑</option>
+                    <option value="call-asc">🔤 Call A-Z</option>
+                    <option value="call-desc">🔤 Call Z-A</option>
+                    <option value="band-asc">📶 Banda ↑</option>
+                    <option value="band-desc">📶 Banda ↓</option>
+                    <option value="mode-asc">🎛️ Modo A-Z</option>
+                    <option value="insert-desc">➕ Insertado</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="quickSort('date')">Fecha/Hora <span class="arrow" id="arrow-date"></span></th>
+                            <th onclick="quickSort('call')">Call <span class="arrow" id="arrow-call"></span></th>
+                            <th>Grid</th>
+                            <th>Freq</th>
+                            <th onclick="quickSort('band')">Banda <span class="arrow" id="arrow-band"></span></th>
+                            <th onclick="quickSort('mode')">Modo <span class="arrow" id="arrow-mode"></span></th>
+                            <th>RST</th>
+                            <th>PWR</th>
+                            <th style="text-align:right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+            <div id="table-empty" class="empty-state" style="display:none;">
+                <div class="icon">📻</div>
+                <p>No hay QSO registrados</p>
+            </div>
+        </div>
+
+        <!-- PANEL ESTADÍSTICAS -->
+        <div id="panel-stats" class="log-entry-panel">
+            <div class="panel-header"><h3>📊 Estadísticas</h3></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="label">Total QSO</div><div class="value" id="sTotal">0</div></div>
+                <div class="stat-card yellow"><div class="label">Duplicados</div><div class="value" id="sDup">0</div></div>
+                <div class="stat-card green"><div class="label">Calls únicos</div><div class="value" id="sCalls">0</div></div>
+                <div class="stat-card purple"><div class="label">Bandas</div><div class="value" id="sBands">0</div></div>
+            </div>
+            <div style="margin-top:15px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">📶 QSO POR BANDA</h4>
+                <div id="chartBands" class="chart-grid"><div class="empty-state"><p>Sin datos</p></div></div>
+            </div>
+            <div style="margin-top:20px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">🎛️ QSO POR MODO</h4>
+                <div id="chartModes" class="chart-grid"><div class="empty-state"><p>Sin datos</p></div></div>
+            </div>
+        </div>
+
+        <!-- PANEL LIBRO DE GUARDIA -->
+        <div id="panel-book" class="log-entry-panel">
+            <div class="panel-header">
+                <h3>📖 Libro de Guardia (Imprimible)</h3>
+                <button class="btn btn-green btn-sm" onclick="printBook()">🖨️ Imprimir</button>
+            </div>
+            <div class="book-controls">
+                <input type="text" id="bookStation" placeholder="Indicativo" value="CL7ADV">
+                <input type="text" id="bookOperator" placeholder="Operador">
+                <input type="text" id="bookQTH" placeholder="QTH">
+                <input type="text" id="bookRig" placeholder="Equipo">
+                <input type="date" id="bookDateFrom" onchange="renderBook()" title="Desde">
+                <input type="date" id="bookDateTo" onchange="renderBook()" title="Hasta">
+                <button class="btn btn-cyan btn-sm" onclick="renderBook()">🔄 Actualizar</button>
+            </div>
+            <div id="bookContent"></div>
+        </div>
+
+        <!-- PANEL HERRAMIENTAS -->
+        <div id="panel-tools" class="log-entry-panel">
+            <div class="panel-header"><h3>🛠️ Herramientas</h3></div>
+
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="label">Conexión</div>
+                    <div class="value" style="font-size:1em" id="toolsStatus">—</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="label">QRZ API</div>
+                    <div class="value" style="font-size:1em" id="toolsQRZ">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">QSO Guardados</div>
+                    <div class="value" id="toolsCount">0</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="label">Almacenamiento</div>
+                    <div class="value" style="font-size:1em" id="toolsStorage">—</div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">📥📤 EXPORTAR / IMPORTAR</h4>
+                <div class="btn-row">
+                    <button class="btn btn-cyan" onclick="exportADIF('standard')">📥 Exportar ADIF</button>
+                    <button class="btn btn-pink" onclick="exportADIF('qrz')">⚡ Exportar QRZ ADIF</button>
+                    <button class="btn btn-orange" onclick="exportCabrillo()">📄 Cabrillo</button>
+                    <input type="file" id="file-import" accept=".adi,.txt,.adif" style="display:none" onchange="importADIF(this.files)">
+                    <button class="btn btn-purple" onclick="document.getElementById('file-import').click()">📂 Importar ADIF</button>
+                    <button class="btn btn-yellow" onclick="exportJSON()">💾 Respaldo JSON</button>
+                    <button class="btn btn-yellow" onclick="document.getElementById('jsonFile').click()">📂 Restaurar JSON</button>
+                    <input type="file" id="jsonFile" accept=".json" style="display:none" onchange="importJSON(event)">
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">🔁 DUPLICADOS</h4>
+                <div class="btn-row">
+                    <button class="btn btn-red" onclick="removeAllDuplicates()">🧹 Eliminar Todos los Duplicados</button>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">🔑 API KEY DE QRZ.COM (opcional)</h4>
+                <div class="api-key-box">
+                    <label>QRZ.com XML Subscription Key</label>
+                    <input type="password" id="qrzApiKey" placeholder="XXXX-XXXX-XXXX-XXXX" onchange="saveQRZKey()">
+                    <div class="hint">
+                        ℹ️ Necesitas suscripción XML en QRZ.com. Sin clave, el botón ⚡ abre la web de QRZ.<br>
+                        Obtén tu clave en <a href="https://www.qrz.com/docs/xml/" target="_blank">qrz.com/docs/xml</a>.<br>
+                        💡 Se guarda solo en tu navegador.
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-purple" onclick="testQRZKey()">🔍 Probar Clave</button>
+                    <button class="btn btn-red" onclick="clearQRZKey()">🗑️ Borrar Clave</button>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <h4 style="color:var(--neon-cyan);font-size:0.85rem;margin-bottom:10px;letter-spacing:1px;">ℹ️ INFORMACIÓN</h4>
+                <div class="info-list">
+                    <div class="info-item">
+                        <h4>NEON LOG STATION v12.1 PRO</h4>
+                        <p>Fusión de v5.9.1 + v11.0 PRO, actualizada a v12.1 con paleta más cálida,
+                        botón de agradecimientos y exportación ADIF 3.1.4 corregida (compatible con
+                        QRZ, LoTW, eQSL, N3FJP, WSJT-X y cualquier logger estándar).</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>💾 Almacenamiento</h4>
+                        <p>Todos tus QSO se guardan en <strong>localStorage</strong>. No se sube nada a internet.
+                        Haz respaldos periódicos con "Respaldo JSON".</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🙏 Agradecimientos especiales</h4>
+                        <p>Con cariño y admiración a <strong>CO5ABC</strong> y <strong>CO5WE</strong>,
+                        amigos y maestros del radioaficionado cubano. Su apoyo, compañerismo y
+                        ejemplo hacen posible proyectos como este. ¡73 y buenos DX!</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🌴 Caribe Edition</h4>
+                        <p>Desarrollado para <strong>CL7ADV</strong> · Paleta caribeña · Responsive PC + móvil.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <p style="font-size:0.82rem;color:var(--text-mute);">
-      ¡Su generosidad y conocimiento hacen la diferencia en la radioafición cubana!
-    </p>
-    <button class="btn btn-primary" style="margin-top:10px;" onclick="closeThanks()">Cerrar</button>
-  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>✏️ Editar QSO</h2>
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group span-2">
+                <label>Indicativo *</label>
+                <div class="qrz-input-wrapper">
+                    <input type="text" id="edit-call" style="text-transform:uppercase" autocapitalize="characters">
+                    <button type="button" class="btn-qrz" onclick="checkQRZFromEdit()">⚡</button>
+                </div>
+            </div>
+            <div class="form-group"><label>Grid</label><input type="text" id="edit-gridsquare" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>TX Power</label><input type="text" id="edit-tx_pwr"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Freq (MHz)</label><input type="text" id="edit-freq"></div>
+            <div class="form-group">
+                <label>Banda</label>
+                <select id="edit-band">
+                    <option value="160M">160M</option><option value="80M">80M</option>
+                    <option value="60M">60M</option><option value="40M">40M</option>
+                    <option value="30M">30M</option><option value="20M">20M</option>
+                    <option value="17M">17M</option><option value="15M">15M</option>
+                    <option value="12M">12M</option><option value="10M">10M</option>
+                    <option value="6M">6M</option><option value="2M">2M</option>
+                    <option value="70CM">70CM</option><option value="23CM">23CM</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Modo</label>
+                <input list="modes-list" id="edit-mode">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="text" id="edit-manual_date" placeholder="AAAA/MM/DD"></div>
+            <div class="form-group"><label>Hora UTC</label><input type="text" id="edit-manual_time" placeholder="HH:MM:SS"></div>
+            <div class="form-group"><label>RST Env.</label><input type="text" id="edit-rst_s"></div>
+            <div class="form-group"><label>RST Rec.</label><input type="text" id="edit-rst_r"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group span-2"><label>Email</label><input type="email" id="edit-email"></div>
+            <div class="form-group span-2"><label>Comentarios</label><input type="text" id="edit-comment"></div>
+        </div>
+        <div class="btn-row" style="margin-top:15px;">
+            <button class="btn btn-green" onclick="saveEdit()">💾 Guardar Cambios</button>
+            <button class="btn btn-ghost" onclick="closeEditModal()">❌ Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GRACIAS -->
+<div class="modal-overlay" id="thanksModal">
+    <div class="modal thanks-modal">
+        <div class="modal-header">
+            <h2>🙏 Agradecimientos</h2>
+            <button class="modal-close" onclick="closeThanksModal()">✕</button>
+        </div>
+        <div class="thanks-content">
+            <div class="thanks-hero">🌴💛📻</div>
+            <p class="thanks-intro">Este proyecto no sería posible sin la amistad, el ejemplo y el apoyo incondicional de nuestra gran familia radioaficionada.</p>
+            <p>Un agradecimiento muy especial a:</p>
+            <div class="thanks-call">
+                <a href="https://www.qrz.com/db/CO5ABC" target="_blank" class="call-badge">📻 CO5ABC</a>
+                <a href="https://www.qrz.com/db/CO5WE" target="_blank" class="call-badge">📻 CO5WE</a>
+            </div>
+            <p>Por su compañerismo, enseñanzas, paciencia y por compartir cada día la pasión por la radio.</p>
+            <p>Gracias también a todos los amigos que con su cariño y sus QSO hacen grande esta afición.</p>
+            <div class="thanks-sign">¡73 y buenos DX! 🌴📡<br>— CL7ADV —</div>
+        </div>
+        <div class="btn-row" style="justify-content:center;margin-top:20px;">
+            <button class="btn btn-green" onclick="closeThanksModal()">🤝 ¡Gracias!</button>
+        </div>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<input type="file" id="fileInput" accept=".adi,.adif,.txt" style="display:none;">
 
 <script>
-const STORAGE_KEY = 'neonlog_v12_qso';
-let log = (() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } })();
+const STORAGE_KEY = 'cl7adv_logs_v12';
+const OP_KEY = 'cl7adv_operator_v12';
+const QRZ_KEY = 'cl7adv_qrz_api_key_v12';
 
-const pad = (n, l = 2) => String(n).padStart(l, '0');
-function nowUTC() {
-  const d = new Date();
-  return {
-    date: `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`,
-    time: `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`
-  };
+let qsoList = [];
+let opData = { call: '', name: '', grid: '', email: '', qth: '', rig: '', pwr: '', country: '' };
+let qrzSession = null;
+let editingId = null;
+
+/* ---------- UTIL ---------- */
+function escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-const toADIFDate = s => s.replace(/-/g, '');
-const toADIFTime = s => s.replace(/:/g, '');
-
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = (type === 'success' ? '✅ ' : '⚠️ ') + msg;
-  t.className = 'toast show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+function toast(msg, type = 'ok') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show ' + type;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.className = 'toast ' + type; }, 2800);
 }
 
-function initForm() {
-  const { date, time } = nowUTC();
-  document.getElementById('fDate').value = date;
-  document.getElementById('fTime').value = time;
+/* ---------- UTC ---------- */
+function getUTCInfo() {
+    const now = new Date();
+    const y = now.getUTCFullYear();
+    const m = (now.getUTCMonth() + 1).toString().padStart(2, '0');
+    const d = now.getUTCDate().toString().padStart(2, '0');
+    const hh = now.getUTCHours().toString().padStart(2, '0');
+    const mm = now.getUTCMinutes().toString().padStart(2, '0');
+    const ss = now.getUTCSeconds().toString().padStart(2, '0');
+    return {
+        dateRaw: `${y}${m}${d}`,
+        timeRaw: `${hh}${mm}${ss}`,
+        dateFormatted: `${y}/${m}/${d}`,
+        timeFormatted: `${hh}:${mm}:${ss}`,
+        display: `${hh}:${mm}:${ss}`
+    };
+}
+function updateClock() {
+    document.getElementById('clock').textContent = getUTCInfo().display + ' UTC';
+}
+
+function parseFlexibleDate(dateStr) {
+    if (!dateStr || dateStr.trim() === '') return null;
+    let cleaned = dateStr.trim();
+    let parts = cleaned.split(/[\/\-\.]/);
+    if (parts.length === 3) {
+        let year, month, day;
+        if (parts[0].length === 4) {
+            year = parts[0]; month = parts[1].padStart(2,'0'); day = parts[2].padStart(2,'0');
+        } else if (parts[2].length === 4) {
+            year = parts[2]; month = parts[1].padStart(2,'0'); day = parts[0].padStart(2,'0');
+        } else return null;
+        const y = parseInt(year,10), mo = parseInt(month,10), d = parseInt(day,10);
+        if (y < 1970 || y > 2150) return null;
+        if (mo < 1 || mo > 12) return null;
+        if (d < 1 || d > 31) return null;
+        return `${year}${month}${day}`;
+    }
+    let digits = cleaned.replace(/\D/g, '');
+    if (digits.length === 8) return digits;
+    return null;
+}
+function parseFlexibleTime(timeStr) {
+    if (!timeStr || timeStr.trim() === '') return null;
+    let cleaned = timeStr.trim();
+    let digits = cleaned.replace(/\D/g, '');
+    if (digits.length === 6) return digits;
+    if (digits.length === 4) return digits + '00';
+    if (digits.length === 2) return digits + '0000';
+    let match = cleaned.match(/(\d{1,2}):(\d{1,2}):?(\d{0,2})/);
+    if (match) {
+        let hh = match[1].padStart(2,'0'), mm = match[2].padStart(2,'0');
+        let ss = match[3] ? match[3].padStart(2,'0') : '00';
+        if (parseInt(hh,10) <= 23 && parseInt(mm,10) <= 59 && parseInt(ss,10) <= 59) return `${hh}${mm}${ss}`;
+    }
+    return null;
+}
+function formatDateDisplay(raw) {
+    if (!raw || raw.length !== 8) return raw || '';
+    return raw.replace(/(\d{4})(\d{2})(\d{2})/, '$1/$2/$3');
+}
+function formatTimeDisplay(raw) {
+    if (!raw || raw.length !== 6) return raw || '';
+    return raw.replace(/(\d{2})(\d{2})(\d{2})/, '$1:$2:$3');
+}
+
+/* ---------- MODE NORMALIZE ---------- */
+// Para uso interno (dupKey, filtros) — devuelve string
+function normalizeModeForADIF(rawMode) {
+    if (!rawMode) return 'SSB';
+    let mode = rawMode.trim().toUpperCase();
+    if (mode === 'DV' || mode.replace(/[ -]/g, '') === 'DIGITALVOICE') {
+        return 'DIGITALVOICE';
+    }
+    // DMR/DSTAR/FUSION se tratan como DIGITALVOICE para dedup
+    if (['DMR','DSTAR','D-STAR','FUSION','C4FM'].includes(mode)) return 'DIGITALVOICE';
+    return mode;
+}
+
+// Para exportación ADIF: devuelve { mode, submode }
+function getADIFMode(rawMode) {
+    if (!rawMode) return { mode: 'SSB', submode: '' };
+    const m = rawMode.trim().toUpperCase();
+    const dvMap = {
+        'DV':           { mode: 'DIGITALVOICE', submode: '' },
+        'DIGITALVOICE': { mode: 'DIGITALVOICE', submode: '' },
+        'DMR':          { mode: 'DIGITALVOICE', submode: 'DMR' },
+        'DSTAR':        { mode: 'DIGITALVOICE', submode: 'DSTAR' },
+        'D-STAR':       { mode: 'DIGITALVOICE', submode: 'DSTAR' },
+        'FUSION':       { mode: 'DIGITALVOICE', submode: 'FUSION' },
+        'C4FM':         { mode: 'DIGITALVOICE', submode: 'C4FM' }
+    };
+    if (m in dvMap) return dvMap[m];
+    return { mode: m, submode: '' };
+}
+function toADIFBand(bandDisplay) {
+    const map = { '160M':'160m','80M':'80m','60M':'60m','40M':'40m','30M':'30m','20M':'20m','17M':'17m','15M':'15m','12M':'12m','10M':'10m','6M':'6m','2M':'2m','70CM':'70cm','23CM':'23cm' };
+    return map[bandDisplay] || bandDisplay.toLowerCase();
+}
+
+/* ---------- NET STATUS ---------- */
+function updateNetStatus() {
+    const online = navigator.onLine;
+    const box = document.getElementById('netStatus');
+    const bulb = document.getElementById('netBulb');
+    const txt = document.getElementById('netText');
+    if (online) {
+        box.className = 'net-status online';
+        bulb.textContent = '💡'; txt.textContent = 'Online';
+    } else {
+        box.className = 'net-status offline';
+        bulb.textContent = '🔴'; txt.textContent = 'Offline';
+    }
+    const ts = document.getElementById('toolsStatus');
+    if (ts) ts.textContent = online ? 'Conectado' : 'Sin internet';
+    document.querySelectorAll('.btn-qrz, .icon-btn.qrz').forEach(b => {
+        b.title = online ? 'QRZ' : 'Sin conexión';
+    });
+}
+window.addEventListener('online', () => { updateNetStatus(); toast('💡 Conexión restaurada', 'ok'); });
+window.addEventListener('offline', () => { updateNetStatus(); toast('🔴 Sin conexión — modo offline', 'warn'); });
+
+/* ---------- PERSISTENCIA ---------- */
+function loadData() {
+    try { qsoList = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (e) { qsoList = []; }
+    try { opData = JSON.parse(localStorage.getItem(OP_KEY)) || opData; }
+    catch (e) {}
+}
+function persist() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(qsoList)); }
+    catch (e) { toast('⚠️ Error al guardar', 'err'); }
+}
+
+/* ---------- PANELES ---------- */
+function togglePanel(panelId, buttonId) {
+    document.querySelectorAll('.log-entry-panel').forEach(p => p.classList.remove('active-panel'));
+    document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active-item'));
+    document.getElementById(panelId)?.classList.add('active-panel');
+    document.getElementById(buttonId)?.classList.add('active-item');
+    if (panelId === 'panel-table') renderTable();
+    if (panelId === 'panel-stats') renderStats();
+    if (panelId === 'panel-tools') updateToolsInfo();
+    if (panelId === 'panel-book') renderBook();
+}
+
+/* ---------- GRACIAS MODAL ---------- */
+function openThanksModal() {
+    document.getElementById('thanksModal').classList.add('show');
+}
+function closeThanksModal() {
+    document.getElementById('thanksModal').classList.remove('show');
+}
+
+/* ---------- OPERADOR ---------- */
+function saveOperatorData(showToast) {
+    opData.call = document.getElementById('op_call').value.trim().toUpperCase();
+    opData.name = document.getElementById('op_name').value.trim();
+    opData.grid = document.getElementById('op_grid').value.trim().toUpperCase();
+    opData.qth = document.getElementById('op_qth').value.trim();
+    opData.rig = document.getElementById('op_rig').value.trim();
+    opData.pwr = document.getElementById('op_pwr').value.trim();
+    opData.country = document.getElementById('op_country').value.trim();
+    opData.email = document.getElementById('op_email').value.trim();
+    localStorage.setItem(OP_KEY, JSON.stringify(opData));
+    document.getElementById('header-op').textContent = opData.call || '—';
+    document.getElementById('header-station').textContent = (opData.call || 'CL7ADV') + ' · CO5ABC · CO5WE · Caribe Pro';
+    if (showToast) toast('💾 Configuración guardada', 'ok');
+}
+function loadOperatorUI() {
+    document.getElementById('op_call').value = opData.call || '';
+    document.getElementById('op_name').value = opData.name || '';
+    document.getElementById('op_grid').value = opData.grid || '';
+    document.getElementById('op_qth').value = opData.qth || '';
+    document.getElementById('op_rig').value = opData.rig || '';
+    document.getElementById('op_pwr').value = opData.pwr || '';
+    document.getElementById('op_country').value = opData.country || '';
+    document.getElementById('op_email').value = opData.email || '';
+    document.getElementById('header-op').textContent = opData.call || '—';
+    document.getElementById('header-station').textContent = (opData.call || 'CL7ADV') + ' · CO5ABC · CO5WE · Caribe Pro';
+    document.getElementById('bookStation').value = opData.call || 'CL7ADV';
+    document.getElementById('bookOperator').value = opData.name || '';
+    document.getElementById('bookQTH').value = opData.qth || '';
+    document.getElementById('bookRig').value = [opData.rig, opData.pwr].filter(Boolean).join(' · ');
+}
+
+/* ---------- QRZ ---------- */
+function getQRZKey() { return localStorage.getItem(QRZ_KEY) || ''; }
+function saveQRZKey() {
+    const k = document.getElementById('qrzApiKey').value.trim();
+    if (k) { localStorage.setItem(QRZ_KEY, k); toast('🔑 Clave guardada', 'ok'); }
+    else localStorage.removeItem(QRZ_KEY);
+    qrzSession = null;
+    updateToolsInfo();
+}
+function clearQRZKey() {
+    if (!confirm('¿Borrar la clave de QRZ?')) return;
+    localStorage.removeItem(QRZ_KEY); qrzSession = null;
+    document.getElementById('qrzApiKey').value = '';
+    updateToolsInfo();
+    toast('🗑️ Clave borrada', 'warn');
+}
+function extractTag(xml, tag) {
+    const m = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i'));
+    return m ? m[1].trim() : '';
+}
+async function qrzLogin() {
+    if (!navigator.onLine) throw new Error('Sin conexión a internet');
+    if (qrzSession) return qrzSession;
+    const key = getQRZKey();
+    if (!key) throw new Error('Sin API Key');
+    const url = `https://xmldata.qrz.com/xml/current/?username=;password=;agent=CL7ADV_LOG_v12;key=${encodeURIComponent(key)}`;
+    const xml = await (await fetch(url)).text();
+    const session = extractTag(xml, 'Key');
+    const error = extractTag(xml, 'Error');
+    if (error) throw new Error('QRZ: ' + error);
+    if (!session) throw new Error('No se pudo iniciar sesión');
+    qrzSession = session;
+    return session;
+}
+async function qrzLookupCall(call) {
+    const session = await qrzLogin();
+    const url = `https://xmldata.qrz.com/xml/current/?s=${encodeURIComponent(session)};callsign=${encodeURIComponent(call)}`;
+    const xml = await (await fetch(url)).text();
+    const err = extractTag(xml, 'Error');
+    if (err && /session|timeout/i.test(err)) { qrzSession = null; throw new Error('Sesión expirada'); }
+    if (err && !/not found/i.test(err)) throw new Error(err);
+    return {
+        call: extractTag(xml, 'call') || call,
+        fname: extractTag(xml, 'fname'),
+        name: extractTag(xml, 'name'),
+        addr1: extractTag(xml, 'addr1'),
+        addr2: extractTag(xml, 'addr2'),
+        state: extractTag(xml, 'state'),
+        country: extractTag(xml, 'country'),
+        grid: extractTag(xml, 'grid'),
+        cqz: extractTag(xml, 'cqzone'),
+        ituz: extractTag(xml, 'ituzone'),
+        email: extractTag(xml, 'email')
+    };
+}
+
+async function checkQRZ() {
+    const call = document.getElementById('call').value.trim().toUpperCase();
+    if (!call) { toast('⚠️ Escribe un indicativo', 'warn'); return; }
+
+    const key = getQRZKey();
+    if (!key) {
+        window.open(`https://www.qrz.com/db/${call}`, '_blank');
+        toast('🌐 Abriendo QRZ.com...', 'info');
+        return;
+    }
+    const btn = event?.target;
+    if (btn) { btn.disabled = true; }
+    try {
+        const data = await qrzLookupCall(call);
+        if (!data.name && !data.country) {
+            showQRZInfo(`<div class="line">❌ No encontrado en QRZ.</div>`);
+            toast('⚠️ No encontrado', 'warn');
+            return;
+        }
+        let filled = 0;
+        const tryFill = (id, val) => {
+            if (!val) return;
+            const el = document.getElementById(id);
+            if (el && !el.value.trim()) {
+                el.value = val;
+                el.classList.add('filled');
+                setTimeout(() => el.classList.remove('filled'), 2500);
+                filled++;
+            }
+        };
+        const fullName = [data.fname, data.name].filter(Boolean).join(' ').trim();
+        tryFill('gridsquare', data.grid);
+        if (fullName) tryFill('comment', fullName);
+        if (data.email) tryFill('email', data.email);
+
+        const lines = [];
+        if (fullName) lines.push(`<div class="line">👤 <strong>${escapeHtml(fullName)}</strong></div>`);
+        if (data.addr1 || data.addr2) lines.push(`<div class="line">📍 ${escapeHtml([data.addr1,data.addr2,data.state].filter(Boolean).join(', '))}</div>`);
+        if (data.country) lines.push(`<div class="line">🌍 ${escapeHtml(data.country)}</div>`);
+        if (data.grid) lines.push(`<div class="line">🗺️ Grid: <strong>${escapeHtml(data.grid)}</strong></div>`);
+        if (data.cqz || data.ituz) lines.push(`<div class="line">📐 CQ: ${escapeHtml(data.cqz||'—')} · ITU: ${escapeHtml(data.ituz||'—')}</div>`);
+        showQRZInfo(lines.join(''));
+        toast(`📡 QRZ OK · ${filled} campos rellenados`, 'ok');
+    } catch (e) {
+        showQRZInfo(`<div class="line" style="color:var(--neon-pink)">❌ ${escapeHtml(e.message)}</div>`);
+        toast('❌ ' + e.message, 'err');
+    } finally { if (btn) btn.disabled = false; }
+}
+function checkQRZFromEdit() {
+    const call = document.getElementById('edit-call').value.trim().toUpperCase();
+    if (!call) { toast('⚠️ Escribe un indicativo', 'warn'); return; }
+    window.open(`https://www.qrz.com/db/${call}`, '_blank');
+}
+function showQRZInfo(html) {
+    document.getElementById('qrzContent').innerHTML = html;
+    document.getElementById('qrzInfo').classList.add('show');
+}
+async function testQRZKey() {
+    saveQRZKey();
+    try { await qrzLogin(); toast('✅ Clave QRZ válida', 'ok'); }
+    catch (e) { toast('❌ ' + e.message, 'err'); }
+}
+
+/* ---------- DUPLICADOS ---------- */
+function dupKey(q) {
+    return [
+        (q.call || '').toUpperCase().trim(),
+        q.date || '',
+        q.time || '',
+        q.band || '',
+        normalizeModeForADIF(q.mode || '')
+    ].join('|');
+}
+function isDuplicate(newQ, ignoreId = null) {
+    const k = dupKey(newQ);
+    return qsoList.some(q => q.id !== ignoreId && dupKey(q) === k);
+}
+function getDupAction() {
+    const el = document.querySelector('input[name="dupAction"]:checked');
+    return el ? el.value : 'keep';
+}
+
+/* ---------- FORMULARIO ---------- */
+function initUTCModeToggle() {
+    const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
+    const radioManual = document.querySelector('input[name="utc_mode"][value="manual"]');
+    const dateField = document.getElementById('manual_date');
+    const timeField = document.getElementById('manual_time');
+    const fillBtn = document.getElementById('fillCurrentBtn');
+
+    function updateFieldsState() {
+        const isManual = radioManual.checked;
+        dateField.disabled = !isManual;
+        timeField.disabled = !isManual;
+        if (!isManual) {
+            dateField.placeholder = 'Auto UTC';
+            timeField.placeholder = 'Auto UTC';
+        } else {
+            dateField.placeholder = 'AAAA/MM/DD';
+            timeField.placeholder = 'HH:MM:SS';
+        }
+    }
+    radioActual.addEventListener('change', updateFieldsState);
+    radioManual.addEventListener('change', updateFieldsState);
+    updateFieldsState();
+
+    fillBtn.addEventListener('click', () => {
+        if (!radioManual.checked) { radioManual.checked = true; updateFieldsState(); }
+        const nowUTC = getUTCInfo();
+        dateField.value = nowUTC.dateFormatted;
+        timeField.value = nowUTC.timeFormatted;
+    });
+}
+
+function saveQSO() {
+    const call = document.getElementById('call').value.trim().toUpperCase();
+    if (!call) { toast('⚠️ Indicativo requerido', 'err'); return; }
+    const editId = document.getElementById('edit_id').value;
+    const utcMode = document.querySelector('input[name="utc_mode"]:checked').value;
+
+    let finalDate, finalTime;
+    if (utcMode === 'actual') {
+        const a = getUTCInfo();
+        finalDate = a.dateRaw; finalTime = a.timeRaw;
+    } else {
+        const rawDate = document.getElementById('manual_date').value.trim();
+        const rawTime = document.getElementById('manual_time').value.trim();
+        let parsedDate = rawDate ? parseFlexibleDate(rawDate) : null;
+        let parsedTime = rawTime ? parseFlexibleTime(rawTime) : null;
+        if (rawDate !== '' && !parsedDate) { toast('⚠️ Fecha inválida', 'err'); return; }
+        if (rawTime !== '' && !parsedTime) { toast('⚠️ Hora inválida', 'err'); return; }
+        finalDate = parsedDate || getUTCInfo().dateRaw;
+        finalTime = parsedTime || getUTCInfo().timeRaw;
+    }
+    if (finalDate.length !== 8) finalDate = getUTCInfo().dateRaw;
+    if (finalTime.length !== 6) finalTime = getUTCInfo().timeRaw;
+
+    const mode = document.getElementById('mode').value.trim().toUpperCase();
+    if (!mode) { toast('⚠️ Escribe un modo', 'err'); return; }
+
+    const qso = {
+        id: editId ? parseInt(editId) : Date.now(),
+        call,
+        gridsquare: document.getElementById('gridsquare').value.trim().toUpperCase(),
+        tx_pwr: document.getElementById('tx_pwr').value.trim(),
+        freq: document.getElementById('freq').value.trim(),
+        band: document.getElementById('band').value,
+        mode,
+        rst_s: document.getElementById('rst_s').value.trim() || '59',
+        rst_r: document.getElementById('rst_r').value.trim() || '59',
+        date: finalDate,
+        time: finalTime,
+        email: document.getElementById('email').value.trim(),
+        comment: document.getElementById('comment').value.trim(),
+        createdAt: editId ? (qsoList.find(q => q.id === parseInt(editId))?.createdAt || Date.now()) : Date.now()
+    };
+
+    if (editId) {
+        const idx = qsoList.findIndex(q => q.id === qso.id);
+        if (idx !== -1) {
+            qsoList[idx] = qso;
+            persist();
+            resetForm();
+            renderTable();
+            updateCount();
+            toast('✅ QSO actualizado', 'ok');
+            togglePanel('panel-table', 'btn-table');
+        } else {
+            toast('❌ QSO no encontrado', 'err');
+        }
+        return;
+    }
+
+    const action = getDupAction();
+    const dup = isDuplicate(qso);
+    if (dup) {
+        if (action === 'skip') { toast('⏭️ Duplicado omitido', 'warn'); return; }
+        if (action === 'remove') {
+            const k = dupKey(qso);
+            qsoList = qsoList.filter(q => dupKey(q) !== k);
+            toast('🗑️ Duplicado reemplazado', 'warn');
+        } else toast('✅ Duplicado permitido', 'warn');
+    } else toast(`💾 QSO guardado · ${qso.mode}`, 'ok');
+
+    qsoList.unshift(qso);
+    persist();
+    resetForm();
+    updateCount();
+    renderTable();
 }
 
 function resetForm() {
-  document.getElementById('qsoForm').reset();
-  initForm();
-  document.getElementById('fRstS').value = '59';
-  document.getElementById('fRstR').value = '59';
-  document.getElementById('fCall').focus();
+    document.getElementById('edit_id').value = '';
+    document.getElementById('call').value = '';
+    document.getElementById('gridsquare').value = '';
+    document.getElementById('tx_pwr').value = '';
+    document.getElementById('freq').value = '';
+    document.getElementById('rst_s').value = '59';
+    document.getElementById('rst_r').value = '59';
+    document.getElementById('mode').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('comment').value = '';
+    document.getElementById('manual_date').value = '';
+    document.getElementById('manual_time').value = '';
+    document.getElementById('panel-title').textContent = '📝 Registro de Contacto';
+    document.getElementById('save-btn').textContent = '💾 Guardar QSO';
+    document.getElementById('cancel-edit').style.display = 'none';
+    document.getElementById('qrzInfo').classList.remove('show');
+    const radioActual = document.querySelector('input[name="utc_mode"][value="actual"]');
+    if (radioActual) { radioActual.checked = true; radioActual.dispatchEvent(new Event('change')); }
 }
 
-function addQSO(e) {
-  e.preventDefault();
-  const call = document.getElementById('fCall').value.trim().toUpperCase();
-  if (!call) { showToast('El indicativo es obligatorio', 'error'); return; }
-  const qso = {
-    id: Date.now() + Math.random().toString(36).slice(2, 8),
-    date: document.getElementById('fDate').value,
-    time: document.getElementById('fTime').value,
-    call,
-    band: document.getElementById('fBand').value,
-    freq: document.getElementById('fFreq').value.trim(),
-    mode: document.getElementById('fMode').value,
-    rstSent: document.getElementById('fRstS').value.trim() || '59',
-    rstRcvd: document.getElementById('fRstR').value.trim() || '59',
-    name: document.getElementById('fName').value.trim(),
-    qth: document.getElementById('fQth').value.trim(),
-    grid: document.getElementById('fGrid').value.trim().toUpperCase(),
-    notes: document.getElementById('fNotes').value.trim(),
-  };
-  log.unshift(qso);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-  renderLog(); updateStats(); resetForm();
-  showToast(`QSO con ${call} registrado`);
+/* ---------- EDITAR ---------- */
+function editQSO(id) {
+    const q = qsoList.find(item => item.id === id);
+    if (!q) { toast('❌ QSO no encontrado', 'err'); return; }
+    editingId = id;
+    document.getElementById('edit-call').value = q.call || '';
+    document.getElementById('edit-gridsquare').value = q.gridsquare || '';
+    document.getElementById('edit-tx_pwr').value = q.tx_pwr || '';
+    document.getElementById('edit-freq').value = q.freq || '';
+    document.getElementById('edit-band').value = q.band || '40M';
+    document.getElementById('edit-mode').value = q.mode || '';
+    document.getElementById('edit-manual_date').value = formatDateDisplay(q.date || '');
+    document.getElementById('edit-manual_time').value = formatTimeDisplay(q.time || '');
+    document.getElementById('edit-rst_s').value = q.rst_s || '59';
+    document.getElementById('edit-rst_r').value = q.rst_r || '59';
+    document.getElementById('edit-email').value = q.email || '';
+    document.getElementById('edit-comment').value = q.comment || '';
+    document.getElementById('editModal').classList.add('show');
 }
-
-function deleteQSO(id) {
-  if (!confirm('¿Eliminar este QSO del registro?')) return;
-  log = log.filter(q => q.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-  renderLog(); updateStats();
-  showToast('QSO eliminado');
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('show');
+    editingId = null;
 }
+function saveEdit() {
+    if (!editingId) return;
+    const q = qsoList.find(x => x.id === editingId);
+    if (!q) return;
 
-function clearLog() {
-  if (!log.length) { showToast('El registro ya está vacío', 'error'); return; }
-  if (!confirm(`¿Eliminar TODOS los ${log.length} QSO? No se puede deshacer.`)) return;
-  log = [];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-  renderLog(); updateStats();
-  showToast('Registro vaciado');
-}
+    const call = document.getElementById('edit-call').value.trim().toUpperCase();
+    if (!call) { toast('⚠️ Indicativo requerido', 'err'); return; }
 
-function escapeHtml(s = '') {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+    const rawDate = document.getElementById('edit-manual_date').value.trim();
+    const rawTime = document.getElementById('edit-manual_time').value.trim();
+    let parsedDate = rawDate ? parseFlexibleDate(rawDate) : q.date;
+    let parsedTime = rawTime ? parseFlexibleTime(rawTime) : q.time;
+    if (!parsedDate) parsedDate = q.date;
+    if (!parsedTime) parsedTime = q.time;
 
-function renderLog(filter = '') {
-  const body = document.getElementById('logBody');
-  const empty = document.getElementById('emptyState');
-  const table = body.closest('table');
-  const term = filter.trim().toLowerCase();
+    const updated = {
+        ...q,
+        call,
+        gridsquare: document.getElementById('edit-gridsquare').value.trim().toUpperCase(),
+        tx_pwr: document.getElementById('edit-tx_pwr').value.trim(),
+        freq: document.getElementById('edit-freq').value.trim(),
+        band: document.getElementById('edit-band').value,
+        mode: document.getElementById('edit-mode').value.trim().toUpperCase(),
+        rst_s: document.getElementById('edit-rst_s').value.trim() || '59',
+        rst_r: document.getElementById('edit-rst_r').value.trim() || '59',
+        date: parsedDate,
+        time: parsedTime,
+        email: document.getElementById('edit-email').value.trim(),
+        comment: document.getElementById('edit-comment').value.trim()
+    };
+    if (!updated.mode) { toast('⚠️ Falta el modo', 'err'); return; }
 
-  const filtered = term
-    ? log.filter(q =>
-        q.call.toLowerCase().includes(term) ||
-        q.band.toLowerCase().includes(term) ||
-        q.mode.toLowerCase().includes(term) ||
-        (q.name && q.name.toLowerCase().includes(term)) ||
-        (q.qth && q.qth.toLowerCase().includes(term))
-      )
-    : log;
-
-  if (!filtered.length) {
-    body.innerHTML = '';
-    table.style.display = 'none';
-    empty.style.display = 'block';
-    empty.querySelector('p').textContent = log.length
-      ? 'Sin resultados para la búsqueda.'
-      : 'No hay contactos aún. ¡Agrega tu primer QSO arriba!';
-    return;
-  }
-  table.style.display = '';
-  empty.style.display = 'none';
-  body.innerHTML = filtered.map(q => `
-    <tr>
-      <td style="color:var(--text-dim);">${q.date}</td>
-      <td style="color:var(--text-dim);">${q.time}</td>
-      <td class="call-cell">${escapeHtml(q.call)}</td>
-      <td><span class="badge badge-band">${escapeHtml(q.band)}</span></td>
-      <td>${q.freq ? q.freq + ' MHz' : '—'}</td>
-      <td><span class="badge badge-mode">${escapeHtml(q.mode)}</span></td>
-      <td>${escapeHtml(q.rstSent)}</td>
-      <td>${escapeHtml(q.rstRcvd)}</td>
-      <td>${escapeHtml(q.name) || '—'}</td>
-      <td>${escapeHtml(q.qth) || '—'}</td>
-      <td><div class="row-actions">
-        <button class="icon-btn danger" title="Eliminar" onclick="deleteQSO('${q.id}')">✕</button>
-      </div></td>
-    </tr>`).join('');
-}
-
-function updateStats() {
-  document.getElementById('statTotal').textContent = log.length;
-  document.getElementById('statCalls').textContent = new Set(log.map(q => q.call)).size;
-  document.getElementById('statBands').textContent = new Set(log.map(q => q.band)).size;
-  document.getElementById('statModes').textContent = new Set(log.map(q => q.mode)).size;
-}
-
-/* ============ EXPORT ADIF (formato correcto 3.1.4) ============ */
-function adifField(tag, value) {
-  if (value === undefined || value === null || value === '') return '';
-  const v = String(value);
-  return `<${tag}:${v.length}>${v} `;
-}
-
-function exportADIF() {
-  if (!log.length) { showToast('No hay QSO para exportar', 'error'); return; }
-  const lines = [];
-  const iso = new Date().toISOString();
-  const createdTs = iso.slice(0, 10).replace(/-/g, '') + ' ' + iso.slice(11, 19).replace(/:/g, '');
-
-  // Cabecera ADIF 3.1.4
-  lines.push('<ADIF_VER:5>3.1.4');
-  lines.push('<PROGRAMID:16>NEON LOG STATION');
-  lines.push('<PROGRAMVERSION:4>12.0');
-  lines.push('<CREATED_TIMESTAMP:15>' + createdTs);
-  lines.push('<EOH>');
-  lines.push('');
-
-  log.forEach(q => {
-    let rec = '';
-    rec += adifField('QSO_DATE', toADIFDate(q.date));
-    rec += adifField('TIME_ON', toADIFTime(q.time));
-    rec += adifField('CALL', q.call);
-    rec += adifField('BAND', q.band);
-    if (q.freq) rec += adifField('FREQ', q.freq);
-    const mode = q.mode === 'DV' ? 'DIGITALVOICE' : q.mode;
-    rec += adifField('MODE', mode);
-    rec += adifField('RST_SENT', q.rstSent);
-    rec += adifField('RST_RCVD', q.rstRcvd);
-    if (q.name) rec += adifField('NAME', q.name);
-    if (q.qth) rec += adifField('QTH', q.qth);
-    if (q.grid) rec += adifField('GRIDSQUARE', q.grid);
-    if (q.notes) rec += adifField('COMMENT', q.notes);
-    rec += adifField('STATION_CALLSIGN', 'CL7ADV');
-    rec += '<EOR>';
-    lines.push(rec);
-  });
-
-  downloadFile(lines.join('\n'), `neonlog_${stamp()}.adi`, 'text/plain;charset=utf-8');
-  showToast(`${log.length} QSO exportados a ADIF`);
-}
-
-function exportCSV() {
-  if (!log.length) { showToast('No hay QSO para exportar', 'error'); return; }
-  const headers = ['QSO_DATE','TIME_ON','CALL','BAND','FREQ','MODE','RST_SENT','RST_RCVD','NAME','QTH','GRID','NOTES'];
-  const rows = log.map(q => [q.date,q.time,q.call,q.band,q.freq,q.mode,q.rstSent,q.rstRcvd,q.name,q.qth,q.grid,q.notes]
-    .map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(','));
-  const csv = [headers.join(','), ...rows].join('\n');
-  downloadFile('\uFEFF' + csv, `neonlog_${stamp()}.csv`, 'text/csv;charset=utf-8');
-  showToast(`${log.length} QSO exportados a CSV`);
-}
-
-function stamp() { return new Date().toISOString().slice(0, 10).replace(/-/g, ''); }
-
-function downloadFile(content, filename, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-/* ============ IMPORT ADIF ============ */
-function importADIF() { document.getElementById('fileInput').click(); }
-
-document.getElementById('fileInput').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => parseADIF(ev.target.result);
-  reader.readAsText(file, 'utf-8');
-  e.target.value = '';
-});
-
-function parseADIF(text) {
-  text = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
-  const eohIdx = text.toUpperCase().indexOf('<EOH>');
-  if (eohIdx !== -1) text = text.slice(eohIdx + 5);
-
-  const records = text.split(/<EOR>/i).map(s => s.trim()).filter(Boolean);
-  let imported = 0, skipped = 0;
-
-  records.forEach(rec => {
-    const fields = {};
-    const re = /<([A-Za-z_]+)(?::(\d+))?>/g;
-    const matches = [];
-    let m;
-    while ((m = re.exec(rec)) !== null) {
-      matches.push({ tag: m[1].toUpperCase(), len: m[2] ? parseInt(m[2]) : null, valueStart: re.lastIndex });
+    if (isDuplicate(updated, editingId)) {
+        if (!confirm('⚠️ Este QSO coincide con otro existente. ¿Guardar de todas formas?')) return;
     }
-    for (let i = 0; i < matches.length; i++) {
-      const cur = matches[i];
-      const endPos = i + 1 < matches.length ? rec.indexOf('<', cur.valueStart) : rec.length;
-      let val = rec.slice(cur.valueStart, endPos).trim();
-      if (cur.len !== null && val.length > cur.len) val = val.slice(0, cur.len);
-      fields[cur.tag] = val;
-    }
-    if (!fields.CALL) { skipped++; return; }
+    const idx = qsoList.findIndex(x => x.id === editingId);
+    qsoList[idx] = updated;
+    persist();
+    populateFilters();
+    renderTable();
+    closeEditModal();
+    toast('✏️ QSO actualizado', 'ok');
+}
 
-    const date = fields.QSO_DATE
-      ? `${fields.QSO_DATE.slice(0,4)}-${fields.QSO_DATE.slice(4,6)}-${fields.QSO_DATE.slice(6,8)}`
-      : '';
-    const t = fields.TIME_ON || '';
-    const time = t
-      ? `${t.slice(0,2)}:${t.slice(2,4)}:${t.slice(4,6) || '00'}`
-      : '';
+/* ---------- TABLA / FILTROS ---------- */
+function populateFilters() {
+    const bands = [...new Set(qsoList.map(q => q.band).filter(Boolean))].sort();
+    const modes = [...new Set(qsoList.map(q => q.mode).filter(Boolean))].sort();
+    const fb = document.getElementById('filterBand');
+    const fm = document.getElementById('filterMode');
+    const vb = fb.value, vm = fm.value;
+    fb.innerHTML = '<option value="">Todas las bandas</option>' +
+        bands.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+    fm.innerHTML = '<option value="">Todos los modos</option>' +
+        modes.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+    fb.value = vb; fm.value = vm;
+}
 
-    log.push({
-      id: Date.now() + Math.random().toString(36).slice(2, 8),
-      date, time,
-      call: fields.CALL,
-      band: fields.BAND || '',
-      freq: fields.FREQ || '',
-      mode: fields.MODE || 'SSB',
-      rstSent: fields.RST_SENT || '',
-      rstRcvd: fields.RST_RCVD || '',
-      name: fields.NAME || '',
-      qth: fields.QTH || '',
-      grid: fields.GRIDSQUARE || '',
-      notes: fields.COMMENT || '',
+function getFilteredList() {
+    const filterStr = (document.getElementById('search').value || '').toUpperCase().trim();
+    const fb = document.getElementById('filterBand').value;
+    const fm = document.getElementById('filterMode').value;
+    let list = qsoList.filter(q => {
+        if (fb && q.band !== fb) return false;
+        if (fm && q.mode !== fm) return false;
+        if (filterStr) {
+            const hay = [q.call, q.gridsquare, q.comment, q.email].join(' ').toUpperCase();
+            if (!hay.includes(filterStr)) return false;
+        }
+        return true;
     });
-    imported++;
-  });
 
-  if (imported) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-    renderLog(); updateStats();
-    showToast(`${imported} QSO importados${skipped ? ` (${skipped} omitidos)` : ''}`);
-  } else {
-    showToast('No se encontraron QSO válidos en el archivo', 'error');
-  }
+    const sort = document.getElementById('sortSelect').value;
+    const bandOrder = ['160M','80M','60M','40M','30M','20M','17M','15M','12M','10M','6M','2M','70CM','23CM'];
+    const byDate = (a, b) => ((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||''));
+    switch (sort) {
+        case 'date-desc': list.sort((a,b)=>byDate(b,a)); break;
+        case 'date-asc': list.sort(byDate); break;
+        case 'call-asc': list.sort((a,b)=>(a.call||'').localeCompare(b.call||'')); break;
+        case 'call-desc': list.sort((a,b)=>(b.call||'').localeCompare(a.call||'')); break;
+        case 'band-asc': list.sort((a,b)=>(bandOrder.indexOf(a.band)-bandOrder.indexOf(b.band))||byDate(b,a)); break;
+        case 'band-desc': list.sort((a,b)=>(bandOrder.indexOf(b.band)-bandOrder.indexOf(a.band))||byDate(b,a)); break;
+        case 'mode-asc': list.sort((a,b)=>(a.mode||'').localeCompare(b.mode||'')); break;
+        case 'insert-desc': list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)); break;
+    }
+    return list;
 }
 
-/* ============ MODAL AGRADECIMIENTOS ============ */
-function openThanks() { document.getElementById('thanksModal').classList.add('show'); }
-function closeThanks() { document.getElementById('thanksModal').classList.remove('show'); }
-document.getElementById('thanksModal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeThanks();
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeThanks(); });
+function renderTable() {
+    const tbody = document.getElementById('table-body');
+    const empty = document.getElementById('table-empty');
+    const list = getFilteredList();
 
-/* ============ INIT ============ */
-initForm(); renderLog(); updateStats();
+    updateTableStats();
+
+    if (!list.length) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    const seen = new Set();
+    let html = '';
+    list.forEach(q => {
+        const k = dupKey(q);
+        const isDup = seen.has(k);
+        if (!isDup) seen.add(k);
+        const dispDate = formatDateDisplay(q.date);
+        const dispTime = formatTimeDisplay(q.time);
+        html += `<tr class="${isDup ? 'dup-row' : ''}">
+            <td>${escapeHtml(dispDate)} ${escapeHtml(dispTime)}</td>
+            <td class="call-cell">${escapeHtml(q.call)}</td>
+            <td class="grid-cell">${escapeHtml(q.gridsquare || '—')}</td>
+            <td>${escapeHtml(q.freq || '—')}</td>
+            <td>${escapeHtml(q.band || '')}</td>
+            <td>${escapeHtml(q.mode || '')}</td>
+            <td>${escapeHtml(q.rst_s || '')}/${escapeHtml(q.rst_r || '')}</td>
+            <td>${escapeHtml(q.tx_pwr || '—')}</td>
+            <td class="actions-cell">
+                <button class="icon-btn edit" onclick="editQSO(${q.id})" title="Editar">✏️</button>
+                <button class="icon-btn qrz" onclick="window.open('https://www.qrz.com/db/${encodeURIComponent(q.call)}','_blank')" title="Ver en QRZ">🌐</button>
+                <button class="icon-btn del" onclick="deleteQSO(${q.id})" title="Eliminar">🗑️</button>
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+    updateArrows();
+}
+
+function updateTableStats() {
+    const total = qsoList.length;
+    const seen = new Set(); let dup = 0;
+    qsoList.forEach(q => { const k = dupKey(q); if (seen.has(k)) dup++; else seen.add(k); });
+    document.getElementById('table-count').textContent = total;
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('dupCount').textContent = dup;
+    document.getElementById('bandCount').textContent = new Set(qsoList.map(q => q.band).filter(Boolean)).size;
+    document.getElementById('uniqueCount').textContent = new Set(qsoList.map(q => q.call)).size;
+}
+function updateCount() {
+    document.getElementById('header-count').textContent = qsoList.length;
+    updateTableStats();
+}
+
+function quickSort(field) {
+    const sel = document.getElementById('sortSelect');
+    const map = {
+        call: ['call-asc','call-desc'],
+        date: ['date-asc','date-desc'],
+        band: ['band-asc','band-desc'],
+        mode: ['mode-asc','mode-asc']
+    };
+    const [asc, desc] = map[field] || [];
+    sel.value = (sel.value === asc) ? desc : asc;
+    renderTable();
+}
+function updateArrows() {
+    ['call','date','band','mode'].forEach(f => {
+        const el = document.getElementById('arrow-' + f);
+        if (el) el.textContent = '';
+    });
+    const v = document.getElementById('sortSelect').value;
+    const map = {
+        'date-desc':['date','↓'], 'date-asc':['date','↑'],
+        'call-asc':['call','↑'], 'call-desc':['call','↓'],
+        'band-asc':['band','↑'], 'band-desc':['band','↓'], 'mode-asc':['mode','↑']
+    };
+    if (map[v]) { const el = document.getElementById('arrow-' + map[v][0]); if (el) el.textContent = map[v][1]; }
+}
+
+/* ---------- BORRAR ---------- */
+function deleteQSO(id) {
+    const q = qsoList.find(x => x.id === id);
+    if (!q) return;
+    if (!confirm(`¿Eliminar el QSO de ${q.call}?`)) return;
+    qsoList = qsoList.filter(x => x.id !== id);
+    persist(); populateFilters(); renderTable(); updateCount();
+    toast('🗑️ QSO eliminado', 'warn');
+}
+function clearLogs() {
+    if (!qsoList.length) { toast('No hay nada que borrar', 'warn'); return; }
+    if (!confirm('⚠️ ¿Borrar TODOS los QSO?\nNo se puede deshacer.')) return;
+    if (!confirm(`¿Confirmar borrado de ${qsoList.length} registros?`)) return;
+    qsoList = []; persist(); populateFilters(); renderTable(); updateCount();
+    toast('🗑️ Registro vaciado', 'err');
+}
+function removeAllDuplicates() {
+    const seen = new Set();
+    const before = qsoList.length;
+    qsoList = qsoList.filter(q => {
+        const k = dupKey(q);
+        if (seen.has(k)) return false;
+        seen.add(k); return true;
+    });
+    const removed = before - qsoList.length;
+    if (!removed) { toast('No había duplicados', 'info'); return; }
+    persist(); populateFilters(); renderTable(); updateCount();
+    toast(`🧹 ${removed} duplicados eliminados`, 'ok');
+}
+
+/* ---------- ESTADÍSTICAS ---------- */
+function renderStats() {
+    const total = qsoList.length;
+    const seen = new Set(); let dup = 0;
+    qsoList.forEach(q => { const k = dupKey(q); if (seen.has(k)) dup++; else seen.add(k); });
+    document.getElementById('sTotal').textContent = total;
+    document.getElementById('sDup').textContent = dup;
+    document.getElementById('sCalls').textContent = new Set(qsoList.map(q => q.call)).size;
+    document.getElementById('sBands').textContent = new Set(qsoList.map(q => q.band).filter(Boolean)).size;
+    renderChart('chartBands', countBy('band'));
+    renderChart('chartModes', countBy('mode'));
+}
+function countBy(field) {
+    const map = {};
+    qsoList.forEach(q => { const v = q[field] || '—'; map[v] = (map[v]||0) + 1; });
+    return Object.entries(map).sort((a,b) => b[1] - a[1]);
+}
+function renderChart(id, data) {
+    const el = document.getElementById(id);
+    if (!data.length) { el.innerHTML = '<div class="empty-state"><p>Sin datos</p></div>'; return; }
+    const max = Math.max(...data.map(d => d[1]));
+    el.innerHTML = data.map(([k, v]) => {
+        const pct = Math.round((v / max) * 100);
+        return `<div class="chart-item">
+            <div class="label">${escapeHtml(k)}</div>
+            <div class="value">${v}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+}
+
+/* ---------- TOOLS ---------- */
+function updateToolsInfo() {
+    document.getElementById('toolsQRZ').textContent = getQRZKey() ? 'Configurada' : 'No config';
+    document.getElementById('toolsCount').textContent = qsoList.length;
+    try {
+        const size = new Blob([JSON.stringify(qsoList)]).size;
+        document.getElementById('toolsStorage').textContent = (size / 1024).toFixed(1) + ' KB';
+    } catch (e) { document.getElementById('toolsStorage').textContent = '—'; }
+    updateNetStatus();
+    document.getElementById('qrzApiKey').value = getQRZKey();
+}
+
+/* ============================================================
+   EXPORTACIÓN ADIF 3.1.4 CORREGIDA
+   - Longitudes en BYTES UTF-8 (cumple spec ADIF 3.1.4)
+   - PROGRAMID/PROGRAMVERSION correctos
+   - OPERATOR = indicativo (no nombre)
+   - SUBMODE para DMR/DSTAR/FUSION
+   - MY_* completos
+   - Sin líneas vacías entre registros (máxima compatibilidad)
+   - Compatible: QRZ, LoTW, eQSL, Clublog, N3FJP, WSJT-X, Logger32, DXLab
+   ============================================================ */
+function exportADIF(type) {
+    if (!qsoList.length) { toast('⚠️ No hay QSOs para exportar', 'err'); return; }
+
+    const action = getDupAction();
+    let data = [...qsoList];
+    let dupRemoved = 0;
+    if (action === 'remove') {
+        const seen = new Set();
+        const before = data.length;
+        data = data.filter(q => { const k = dupKey(q); if (seen.has(k)) return false; seen.add(k); return true; });
+        dupRemoved = before - data.length;
+    }
+    data.sort((a,b) => ((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||'')));
+
+    const myCall = (opData.call || 'NOCALL').toUpperCase().trim();
+    const myGrid = (opData.grid || '').toUpperCase().trim();
+    const myName = (opData.name || '').trim();
+    const myQTH = (opData.qth || '').trim();
+    const myCountry = (opData.country || '').trim();
+    const myEmail = (opData.email || '').trim();
+    const myRig = (opData.rig || '').trim();
+    const myPwr = (opData.pwr || '').trim();
+
+    // Timestamp UTC ADIF: YYYYMMDDHHMMSS (14 chars)
+    const now = new Date();
+    const createdTs =
+        now.getUTCFullYear().toString() +
+        String(now.getUTCMonth() + 1).padStart(2,'0') +
+        String(now.getUTCDate()).padStart(2,'0') +
+        String(now.getUTCHours()).padStart(2,'0') +
+        String(now.getUTCMinutes()).padStart(2,'0') +
+        String(now.getUTCSeconds()).padStart(2,'0');
+
+    // ADIF field con longitud en BYTES UTF-8
+    const f = (tag, value) => {
+        if (value === undefined || value === null) return '';
+        const v = String(value);
+        if (v === '') return '';
+        const bytes = new TextEncoder().encode(v).length;
+        return `<${tag}:${bytes}>${v}\n`;
+    };
+
+    // Cabecera ADIF 3.1.4
+    let adi = '';
+    adi += `<ADIF_VER:5>3.1.4\n`;
+    adi += `<PROGRAMID:16>NeonLogStation\n`;
+    adi += `<PROGRAMVERSION:4>12.1\n`;
+    adi += `<CREATED_TIMESTAMP:14>${createdTs}\n`;
+    adi += `<EOH>\n`;
+
+    data.forEach(q => {
+        const bandAdif = toADIFBand(q.band);
+        const { mode, submode } = getADIFMode(q.mode);
+
+        // Normalizar RST
+        const rstS = (q.rst_s || '59').toString().trim();
+        const rstR = (q.rst_r || '59').toString().trim();
+        // Fecha/hora: validar formatos ADIF
+        const qsoDate = (q.date || '').replace(/\D/g,'').slice(0,8);
+        const timeOn  = (q.time || '').replace(/\D/g,'').slice(0,6);
+
+        adi += f('CALL', q.call);
+        adi += f('QSO_DATE', qsoDate);
+        adi += f('TIME_ON', timeOn);
+        adi += f('QSO_DATE_OFF', qsoDate);
+        adi += f('TIME_OFF', timeOn);
+        adi += f('BAND', bandAdif);
+        adi += f('MODE', mode);
+        if (submode) adi += f('SUBMODE', submode);
+        adi += f('RST_SENT', rstS);
+        adi += f('RST_RCVD', rstR);
+        adi += f('FREQ', q.freq);
+        adi += f('TX_PWR', q.tx_pwr || myPwr);
+        adi += f('GRIDSQUARE', q.gridsquare);
+        adi += f('EMAIL', q.email);
+        adi += f('COMMENT', q.comment);
+
+        // Datos de mi estación (MY_*)
+        adi += f('STATION_CALLSIGN', myCall);
+        adi += f('OPERATOR', myCall);          // ← indicativo, no nombre
+        adi += f('MY_CALLSIGN', myCall);
+        adi += f('MY_NAME', myName);
+        adi += f('MY_GRIDSQUARE', myGrid);
+        adi += f('MY_CITY', myQTH);
+        adi += f('MY_COUNTRY', myCountry);
+        adi += f('MY_EMAIL', myEmail);
+        adi += f('MY_RIG', myRig);
+
+        adi += `<EOR>\n`;
+    });
+
+    const blob = new Blob([adi], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStamp = getUTCInfo().dateRaw;
+    if (type === 'qrz') {
+        a.download = `QRZ_${myCall}_${dateStamp}.adi`;
+        setTimeout(() => window.open('https://www.qrz.com/logbook', '_blank'), 500);
+        toast(`⚡ ${data.length} QSO exportados para QRZ`, 'ok');
+    } else {
+        a.download = `ADIF_Log_${myCall}_${dateStamp}.adi`;
+        const msg = dupRemoved > 0
+            ? `📥 ${data.length} QSO exportados (${dupRemoved} duplicados excluidos)`
+            : `📥 ${data.length} QSO exportados`;
+        toast(msg, 'ok');
+    }
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/* ---------- IMPORTAR ADIF ---------- */
+async function importADIF(files) {
+    if (!files || !files.length) return;
+    const file = files[0];
+    const text = await file.text();
+    const records = text.split(/(?=<EOR>)/i);
+    const action = getDupAction();
+    let imported = 0, skipped = 0, replaced = 0;
+
+    for (let record of records) {
+        if (!record.trim() || record.includes('<EOH>')) continue;
+        const getTag = (tag) => {
+            const regex = new RegExp(`<${tag}:(\\d+)>([^<]*)`, 'i');
+            const match = record.match(regex);
+            return match ? match[2].trim() : '';
+        };
+        const call = getTag('CALL').toUpperCase();
+        if (!call) continue;
+
+        const qsoDate = getTag('QSO_DATE').replace(/\D/g,'');
+        const timeOn = getTag('TIME_ON').replace(/\D/g,'');
+        const date = qsoDate.length === 8 ? qsoDate : getUTCInfo().dateRaw;
+        const time = timeOn.length >= 4 ? (timeOn.length === 4 ? timeOn + '00' : timeOn.slice(0,6)) : getUTCInfo().timeRaw;
+
+        // Leer MODE o SUBMODE
+        const modeRaw = getTag('MODE').toUpperCase() || 'SSB';
+        const subModeRaw = getTag('SUBMODE').toUpperCase();
+        let mode = modeRaw;
+        if (subModeRaw) {
+            if (modeRaw === 'DIGITALVOICE' && subModeRaw) mode = subModeRaw;
+        }
+        mode = normalizeModeForADIF(mode);
+
+        const bandRaw = getTag('BAND').toLowerCase();
+        const bandMapRev = { '160m':'160M','80m':'80M','60m':'60M','40m':'40M','30m':'30M','20m':'20M','17m':'17M','15m':'15M','12m':'12M','10m':'10M','6m':'6M','2m':'2M','70cm':'70CM','23cm':'23CM' };
+        const bandDisplay = bandMapRev[bandRaw] || '20M';
+
+        const newQSO = {
+            id: Date.now() + imported,
+            call,
+            gridsquare: getTag('GRIDSQUARE').toUpperCase(),
+            tx_pwr: getTag('TX_PWR'),
+            freq: getTag('FREQ'),
+            band: bandDisplay,
+            mode,
+            rst_s: getTag('RST_SENT') || '59',
+            rst_r: getTag('RST_RCVD') || '59',
+            date, time,
+            email: getTag('EMAIL'),
+            comment: getTag('COMMENT'),
+            createdAt: Date.now() + imported
+        };
+
+        if (isDuplicate(newQSO)) {
+            if (action === 'skip') { skipped++; continue; }
+            if (action === 'remove') {
+                const k = dupKey(newQSO);
+                qsoList = qsoList.filter(q => dupKey(q) !== k);
+                replaced++;
+            }
+        }
+        qsoList.unshift(newQSO);
+        imported++;
+    }
+
+    if (imported > 0) {
+        persist(); populateFilters(); renderTable(); updateCount();
+        toast(`📤 ${imported} importados · ${skipped} omit. · ${replaced} reempl.`, 'ok');
+        togglePanel('panel-table', 'btn-table');
+    } else {
+        toast('⚠️ No se encontraron registros ADIF válidos', 'err');
+    }
+    document.getElementById('file-import').value = '';
+}
+
+/* ---------- RESPALDO JSON ---------- */
+function exportJSON() {
+    if (!qsoList.length) { toast('⚠️ No hay datos', 'err'); return; }
+    const now = new Date().toISOString().slice(0, 10);
+    const myCall = opData.call || 'CL7ADV';
+    const backup = {
+        version: '12.1',
+        exported: new Date().toISOString(),
+        operator: opData,
+        qso: qsoList
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${myCall}_backup_${now}.json`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast(`💾 Respaldo creado (${qsoList.length} QSO)`, 'ok');
+}
+function importJSON(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            let data = JSON.parse(e.target.result);
+            let records = Array.isArray(data) ? data : (data.qso || []);
+            if (!Array.isArray(records)) throw new Error();
+            if (!confirm(`¿Añadir ${records.length} QSO al registro actual?`)) return;
+            records.forEach(q => {
+                if (!q.id) q.id = Date.now() + Math.floor(Math.random() * 100000);
+                if (!q.createdAt) q.createdAt = Date.now();
+                qsoList.push(q);
+            });
+            persist(); populateFilters(); renderTable(); updateCount();
+            toast(`📂 ${records.length} QSO restaurados`, 'ok');
+        } catch (err) { toast('⚠️ JSON inválido', 'err'); }
+    };
+    reader.readAsText(file);
+    evt.target.value = '';
+}
+
+/* ---------- CABRILLO ---------- */
+function exportCabrillo() {
+    if (!qsoList.length) { toast('⚠️ No hay QSO', 'err'); return; }
+    const myCall = opData.call || 'CL7ADV';
+    const contest = (prompt('Concurso (CQ-WW-SSB, CQ-WW-CW, ARRL-DX-CW, GENERAL):', 'GENERAL') || 'GENERAL').toUpperCase();
+    const categoryOp = (prompt('Categoría operador (SINGLE-OP, MULTI-OP, CHECKLOG):', 'SINGLE-OP') || 'SINGLE-OP').toUpperCase();
+    const categoryMode = (prompt('Modo (SSB, CW, MIXED, DIGITAL):', 'MIXED') || 'MIXED').toUpperCase();
+    const categoryPower = (prompt('Potencia (HIGH, LOW, QRP):', 'LOW') || 'LOW').toUpperCase();
+
+    const action = getDupAction();
+    let data = [...qsoList];
+    if (action === 'remove') {
+        const seen = new Set();
+        data = data.filter(q => { const k = dupKey(q); if (seen.has(k)) return false; seen.add(k); return true; });
+    }
+    data.sort((a,b) => ((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||'')));
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const lines = [
+        'START-OF-LOG: 3.0',
+        'CREATED-BY: NEON LOG STATION v12.1 PRO',
+        'CALLSIGN: ' + myCall,
+        'CONTEST: ' + contest,
+        'CATEGORY-OPERATOR: ' + categoryOp,
+        'CATEGORY-ASSISTED: NON-ASSISTED',
+        'CATEGORY-BAND: ALL',
+        'CATEGORY-MODE: ' + categoryMode,
+        'CATEGORY-POWER: ' + categoryPower,
+        'CATEGORY-STATION: FIXED',
+        'CATEGORY-TRANSMITTER: ONE',
+        'CLAIMED-SCORE: 0',
+        'OPERATORS: ' + (opData.name ? myCall + ', ' + opData.name : myCall),
+        'NAME: ' + (opData.name || ''),
+        'ADDRESS: ' + (opData.qth || ''),
+        'ADDRESS-CITY: ' + (opData.qth || ''),
+        'ADDRESS-COUNTRY: ' + (opData.country || ''),
+        'EMAIL: ' + (opData.email || ''),
+        'GRID-LOCATOR: ' + (opData.grid || ''),
+        'CLUB: ', ''
+    ];
+    data.forEach(q => {
+        const freq = cabrilloFreq(q);
+        const mode = cabrilloMode(q.mode);
+        const date = (q.date || '').replace(/\D/g, '');
+        const time = (q.time || '').replace(/\D/g, '').padEnd(4, '0');
+        const myRst = (q.rst_s || '59').padEnd(3, ' ');
+        const theirRst = (q.rst_r || '59').padEnd(3, ' ');
+        const myExch = '001';
+        const theirExch = '001';
+        lines.push('QSO: ' +
+            freq.toString().padStart(5, ' ') + ' ' +
+            mode.padEnd(2, ' ') + ' ' + date + ' ' + time + ' ' +
+            myCall.padEnd(13, ' ') + ' ' + myRst + ' ' + myExch.padEnd(6, ' ') + ' ' +
+            (q.call || '').padEnd(13, ' ') + ' ' + theirRst + ' ' + theirExch.padEnd(6, ' '));
+    });
+    lines.push('END-OF-LOG:');
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${myCall}_${contest}_${dateStr}.log`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast(`📄 Cabrillo exportado (${data.length} QSO)`, 'ok');
+}
+function cabrilloFreq(q) {
+    if (q.freq) {
+        const f = parseFloat(q.freq);
+        if (!isNaN(f)) {
+            return f < 100 ? Math.round(f * 1000) : Math.round(f);
+        }
+    }
+    const map = { '160M':1825,'80M':3600,'60M':5357,'40M':7100,'30M':10120,'20M':14180,'17M':18100,'15M':21200,'12M':24900,'10M':28300,'6M':50100,'2M':144200,'70CM':432100,'23CM':1296100 };
+    return map[q.band] || 14000;
+}
+function cabrilloMode(mode) {
+    const m = normalizeModeForADIF(mode);
+    if (['SSB','USB','LSB','FM','AM'].includes(m)) return 'PH';
+    if (m === 'CW') return 'CW';
+    if (['RTTY','PSK31','PSK63','PSK125','PSK','DIGITAL'].includes(m)) return 'RY';
+    if (['FT8','FT4','JS8','WSPR','DIGITALVOICE','DV','DMR','DSTAR','FUSION'].includes(m)) return 'DG';
+    return 'PH';
+}
+
+/* ---------- LIBRO DE GUARDIA ---------- */
+function renderBook() {
+    const station = document.getElementById('bookStation').value || opData.call || 'CL7ADV';
+    const operator = document.getElementById('bookOperator').value || opData.name || '—';
+    const qth = document.getElementById('bookQTH').value || opData.qth || '—';
+    const rig = document.getElementById('bookRig').value || [opData.rig, opData.pwr].filter(Boolean).join(' · ') || '—';
+    const from = document.getElementById('bookDateFrom').value;
+    const to = document.getElementById('bookDateTo').value;
+
+    let data = [...qsoList];
+    if (from) data = data.filter(q => {
+        const d = (q.date||'').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+        return d >= from;
+    });
+    if (to) data = data.filter(q => {
+        const d = (q.date||'').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+        return d <= to;
+    });
+    data.sort((a,b) => ((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||'')));
+
+    const wrap = document.getElementById('bookContent');
+    if (!data.length) {
+        wrap.innerHTML = '<div class="empty-state"><div class="icon">📖</div><p>No hay QSO en el rango seleccionado</p></div>';
+        return;
+    }
+
+    let html = `<div class="logbook">
+        <div class="logbook-header">
+            <h1>📖 LIBRO DE GUARDIA</h1>
+            <div class="subtitle">Registro Oficial de Comunicaciones Radioaficionado</div>
+        </div>
+        <div class="logbook-meta">
+            <div class="field2"><span class="lbl">Estación:</span><span class="val">${escapeHtml(station)}</span></div>
+            <div class="field2"><span class="lbl">Operador:</span><span class="val">${escapeHtml(operator)}</span></div>
+            <div class="field2"><span class="lbl">QTH:</span><span class="val">${escapeHtml(qth)}</span></div>
+            <div class="field2"><span class="lbl">Equipo:</span><span class="val">${escapeHtml(rig)}</span></div>
+            <div class="field2"><span class="lbl">Impreso:</span><span class="val">${new Date().toLocaleString('es-ES')}</span></div>
+            <div class="field2"><span class="lbl">Total QSO:</span><span class="val">${data.length}</span></div>
+        </div>
+        <table class="logbook-table">
+            <thead><tr>
+                <th style="width:30px;">#</th><th style="width:65px;">Fecha</th><th style="width:50px;">Hora</th>
+                <th style="width:95px;">Indicativo</th><th style="width:50px;">Banda</th>
+                <th style="width:55px;">Modo</th><th style="width:60px;">RST</th>
+                <th>QTH / Nombre</th><th>Observaciones</th>
+            </tr></thead>
+            <tbody>`;
+    data.forEach((q, i) => {
+        const qthName = [q.comment, q.gridsquare, q.freq && q.freq + ' MHz'].filter(Boolean).join(' · ');
+        html += `<tr>
+            <td>${i + 1}</td>
+            <td>${escapeHtml(formatDateDisplay(q.date))}</td>
+            <td>${escapeHtml(formatTimeDisplay(q.time))}</td>
+            <td class="call-cell2">${escapeHtml(q.call)}</td>
+            <td>${escapeHtml(q.band || '')}</td>
+            <td>${escapeHtml(q.mode || '')}</td>
+            <td>${escapeHtml(q.rst_s || '')}/${escapeHtml(q.rst_r || '')}</td>
+            <td style="text-align:left;">${escapeHtml(qthName)}</td>
+            <td class="remarks">${escapeHtml(q.email || '')}</td>
+        </tr>`;
+    });
+    html += `</tbody></table>
+        <div class="logbook-footer">
+            <span>Firma del Operador: ______________________</span>
+            <span>Página 1 de 1</span>
+        </div>
+        <div class="logbook-page-num">Documento generado por NEON LOG STATION v12.1 PRO — ${new Date().toLocaleDateString('es-ES')}</div>
+    </div>`;
+    wrap.innerHTML = html;
+}
+function printBook() {
+    renderBook();
+    setTimeout(() => window.print(), 300);
+}
+
+/* ---------- INIT ---------- */
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const intro = document.getElementById('intro-screen');
+        const main = document.getElementById('main-content');
+        intro.style.opacity = '0';
+        setTimeout(() => {
+            intro.style.visibility = 'hidden';
+            main.style.opacity = '1';
+        }, 800);
+    }, 900);
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    loadData();
+    loadOperatorUI();
+    populateFilters();
+    renderTable();
+    updateCount();
+    updateNetStatus();
+    initUTCModeToggle();
+
+    ['op_call','op_name','op_grid','op_qth','op_rig','op_pwr','op_country','op_email'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => saveOperatorData(false));
+    });
+
+    setInterval(updateNetStatus, 15000);
+});
+
+// Cerrar modales con Escape o clic fuera
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeEditModal();
+        closeThanksModal();
+    }
+});
+document.getElementById('editModal').addEventListener('click', e => {
+    if (e.target.id === 'editModal') closeEditModal();
+});
+document.getElementById('thanksModal').addEventListener('click', e => {
+    if (e.target.id === 'thanksModal') closeThanksModal();
+});
 </script>
 </body>
 </html>
